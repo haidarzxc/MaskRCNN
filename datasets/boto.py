@@ -1,9 +1,21 @@
+
+
 import boto3
 import botocore
 
+import os, sys, inspect
+parent_directory = os.path.dirname(\
+                    os.path.dirname(\
+                    os.path.abspath(inspect.getfile(inspect.currentframe()))))
+sys.path.insert(0,parent_directory)
+
+
+
+import settings.local as local
+
 session = boto3.Session(
-    aws_access_key_id="",
-    aws_secret_access_key="",
+    aws_access_key_id=local.AWSAccessKeyId,
+    aws_secret_access_key=local.AWSSecretKey,
 )
 
 s3 = session.resource('s3')
