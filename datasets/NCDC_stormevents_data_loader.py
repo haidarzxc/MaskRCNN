@@ -3,10 +3,15 @@ import wget
 import os
 import gzip
 import pandas as pd
-import psycopg2
-from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+import utils.track as tr
 
-def get_data(output_dir):
+Track=tr.Track()
+
+'''
+https://www.ncdc.noaa.gov/stormevents/ftp.jsp
+ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/
+'''
+def get_NCDC_data(output_dir,year=None):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -15,28 +20,29 @@ def get_data(output_dir):
 
     for i in str(html.decode("utf-8")).splitlines():
         if(i.endswith('gz')):
-            file=i.split(' ')[len(i.split(' '))-1]
-            dir=(output_dir+"/"+file)
-            print(file,end="")
+            file=i.split(' ')
+            file_name=file[len(i.split(' '))-1]
+            file_year=file_name.split("_")[3].replace("d","")
 
-            wget.download(url=(url+file), out=output_dir)
+            if int(file_year)!=year:
+                continue
+
+            dir=(output_dir+"/"+file_name)
+            Track.info(file_name+"-> year "+file_year)
+
+            wget.download(url=(url+file_name), out=output_dir)
             df = pd.read_csv(dir, compression='gzip', header=0, sep=',', quotechar='"')
-            df.to_csv(output_dir+"/"+file.replace(".gz","")+".csv")
+            df.to_csv(output_dir+"/"+file_name.replace(".gz",""))
             os.remove(".\\"+dir)
-
-# def create_database(dbname, user, host, password, files):
-#     try:
-#         # con = psycopg2.connect(dbname=dbname,user=user, host=host,password=password)
-#         # con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-#         # cur = con.cursor()
-#         # cur.execute("CREATE TABLE "+"test"+"() ;")
-#
-#         # cur.copy_from(f, sd, sep=',')
-#         # f.close()
-#     except:
-#         pass
+            print("\n")
 
 
-# create_database("test","postgres","127.0.0.1","",
-# dict(StormEvents="dir/StormEvents_details-ftp_v1.0_d1950_c20170120.csv"))
-# get_data("dir")
+def load_NCDC_file(fileName):
+    csv_path=os.path.abspath(fileName)
+    try:
+        csv_file=pd.read_csv(csv_path)
+        Track.info("csv file read")
+    except:
+        Track.warn("unable to open")
+
+
