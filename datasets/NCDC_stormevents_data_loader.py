@@ -42,6 +42,7 @@ def load_NCDC_file(fileName):
     try:
         csv_file=pd.read_csv(csv_path)
         Track.info("csv file read")
+        return csv_file
     except:
         Track.warn("unable to open")
 
