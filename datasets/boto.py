@@ -12,7 +12,7 @@ parent_directory = os.path.dirname(\
 sys.path.insert(0,parent_directory)
 
 import settings.local as local
-from NCDC_stormevents_data_loader import load_NCDC_file, get_NCDC_data,\
+from NCDC_stormevents_data_loader import load_CSV_file, get_NCDC_data,\
                                     retrieve_WSR_88D_RDA_locations
 import utils.track as tr
 
@@ -88,7 +88,7 @@ def get_data():
     session=create_session()
     Track.info("Session Created.")
 
-    csv_file=load_NCDC_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
+    csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
     df=csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
 
     # df['HX']=pd.Series()
@@ -109,6 +109,6 @@ def get_data():
 # get_data()
 
 # get_NCDC_data("NCDC_stormevents",2017)
-retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS)
+retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
 
 

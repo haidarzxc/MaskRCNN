@@ -39,7 +39,7 @@ def get_NCDC_data(output_dir,year=None):
             print("\n")
 
 
-def load_NCDC_file(fileName):
+def load_CSV_file(fileName):
     csv_path=os.path.abspath(fileName)
     try:
         csv_file=pd.read_csv(csv_path)
@@ -48,17 +48,39 @@ def load_NCDC_file(fileName):
     except:
         Track.warn("unable to open")
 
-def retrieve_WSR_88D_RDA_locations(url):
-    req = request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-    page = request.urlopen(req)
-    soup = BeautifulSoup(page, "html.parser")
-    rows = soup.find("table").find_all('tr')
-
+def retrieve_WSR_88D_RDA_locations(url,output_dir):
+    data=dict()
+    try:
+        req = request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        page = request.urlopen(req)
+        soup = BeautifulSoup(page, "html.parser")
+        rows = soup.find("table").find_all('tr')
+    except:
+        Track.warn("Request is failed")
+        return
+        
+    Track.info("Request is successful")
+    Track.info("Scraping...")
+    c=0
     for row in rows:
         cells = row.find_all("td")
-        for cell in cells:
-            print(cell)
-        break
+        # header
+        if c==0:
+            for header in cells:
+                data[header.get_text().replace(" ","")]=[]
+            c+=1
+            continue
+        # actual data (table body)
+        for key,cell in zip(data,cells):
+            data[key].append(cell.get_text())
+        c+=1
+
+        # if c==2:
+        #     break
+    df=pd.DataFrame(data=data)
+    Track.info("Exporting CSV file to "+output_dir)
+    df.to_csv(output_dir)
+
 
 
 
