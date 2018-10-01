@@ -12,7 +12,8 @@ parent_directory = os.path.dirname(\
 sys.path.insert(0,parent_directory)
 
 import settings.local as local
-from NCDC_stormevents_data_loader import load_NCDC_file, get_NCDC_data
+from NCDC_stormevents_data_loader import load_NCDC_file, get_NCDC_data,\
+                                    retrieve_WSR_88D_RDA_locations
 import utils.track as tr
 
 Track=tr.Track()
@@ -105,9 +106,9 @@ def get_data():
 
 
 
-get_data()
+# get_data()
 
 # get_NCDC_data("NCDC_stormevents",2017)
-
+retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS)
 
 

@@ -4,6 +4,8 @@ import os
 import gzip
 import pandas as pd
 import utils.track as tr
+from bs4 import BeautifulSoup
+import settings.local as local
 
 Track=tr.Track()
 
@@ -15,7 +17,7 @@ def get_NCDC_data(output_dir,year=None):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    url ="ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/"
+    url =local.NCDC_STORMEVENTS
     html = request.urlopen(url).read()
 
     for i in str(html.decode("utf-8")).splitlines():
@@ -45,5 +47,18 @@ def load_NCDC_file(fileName):
         return csv_file
     except:
         Track.warn("unable to open")
+
+def retrieve_WSR_88D_RDA_locations(url):
+    req = request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    page = request.urlopen(req)
+    soup = BeautifulSoup(page, "html.parser")
+    rows = soup.find("table").find_all('tr')
+
+    for row in rows:
+        cells = row.find_all("td")
+        for cell in cells:
+            print(cell)
+        break
+
 
 
