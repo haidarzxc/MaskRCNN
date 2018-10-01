@@ -49,7 +49,7 @@ def return_bucket(session):
             # NOTE: KTLX19910605_162126.gz
             # format <SSSS><YYYY><MONTH><DAY>_<HOUR><MINUTE><SECOND>
             meta_data=object.key.split("/")[4].split('_')
-            print(object.key.split("/")[4])
+            
             meta_data_time=meta_data[1].replace(".gz","")
             meta_data_date=meta_data[0]
 
@@ -106,9 +106,9 @@ def get_data():
 
 
 
-# get_data()
+get_data()
 
 # get_NCDC_data("NCDC_stormevents",2017)
-retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
+# retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
 
 
