@@ -15,6 +15,7 @@ build/
 *.swn
 *.swo
 *.swp
+local.py
 
 # Dataset symlinks
 detectron/datasets/data/*
