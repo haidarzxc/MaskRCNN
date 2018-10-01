@@ -49,7 +49,7 @@ def return_bucket(session):
             # NOTE: KTLX19910605_162126.gz
             # format <SSSS><YYYY><MONTH><DAY>_<HOUR><MINUTE><SECOND>
             meta_data=object.key.split("/")[4].split('_')
-            
+
             meta_data_time=meta_data[1].replace(".gz","")
             meta_data_date=meta_data[0]
 
@@ -88,17 +88,19 @@ def get_data():
     session=create_session()
     Track.info("Session Created.")
 
-    csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
-    df=csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
+    stormevents_csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
+    locations_csv_file=load_CSV_file("NCDC_stormevents/88D_locations.csv")
+    print(locations_csv_file)
+    stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
 
     # df['HX']=pd.Series()
     # df['HY']=pd.Series()
     # df['VX']=pd.Series()
     # df['VY']=pd.Series()
-    df=df.head(1).apply(addPoints, axis=1)
+    # df=df.head(1).apply(addPoints, axis=1)
 
     # print(df.head(1))
-    return_bucket(session)
+    # return_bucket(session)
 
 
 
