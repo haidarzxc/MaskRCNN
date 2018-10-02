@@ -3,6 +3,7 @@ import boto3
 import botocore
 import os, sys, inspect
 import pandas as pd
+import numpy as np
 pd.options.mode.chained_assignment = None
 import re
 
@@ -78,9 +79,28 @@ def return_bucket(session):
             raise
             Track.warn("Error.")
 
-def addPoints(row,locations):
-    print(locations)
-    
+def is_overlapping(location,storm):
+    # location (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
+    # storm (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
+
+
+    if location['BEGIN_LON'] > abs(storm['END_LON']) or \
+        abs(storm['BEGIN_LON']) > location['END_LON']:
+        # storm['IS_OVERLAPPING']=False
+        return storm
+
+    if location['BEGIN_LAT'] < abs(storm['END_LAT']) or \
+        abs(storm['BEGIN_LAT']) < location['END_LAT']:
+        # storm['IS_OVERLAPPING']=False
+        return storm
+
+    storm['STATIONID']=location['STATIONID']
+    storm['IS_OVERLAPPING']=True
+    return storm
+
+
+def filter_stormevents(row,locations):
+    locations.apply(lambda x: is_overlapping(x,row),axis=1)
     return row
 
 def locations_lon_lat(row):
@@ -117,20 +137,26 @@ def get_data():
 
     stormevents_csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
     locations_csv_file=load_CSV_file("NCDC_stormevents/88D_locations.csv")
+
     locations_df=locations_csv_file[['STATIONID','LATN/LONGW(deg,min,sec)']]
     locations_df['BEGIN_LAT']=pd.Series()
     locations_df['BEGIN_LON']=pd.Series()
     locations_df['END_LAT']=pd.Series()
     locations_df['END_LON']=pd.Series()
     locations_df=locations_df.apply(locations_lon_lat, axis=1)
-    stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
 
-    stormevents_df=stormevents_df.head(1).apply(lambda x: addPoints(x,locations_df), axis=1)
-    print("\n")
+    stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
+    # stormevents_df dropping NaN rows
+    stormevents_df=stormevents_df.dropna(thresh=2)
+    stormevents_df['IS_OVERLAPPING']=pd.Series()
+    stormevents_df['STATIONID']=pd.Series()
+
+    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
+    # print("\n")
     # print(locations_df.head(1))
-    print("\n")
-    print(stormevents_df.head(1))
-    print("\n")
+    # print("\n")
+    print(stormevents_df)
+    # print("\n")
     # return_bucket(session)
 
 
