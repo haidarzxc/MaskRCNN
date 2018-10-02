@@ -79,28 +79,28 @@ def return_bucket(session):
             raise
             Track.warn("Error.")
 
-def is_overlapping(location,storm):
+def intersction_test(location,storm):
     # location (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
     # storm (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
 
 
-    if location['BEGIN_LON'] > abs(storm['END_LON']) or \
-        abs(storm['BEGIN_LON']) > location['END_LON']:
-        # storm['IS_OVERLAPPING']=False
+    if location['BEGIN_LON'] > storm['END_LON'] or \
+        storm['BEGIN_LON'] > location['END_LON']:
         return storm
 
-    if location['BEGIN_LAT'] < abs(storm['END_LAT']) or \
-        abs(storm['BEGIN_LAT']) < location['END_LAT']:
-        # storm['IS_OVERLAPPING']=False
+    if location['BEGIN_LAT'] < storm['END_LAT'] or \
+        storm['BEGIN_LAT'] < location['END_LAT']:
         return storm
 
     storm['STATIONID']=location['STATIONID']
-    storm['IS_OVERLAPPING']=True
+    storm['IS_INTERSECTING']=True
     return storm
 
 
 def filter_stormevents(row,locations):
-    locations.apply(lambda x: is_overlapping(x,row),axis=1)
+
+    locations.apply(lambda x: intersction_test(x,row),axis=1)
+    Track.info("Testing "+str(row.name)+", "+str(row["IS_INTERSECTING"]))
     return row
 
 def locations_lon_lat(row):
@@ -122,13 +122,6 @@ def locations_lon_lat(row):
         Track.warn("Exception: Float Parsing ")
 
 
-    # NOTE: or keep as it is
-    # deg=row['LATN/LONGW(deg,min,sec)'].split('/')
-    # row['LON']=deg[1].strip()[:-4]
-    # row['LAT']=deg[0].strip()[:-4]
-    # row['END_LON']=int(row['LON'])+local.HORIZONTAL_SHIFT
-    # row['END_LAT']=int(row['LAT'])+local.VERTICAL_SHIFT
-
     return row
 
 def get_data():
@@ -148,14 +141,14 @@ def get_data():
     stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
     # stormevents_df dropping NaN rows
     stormevents_df=stormevents_df.dropna(thresh=2)
-    stormevents_df['IS_OVERLAPPING']=pd.Series()
+    stormevents_df['IS_INTERSECTING']=pd.Series()
     stormevents_df['STATIONID']=pd.Series()
-
+    Track.info("Intersection Test")
     stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
     # print(locations_df.head(1))
     # print("\n")
-    print(stormevents_df)
+    # print(stormevents_df.head(1))
     # print("\n")
     # return_bucket(session)
 
