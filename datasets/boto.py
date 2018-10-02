@@ -4,6 +4,7 @@ import botocore
 import os, sys, inspect
 import pandas as pd
 import numpy as np
+from time import sleep
 pd.options.mode.chained_assignment = None
 import re
 
@@ -86,23 +87,33 @@ def return_bucket(session):
 def intersction_test(location,storm):
     # location (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
     # storm (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
+    # (l1, r1) and (l2, r2)
+    #
+    # l1=location['BEGIN_']
+    # r1=location['END_']
+    #
+    # l2=storm['BEGIN_']
+    # r2=storm['END_']
+
+    # (l1.x > r2.x || l2.x > r1.x)
+    # (l1.y < r2.y || l2.y < r1.y)
 
     if location['BEGIN_LON'] > storm['END_LON'] or \
         storm['BEGIN_LON'] > location['END_LON']:
-        return storm
-
+        return
     if location['BEGIN_LAT'] < storm['END_LAT'] or \
         storm['BEGIN_LAT'] < location['END_LAT']:
-        return storm
+        return
 
     storm['STATIONID']=location['STATIONID']
     storm['IS_INTERSECTING']=True
+
     return storm
 
 
 def filter_stormevents(row,locations):
-
-    locations.apply(lambda x: intersction_test(x,row),axis=1)
+    st=locations.apply(lambda x: intersction_test(x,row),axis=1)
+    # sleep(3)
     Track.info("Testing "+str(row.name)+", "+str(row["IS_INTERSECTING"]))
     return row
 
@@ -117,8 +128,10 @@ def locations_lon_lat(row):
     lat=re.sub('[^0-9]','', lat)
     # sec [-2:] | min [-4:-2] | deg [:-4]
     try:
+
         lon_float=float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600)
         lat_float=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
+
         row['BEGIN_LON']=lon_float-local.HORIZONTAL_SHIFT
         row['BEGIN_LAT']=lat_float-local.VERTICAL_SHIFT
         row['END_LON']=lon_float+local.HORIZONTAL_SHIFT
@@ -152,14 +165,36 @@ def get_data():
     Track.info("Intersection Test")
     # stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
-    print(locations_df.head(1))
+    # print(locations_df.head(1))
+
     # print("\n")
-    print(stormevents_df.head(1))
+    # print(stormevents_df.head(1))
     # print("\n")
     # return_bucket(session)
 
 
+    loc=pd.DataFrame()
+    loc['BEGIN_LON']=pd.Series([0,-1,-1,-1])
+    loc['BEGIN_LAT']=pd.Series([10,-1,-1,-1])
+    loc['END_LON']=pd.Series([10,1,1,1])
+    loc['END_LAT']=pd.Series([0,1,1,1])
+    loc['STATIONID']=pd.Series(["xxxx","xxxx","xxxx"])
 
+    stm=pd.DataFrame()
+    stm['BEGIN_LON']=pd.Series([5,0,5,3])
+    stm['BEGIN_LAT']=pd.Series([5,0,5,3])
+    stm['END_LON']=pd.Series([15,2,-10,5])
+    stm['END_LAT']=pd.Series([0,2,-10,5])
+    stm['STATIONID']=pd.Series()
+    stm['IS_INTERSECTING']=pd.Series()
+
+    # print(loc)
+    # print(loc['BEGIN_LON'] > stm['END_LON'])
+    # print(stm['BEGIN_LON'] > loc['END_LON'])
+    # print(loc['BEGIN_LAT'] < stm['END_LAT'])
+    # print(stm['BEGIN_LAT'] < loc['END_LAT'])
+    stm=stm.apply(lambda x: filter_stormevents(x,loc),axis=1)
+    print(stm)
 
 
 
