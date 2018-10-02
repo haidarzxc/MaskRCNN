@@ -79,11 +79,8 @@ def return_bucket(session):
             Track.warn("Error.")
 
 def addPoints(row,locations):
-    # print(locations['LON'])
-    # row["VX"]=row["BEGIN_LON"]
-    # row["VY"]=row["BEGIN_LAT"]+local.VERTICAL_SHIFT
-    # row["HX"]=row["BEGIN_LON"]+local.HORIZONTAL_SHIFT
-    # row["HY"]=row["BEGIN_LAT"]
+    print(locations)
+    
     return row
 
 def locations_lon_lat(row):
@@ -96,12 +93,11 @@ def locations_lon_lat(row):
     lon=re.sub('[^0-9]','', lon)
     lat=re.sub('[^0-9]','', lat)
     # sec [-2:] | min [-4:-2] | deg [:-4]
-
     try:
-        row['LON']=float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600)
-        row['LAT']=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
-        row['END_LON']=float(row['LON'])+local.HORIZONTAL_SHIFT
-        row['END_LAT']=float(row['LAT'])+local.VERTICAL_SHIFT
+        row['BEGIN_LON']=float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600)
+        row['BEGIN_LAT']=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
+        row['END_LON']=float(row['BEGIN_LON'])+local.HORIZONTAL_SHIFT
+        row['END_LAT']=float(row['BEGIN_LAT'])+local.VERTICAL_SHIFT
     except:
         Track.warn("Exception: Float Parsing ")
 
@@ -122,16 +118,16 @@ def get_data():
     stormevents_csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
     locations_csv_file=load_CSV_file("NCDC_stormevents/88D_locations.csv")
     locations_df=locations_csv_file[['STATIONID','LATN/LONGW(deg,min,sec)']]
-    locations_df['LAT']=pd.Series()
-    locations_df['LON']=pd.Series()
+    locations_df['BEGIN_LAT']=pd.Series()
+    locations_df['BEGIN_LON']=pd.Series()
     locations_df['END_LAT']=pd.Series()
     locations_df['END_LON']=pd.Series()
     locations_df=locations_df.apply(locations_lon_lat, axis=1)
     stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
 
-    # stormevents_df=stormevents_df.head(1).apply(lambda x: addPoints(x,locations_df), axis=1)
+    stormevents_df=stormevents_df.head(1).apply(lambda x: addPoints(x,locations_df), axis=1)
     print("\n")
-    print(locations_df.head(1))
+    # print(locations_df.head(1))
     print("\n")
     print(stormevents_df.head(1))
     print("\n")
