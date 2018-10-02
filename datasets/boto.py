@@ -22,13 +22,17 @@ Track=tr.Track()
 
 
 '''
+RADAR CENTER LOCATION
+
                     HORIZONTAL_SHIFT
-             (VX,VY).-----------. (END_LON,END_LAT)
+                    .-----------. (END_LON+HORIZONTAL_SHIFT,END_LAT+VERTICAL_SHIFT)
                     |           |
-  VERTICAL_SHIFT    |           |
+  VERTICAL_SHIFT    |     .<----|--center (x,y)
                     |           |
                     .-----------.
-    (BEGIN_LON,BEGIN_LAT)       (HX,HY)
+    (BEGIN_LON-HORIZONTAL_SHIFT,BEGIN_LAT-VERTICAL_SHIFT)
+
+
 '''
 
 
@@ -83,7 +87,6 @@ def intersction_test(location,storm):
     # location (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
     # storm (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
 
-
     if location['BEGIN_LON'] > storm['END_LON'] or \
         storm['BEGIN_LON'] > location['END_LON']:
         return storm
@@ -114,10 +117,12 @@ def locations_lon_lat(row):
     lat=re.sub('[^0-9]','', lat)
     # sec [-2:] | min [-4:-2] | deg [:-4]
     try:
-        row['BEGIN_LON']=float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600)
-        row['BEGIN_LAT']=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
-        row['END_LON']=float(row['BEGIN_LON'])+local.HORIZONTAL_SHIFT
-        row['END_LAT']=float(row['BEGIN_LAT'])+local.VERTICAL_SHIFT
+        lon_float=float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600)
+        lat_float=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
+        row['BEGIN_LON']=lon_float-local.HORIZONTAL_SHIFT
+        row['BEGIN_LAT']=lat_float-local.VERTICAL_SHIFT
+        row['END_LON']=lon_float+local.HORIZONTAL_SHIFT
+        row['END_LAT']=lat_float+local.VERTICAL_SHIFT
     except:
         Track.warn("Exception: Float Parsing ")
 
@@ -143,14 +148,16 @@ def get_data():
     stormevents_df=stormevents_df.dropna(thresh=2)
     stormevents_df['IS_INTERSECTING']=pd.Series()
     stormevents_df['STATIONID']=pd.Series()
+
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
+    # stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
-    # print(locations_df.head(1))
+    print(locations_df.head(1))
     # print("\n")
-    # print(stormevents_df.head(1))
+    print(stormevents_df.head(1))
     # print("\n")
     # return_bucket(session)
+
 
 
 
