@@ -1,24 +1,29 @@
 import React, { Component } from 'react';
 import '../css/App.css';
+import LoadCSV from "./LoadCSV.js"
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+
+      <div className="container">
+        <div className="row">
+
+          <div className="col-sm-6">
+            <div className="row">
+              <div className="App">
+                <LoadCSV/>
+              </div>
+            </div>
+            <div className="row">
+            </div>
+          </div>
+
+          <div className="col-sm-6">
+          </div>
+        </div>
       </div>
+
     );
   }
 }
