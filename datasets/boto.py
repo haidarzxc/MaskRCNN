@@ -8,6 +8,11 @@ from time import sleep
 pd.options.mode.chained_assignment = None
 import re
 
+import plotly
+import plotly.plotly as py
+import plotly.graph_objs as go
+
+
 # NOTE: switch python PATH to look at parent_directory
 parent_directory = os.path.dirname(\
                     os.path.dirname(\
@@ -21,7 +26,7 @@ import utils.track as tr
 from datasets.intersect import *
 
 Track=tr.Track()
-
+plotly.tools.set_credentials_file(username=local.username, api_key=local.plotlyApiKey)
 
 '''
 RADAR CENTER LOCATION
@@ -139,7 +144,7 @@ filter_stormevents method
 def filter_stormevents(row,locations):
     st=locations.apply(lambda x: intersction_test(x,row),axis=1)
     # sleep(3)
-    Track.info("Testing "+str(row.name)+", "+str(row["IS_INTERSECTING"]))
+    Track.info("filter_stormevents Testing Intersection "+str(row.name)+", "+str(row["IS_INTERSECTING"]))
     return row
 
 def locations_lon_lat(row):
@@ -190,21 +195,30 @@ def get_data():
     Track.info("Intersection Test")
     # stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
-    print(locations_df.head(1))
+    # print(locations_df.head(1))
 
     # print("\n")
     # print(stormevents_df.head(1))
     # print("\n")
     # return_bucket(session)
 
+    # # Create a trace
+    # trace = go.Scatter(
+    #     x = random_x,
+    #     y = random_y,
+    #     mode = 'markers'
+    # )
+    #
+    # data = [trace]
+    #
+    # py.plot(data, filename='basic-scatter')
 
 
 
 
 
 
-
-get_data()
+# get_data()
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
