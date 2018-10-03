@@ -1,12 +1,13 @@
 const initialState = {
-
+  csv_data:null,
 };
 
 function LoadCSV(state = initialState, action) {
   switch(action.type) {
-    case 'SHOW_LOGIN_MODAL':
+    case 'DATA_LOADED':
       return {
         ...state,
+        csv_data:action.data,
       }
 
 
