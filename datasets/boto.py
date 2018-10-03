@@ -18,6 +18,7 @@ import settings.local as local
 from NCDC_stormevents_data_loader import load_CSV_file, get_NCDC_data,\
                                     retrieve_WSR_88D_RDA_locations
 import utils.track as tr
+from datasets.intersect import *
 
 Track=tr.Track()
 
@@ -84,32 +85,56 @@ def return_bucket(session):
             raise
             Track.warn("Error.")
 
+'''
+intersction_test method
+    arguments -> location: one row of radar locations
+                            (ex: 0 KABR 452721 / 0982447  44.455833  97.413056  46.455833  99.413056)
+                 storm: one row of storm event
+                            (ex:0 39.6600 -75.0800 39.6600 -75.0800 NaN NaN)
+    function -> create 4 points (x,y)
+                1. location_begin_point
+                2. location_end_point
+                3. storm_begin_point
+                4. storm_end_point
+             -> create 2 boxes
+                1.location_box
+                2.storm_box
+             -> calls function is_intersecting() to find if boxes intersect
+                ->function returns boolean value
+             -> returns row
+'''
+
 def intersction_test(location,storm):
-    # location (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
-    # storm (['BEGIN_LON'] ['BEGIN_LAT']) , (['END_LON'] ['END_LAT'])
-    # (l1, r1) and (l2, r2)
-    #
-    # l1=location['BEGIN_']
-    # r1=location['END_']
-    #
-    # l2=storm['BEGIN_']
-    # r2=storm['END_']
 
-    # (l1.x > r2.x || l2.x > r1.x)
-    # (l1.y < r2.y || l2.y < r1.y)
+    location_begin_point=Point(location['BEGIN_LON'],location['BEGIN_LAT'])
+    location_end_point=Point(location['END_LON'],location['END_LAT'])
 
-    if location['BEGIN_LON'] > storm['END_LON'] or \
-        storm['BEGIN_LON'] > location['END_LON']:
-        return
-    if location['BEGIN_LAT'] < storm['END_LAT'] or \
-        storm['BEGIN_LAT'] < location['END_LAT']:
-        return
+    storm_begin_point=Point(storm['BEGIN_LON'], storm['BEGIN_LAT'])
+    storm_end_point=Point(storm['END_LON'],storm['END_LAT'])
 
-    storm['STATIONID']=location['STATIONID']
-    storm['IS_INTERSECTING']=True
+    location_box=Box(location_begin_point,location_end_point)
+    storm_box=Box(storm_begin_point, storm_end_point)
+
+    intersection=is_intersecting(location_box,storm_box)
+
+    if intersection:
+        storm['STATIONID']=location['STATIONID']
+        storm['IS_INTERSECTING']=True
+
+
+
 
     return storm
 
+'''
+filter_stormevents method
+    arguments -> row      : one storm event row
+                            (ex:0 39.6600 -75.0800 39.6600 -75.0800 NaN NaN)
+              -> locations: pandas data frame contains all radar locations
+
+    function -> for each row, function iterates accross locations
+             -> returns row
+'''
 
 def filter_stormevents(row,locations):
     st=locations.apply(lambda x: intersction_test(x,row),axis=1)
@@ -165,7 +190,7 @@ def get_data():
     Track.info("Intersection Test")
     # stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
-    # print(locations_df.head(1))
+    print(locations_df.head(1))
 
     # print("\n")
     # print(stormevents_df.head(1))
@@ -173,28 +198,7 @@ def get_data():
     # return_bucket(session)
 
 
-    loc=pd.DataFrame()
-    loc['BEGIN_LON']=pd.Series([0,-1,-1,-1])
-    loc['BEGIN_LAT']=pd.Series([10,-1,-1,-1])
-    loc['END_LON']=pd.Series([10,1,1,1])
-    loc['END_LAT']=pd.Series([0,1,1,1])
-    loc['STATIONID']=pd.Series(["xxxx","xxxx","xxxx"])
 
-    stm=pd.DataFrame()
-    stm['BEGIN_LON']=pd.Series([5,0,5,3])
-    stm['BEGIN_LAT']=pd.Series([5,0,5,3])
-    stm['END_LON']=pd.Series([15,2,-10,5])
-    stm['END_LAT']=pd.Series([0,2,-10,5])
-    stm['STATIONID']=pd.Series()
-    stm['IS_INTERSECTING']=pd.Series()
-
-    # print(loc)
-    # print(loc['BEGIN_LON'] > stm['END_LON'])
-    # print(stm['BEGIN_LON'] > loc['END_LON'])
-    # print(loc['BEGIN_LAT'] < stm['END_LAT'])
-    # print(stm['BEGIN_LAT'] < loc['END_LAT'])
-    stm=stm.apply(lambda x: filter_stormevents(x,loc),axis=1)
-    print(stm)
 
 
 
