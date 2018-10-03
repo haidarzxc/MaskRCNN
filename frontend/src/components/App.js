@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
 import '../css/App.css';
 import LoadCSV from "./LoadCSV.js"
+import PlotBox from "./PlotBox.js"
 import { connect  } from 'react-redux';
 
 class App extends Component {
+
+
+  handleRow(evt){
+    console.log(evt.currentTarget);
+
+  }
+
   render() {
     let data=this.props.LoadCSV.csv_data
     let content;
@@ -25,7 +33,7 @@ class App extends Component {
         for(var cell in data[idx]){
           cells[cell]=<th key={cell}>{data[idx][cell]}</th>
         }
-        body[idx]=<tr key={idx}>{cells}</tr>
+        body[idx]=<tr key={idx} onClick={this.handleRow}>{cells}</tr>
       }//end of row
 
       content=
@@ -63,6 +71,7 @@ class App extends Component {
           </div>
 
           <div className="col-sm-6">
+            
           </div>
 
         </div>
