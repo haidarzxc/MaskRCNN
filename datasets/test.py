@@ -7,7 +7,7 @@ parent_directory = os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
 
-from datasets.boto import filter_stormevents
+from datasets.boto import filter_stormevents,boxes
 from datasets.intersect import *
 
 
@@ -70,5 +70,46 @@ stm['STATIONID']=pd.Series()
 stm['IS_INTERSECTING']=pd.Series()
 
 stm=stm.apply(lambda x: filter_stormevents(x,loc),axis=1)
-print(loc)
-print(stm)
+# print(loc)
+# print(stm)
+
+def export_boxes_to_csv(output_dir):
+    df=pd.DataFrame()
+    # location
+    loc_left=[]
+    loc_right=[]
+    loc_bottom=[]
+    loc_top=[]
+
+    # storm
+    stm_left=[]
+    stm_right=[]
+    stm_bottom=[]
+    stm_top=[]
+
+    for loc,stm in zip(boxes['location_box'],boxes['storm_box']):
+        loc_left.append(loc.left)
+        loc_right.append(loc.right)
+        loc_bottom.append(loc.bottom)
+        loc_top.append(loc.top)
+
+        stm_left.append(stm.left)
+        stm_right.append(stm.right)
+        stm_bottom.append(stm.bottom)
+        stm_top.append(stm.top)
+
+    df['loc_left']=pd.Series(loc_left)
+    df['loc_right']=pd.Series(loc_right)
+    df['loc_bottom']=pd.Series(loc_bottom)
+    df['loc_top']=pd.Series(loc_top)
+
+    df['stm_left']=pd.Series(stm_left)
+    df['stm_right']=pd.Series(stm_right)
+    df['stm_bottom']=pd.Series(stm_bottom)
+    df['stm_top']=pd.Series(stm_top)
+    df.to_csv(output_dir)
+    # print(df)
+
+
+
+export_boxes_to_csv("NCDC_stormevents\\boxes.csv")

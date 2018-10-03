@@ -108,6 +108,9 @@ intersction_test method
                 ->function returns boolean value
              -> returns row
 '''
+boxes={}
+boxes['location_box']=[]
+boxes['storm_box']=[]
 
 def intersction_test(location,storm):
 
@@ -120,6 +123,9 @@ def intersction_test(location,storm):
     location_box=Box(location_begin_point,location_end_point)
     storm_box=Box(storm_begin_point, storm_end_point)
 
+    boxes['location_box'].append(location_box)
+    boxes['storm_box'].append(storm_box)
+
     intersection=is_intersecting(location_box,storm_box)
 
     if intersection:
@@ -130,6 +136,8 @@ def intersction_test(location,storm):
 
 
     return storm
+
+
 
 '''
 filter_stormevents method
