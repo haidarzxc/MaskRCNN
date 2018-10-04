@@ -173,7 +173,8 @@ def locations_lon_lat(row):
     # sec [-2:] | min [-4:-2] | deg [:-4]
     try:
 
-        lon_float=float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600)
+        # NOTE: all lon (longtudes) are negative
+        lon_float=(float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600))*-1
         lat_float=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
 
         row['BEGIN_LON']=lon_float-local.HORIZONTAL_SHIFT
@@ -207,7 +208,7 @@ def get_data():
     stormevents_df['STATIONID']=pd.Series()
 
     Track.info("Intersection Test")
-    # stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
+    stormevents_df=stormevents_df.head(5).apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
     # print(locations_df.head(1))
 
@@ -232,7 +233,7 @@ def get_data():
 
 
 
-# get_data()
+get_data()
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')

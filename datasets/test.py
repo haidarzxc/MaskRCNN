@@ -70,7 +70,7 @@ stm['END_LAT']=pd.Series([2,3])
 stm['STATIONID']=pd.Series()
 stm['IS_INTERSECTING']=pd.Series()
 
-stm=stm.apply(lambda x: filter_stormevents(x,loc),axis=1)
+# stm=stm.apply(lambda x: filter_stormevents(x,loc),axis=1)
 # print(loc)
 # print(stm)
 
