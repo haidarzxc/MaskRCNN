@@ -11,61 +11,62 @@ from datasets.boto import filter_stormevents,boxes
 from datasets.intersect import *
 
 
-# testing intersect module
-# Example 1
-p1=Point(0,10)
-p2=Point(10,0)
-p3=Point(5,5)
-p4=Point(15,0)
-r1=Box(p1,p2)
-r2=Box(p3,p4)
-res=is_intersecting(r1,r2)
-print(res)
-
-# Example 2
-p1A=Point(3,7)
-p2A=Point(12,-10)
-p3A=Point(8,4)
-p4A=Point(20,7)
-r1A=Box(p1A,p2A)
-r2A=Box(p3A,p4A)
-resA=is_intersecting(r1A,r2A)
-print(resA)
-
-# Example 3
-p1B=Point(-1,-1)
-p2B=Point(1,1)
-p3B=Point(0,0)
-p4B=Point(2,2)
-r1B=Box(p1B,p2B)
-r2B=Box(p3B,p4B)
-resB=is_intersecting(r1B,r2B)
-print(resB)
-
-# Example 4
-p1C=Point(-1,-1)
-p2C=Point(1,1)
-p3C=Point(2,2)
-p4C=Point(3,3)
-r1C=Box(p1C,p2C)
-r2C=Box(p3C,p4C)
-resC=is_intersecting(r1C,r2C)
-print(resC)
+# # testing intersect module
+# # Example 1
+# p1=Point(0,10)
+# p2=Point(10,0)
+# p3=Point(5,5)
+# p4=Point(15,0)
+# r1=Box(p1,p2)
+# r2=Box(p3,p4)
+# res=is_intersecting(r1,r2)
+# print(res)
+#
+# # Example 2
+# p1A=Point(3,7)
+# p2A=Point(12,-10)
+# p3A=Point(8,4)
+# p4A=Point(20,7)
+# r1A=Box(p1A,p2A)
+# r2A=Box(p3A,p4A)
+# resA=is_intersecting(r1A,r2A)
+# print(resA)
+#
+# # Example 3
+# p1B=Point(-1,-1)
+# p2B=Point(1,1)
+# p3B=Point(0,0)
+# p4B=Point(2,2)
+# r1B=Box(p1B,p2B)
+# r2B=Box(p3B,p4B)
+# resB=is_intersecting(r1B,r2B)
+# print(resB)
+#
+# # Example 4
+# p1C=Point(-1,-1)
+# p2C=Point(1,1)
+# p3C=Point(2,2)
+# p4C=Point(3,3)
+# r1C=Box(p1C,p2C)
+# r2C=Box(p3C,p4C)
+# resC=is_intersecting(r1C,r2C)
+# print(resC)
 
 
 # testing filter_stormevents
 loc=pd.DataFrame()
-loc['BEGIN_LON']=pd.Series([0,3,-1])
-loc['END_LON']=pd.Series([10,7,-1])
-loc['BEGIN_LAT']=pd.Series([10,12,1])
-loc['END_LAT']=pd.Series([0,-10,1])
-loc['STATIONID']=pd.Series(["xxxx1","xxxx2","xxxx3"])
-
 stm=pd.DataFrame()
-stm['BEGIN_LON']=pd.Series([5,8,0])
-stm['END_LON']=pd.Series([5,4,0])
-stm['BEGIN_LAT']=pd.Series([15,20,2])
-stm['END_LAT']=pd.Series([0,7,2])
+
+loc['BEGIN_LON']=pd.Series([-1,0])
+loc['BEGIN_LAT']=pd.Series([-1,0])
+loc['END_LON']=pd.Series([1,1])
+loc['END_LAT']=pd.Series([1,1])
+loc['STATIONID']=pd.Series(["xxxx3"])
+
+stm['BEGIN_LON']=pd.Series([0,2])
+stm['BEGIN_LAT']=pd.Series([0,2])
+stm['END_LON']=pd.Series([2,3])
+stm['END_LAT']=pd.Series([2,3])
 stm['STATIONID']=pd.Series()
 stm['IS_INTERSECTING']=pd.Series()
 
@@ -74,42 +75,62 @@ stm=stm.apply(lambda x: filter_stormevents(x,loc),axis=1)
 # print(stm)
 
 def export_boxes_to_csv(output_dir):
+
     df=pd.DataFrame()
     # location
-    loc_left=[]
-    loc_right=[]
-    loc_bottom=[]
-    loc_top=[]
+    loc_beg_x=[]
+    loc_beg_y=[]
+    loc_end_x=[]
+    loc_end_y=[]
 
     # storm
-    stm_left=[]
-    stm_right=[]
-    stm_bottom=[]
-    stm_top=[]
+    stm_beg_x=[]
+    stm_beg_y=[]
+    stm_end_x=[]
+    stm_end_y=[]
+    is_intersecting=[]
 
-    for loc,stm in zip(boxes['location_box'],boxes['storm_box']):
-        loc_left.append(loc.left)
-        loc_right.append(loc.right)
-        loc_bottom.append(loc.bottom)
-        loc_top.append(loc.top)
+    for loc_beg,loc_end,stm_beg,stm_end in zip(boxes['location_begin_point'],
+                                            boxes['location_end_point'],
+                                            boxes['storm_begin_point'],
+                                            boxes['storm_end_point']):
+        # check intersection
+        loc_beg_point=Point(loc_beg.x,loc_beg.y)
+        loc_end_point=Point(loc_end.x,loc_end.y)
+        stm_beg_point=Point(stm_beg.x,stm_beg.y)
+        stm_end_point=Point(stm_end.x,stm_end.y)
+        loc_box=Box(loc_beg_point,loc_end_point)
+        stm_box=Box(stm_beg_point,stm_end_point)
+        # res=is_intersecting(loc_box,stm_box)
+        # is_intersecting.append(is_intersecting(loc_box,stm_box))
 
-        stm_left.append(stm.left)
-        stm_right.append(stm.right)
-        stm_bottom.append(stm.bottom)
-        stm_top.append(stm.top)
+        # location
+        loc_beg_x.append(loc_beg.x)
+        loc_beg_y.append(loc_beg.y)
+        loc_end_x.append(loc_end.x)
+        loc_end_y.append(loc_end.y)
 
-    df['loc_left']=pd.Series(loc_left)
-    df['loc_right']=pd.Series(loc_right)
-    df['loc_bottom']=pd.Series(loc_bottom)
-    df['loc_top']=pd.Series(loc_top)
+        # storm
+        stm_beg_x.append(stm_beg.x)
+        stm_beg_y.append(stm_beg.y)
+        stm_end_x.append(stm_end.x)
+        stm_end_y.append(stm_end.y)
 
-    df['stm_left']=pd.Series(stm_left)
-    df['stm_right']=pd.Series(stm_right)
-    df['stm_bottom']=pd.Series(stm_bottom)
-    df['stm_top']=pd.Series(stm_top)
+    df['loc_beg_x']=pd.Series(loc_beg_x)
+    df['loc_beg_y']=pd.Series(loc_beg_y)
+    df['loc_end_x']=pd.Series(loc_end_x)
+    df['loc_end_y']=pd.Series(loc_end_y)
+
+    df['stm_beg_x']=pd.Series(stm_beg_x)
+    df['stm_beg_y']=pd.Series(stm_beg_y)
+    df['stm_end_x']=pd.Series(stm_end_x)
+    df['stm_end_y']=pd.Series(stm_end_y)
+    # df['is_intersecting']=pd.Series(is_intersecting)
+
+    df=df.drop_duplicates()
     df.to_csv(output_dir)
-    # print(df)
+    print(df)
 
 
 
-export_boxes_to_csv("NCDC_stormevents\\boxes.csv")
+export_boxes_to_csv("frontend\\src\\static\\boxes.csv")

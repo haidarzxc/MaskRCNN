@@ -108,9 +108,12 @@ intersction_test method
                 ->function returns boolean value
              -> returns row
 '''
+# NOTE: for frontend csv
 boxes={}
-boxes['location_box']=[]
-boxes['storm_box']=[]
+boxes['location_begin_point']=[]
+boxes['location_end_point']=[]
+boxes['storm_begin_point']=[]
+boxes['storm_end_point']=[]
 
 def intersction_test(location,storm):
 
@@ -123,8 +126,11 @@ def intersction_test(location,storm):
     location_box=Box(location_begin_point,location_end_point)
     storm_box=Box(storm_begin_point, storm_end_point)
 
-    boxes['location_box'].append(location_box)
-    boxes['storm_box'].append(storm_box)
+    # NOTE: for frontend csv
+    boxes['location_begin_point'].append(location_begin_point)
+    boxes['location_end_point'].append(location_end_point)
+    boxes['storm_begin_point'].append(storm_begin_point)
+    boxes['storm_end_point'].append(storm_end_point)
 
     intersection=is_intersecting(location_box,storm_box)
 
