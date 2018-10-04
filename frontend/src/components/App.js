@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../css/App.css';
 import LoadCSV from "./LoadCSV.js"
 import PlotBox from "./PlotBox.js"
+import PlotBoxModal from "./PlotBoxModal.js"
 import { connect  } from 'react-redux';
 
 class App extends Component {
@@ -27,6 +28,8 @@ class App extends Component {
     let content;
     let header=[];
     let body=[];
+    let plot
+    let plotModal
     if(data!=null){
       //header
       for(var prop in data[0]){
@@ -61,10 +64,15 @@ class App extends Component {
       </table>
     }//data not null
 
-    let plot
+
 
     if(this.props.LoadCSV.plot_data!=null){
       plot=<PlotBox/>
+    }
+
+
+    if(data!=null){
+      plotModal=<PlotBoxModal/>
     }
 
     return (
@@ -87,7 +95,9 @@ class App extends Component {
           </div>
 
           <div className="col-sm-6">
+            {plotModal}
             {plot}
+
           </div>
 
         </div>
