@@ -88,7 +88,7 @@ def export_boxes_to_csv(output_dir):
     stm_beg_y=[]
     stm_end_x=[]
     stm_end_y=[]
-    is_intersecting=[]
+    intersection=[]
 
     for loc_beg,loc_end,stm_beg,stm_end in zip(boxes['location_begin_point'],
                                             boxes['location_end_point'],
@@ -101,8 +101,8 @@ def export_boxes_to_csv(output_dir):
         stm_end_point=Point(stm_end.x,stm_end.y)
         loc_box=Box(loc_beg_point,loc_end_point)
         stm_box=Box(stm_beg_point,stm_end_point)
-        # res=is_intersecting(loc_box,stm_box)
-        # is_intersecting.append(is_intersecting(loc_box,stm_box))
+        res=is_intersecting(loc_box,stm_box)
+        intersection.append(is_intersecting(loc_box,stm_box))
 
         # location
         loc_beg_x.append(loc_beg.x)
@@ -125,7 +125,7 @@ def export_boxes_to_csv(output_dir):
     df['stm_beg_y']=pd.Series(stm_beg_y)
     df['stm_end_x']=pd.Series(stm_end_x)
     df['stm_end_y']=pd.Series(stm_end_y)
-    # df['is_intersecting']=pd.Series(is_intersecting)
+    df['intersection']=pd.Series(intersection)
 
     df=df.drop_duplicates()
     df.to_csv(output_dir)
