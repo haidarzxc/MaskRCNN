@@ -29,6 +29,16 @@ class PlotBox extends Component {
                          'color': 'rgba(128, 0, 128, 1)',
                      },
                  },
+                 {
+                     'type': 'rect',
+                     'x0': this.props.LoadCSV.plot_data[5],
+                     'y0': this.props.LoadCSV.plot_data[6],
+                     'x1': this.props.LoadCSV.plot_data[7],
+                     'y1': this.props.LoadCSV.plot_data[8],
+                     'line': {
+                         'color': 'rgba(22, 0, 128, 1)',
+                     },
+                 },
 
               ]
        }}
