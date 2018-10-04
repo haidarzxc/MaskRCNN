@@ -13,19 +13,25 @@ class PlotBox extends Component {
   }
 
   render() {
+
+
     return (
       <Plot
-         data={[
-           {
-             x: this.props.LoadCSV.plot_data,
+         layout={{title: 'Boxes',
+         'shapes': [
+                 {
+                     'type': 'rect',
+                     'x0': this.props.LoadCSV.plot_data[1],
+                     'y0': this.props.LoadCSV.plot_data[2],
+                     'x1': this.props.LoadCSV.plot_data[3],
+                     'y1': this.props.LoadCSV.plot_data[4],
+                     'line': {
+                         'color': 'rgba(128, 0, 128, 1)',
+                     },
+                 },
 
-             type: 'scatter',
-             mode: 'points',
-             marker: {color: 'red'},
-           },
-
-         ]}
-
+              ]
+       }}
        />
     );
   }
