@@ -5,12 +5,22 @@ import PlotBox from "./PlotBox.js"
 import { connect  } from 'react-redux';
 
 class App extends Component {
+  constructor(props){
 
+    super(props)
+    this.handleRow=this.handleRow.bind(this)
+  }
 
   handleRow(evt){
-    console.log(evt.currentTarget);
-
-  }
+    let values=[]
+    for(var child in evt.currentTarget.childNodes){
+      let value=evt.currentTarget.childNodes[child].innerHTML
+      if(value!=undefined){
+        values.push(value)
+      }//end of if
+    }//end of loop
+    this.props.dispatch({ type: 'DATA_PLOT', values:values });
+  }//end of handleRow
 
   render() {
     let data=this.props.LoadCSV.csv_data
@@ -51,10 +61,16 @@ class App extends Component {
       </table>
     }//data not null
 
+    let plot
+
+    if(this.props.LoadCSV.plot_data!=null){
+      plot=<PlotBox/>
+    }
+
     return (
 
-      <div className="container">
-        <div className="row">
+      <div>
+        <div className="row mainRow">
 
           <div className="col-sm-6">
 
@@ -64,14 +80,14 @@ class App extends Component {
               </div>
             </div>
 
-            <div className="row">
+            <div className="row tableColumn">
               {content}
             </div>
 
           </div>
 
           <div className="col-sm-6">
-            
+            {plot}
           </div>
 
         </div>

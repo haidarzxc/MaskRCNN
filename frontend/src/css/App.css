@@ -1,3 +1,8 @@
-.container{
-  margin: 0;
+.tableColumn{
+  height: 600px;
+  overflow-y: auto;
+}
+
+.mainRow{
+  margin-left: 3px;
 }

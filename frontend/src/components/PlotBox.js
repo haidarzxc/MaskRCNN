@@ -17,15 +17,15 @@ class PlotBox extends Component {
       <Plot
          data={[
            {
-             x: [1, 2, 3],
-             y: [2, 6, 3],
+             x: this.props.LoadCSV.plot_data,
+
              type: 'scatter',
              mode: 'points',
              marker: {color: 'red'},
            },
 
          ]}
-         
+
        />
     );
   }

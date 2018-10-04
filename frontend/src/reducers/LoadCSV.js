@@ -1,5 +1,6 @@
 const initialState = {
   csv_data:null,
+  plot_data:null,
 };
 
 function LoadCSV(state = initialState, action) {
@@ -9,6 +10,11 @@ function LoadCSV(state = initialState, action) {
         ...state,
         csv_data:action.data,
       }
+    case 'DATA_PLOT':
+        return {
+          ...state,
+          plot_data:action.values,
+        }
 
 
 
