@@ -216,7 +216,7 @@ def get_data(output_dir):
 
     stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
     print(stormevents_filtered_df)
-    stormevents_filtered_df.to_csv("NCDC_stormevents\\intersections.csv")
+    stormevents_filtered_df.to_csv(output_dir)
     # print("\n")
     # return_bucket(session)
 
@@ -225,7 +225,7 @@ def get_data(output_dir):
 
 
 
-get_data()
+get_data("NCDC_stormevents\\intersections.csv")
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
