@@ -129,7 +129,7 @@ def export_boxes_to_csv(output_dir):
 
     df=df.drop_duplicates()
     df.to_csv(output_dir)
-    print(df)
+    # print(df)
 
 
 

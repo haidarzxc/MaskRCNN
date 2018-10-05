@@ -187,7 +187,7 @@ def locations_lon_lat(row):
 
     return row
 
-def get_data():
+def get_data(output_dir):
     session=create_session()
     Track.info("Session Created.")
 
@@ -213,7 +213,10 @@ def get_data():
     # print(locations_df.head(1))
 
     # print("\n")
-    print(stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True])
+
+    stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+    print(stormevents_filtered_df)
+    stormevents_filtered_df.to_csv("NCDC_stormevents\\intersections.csv")
     # print("\n")
     # return_bucket(session)
 
