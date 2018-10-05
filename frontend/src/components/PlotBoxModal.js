@@ -100,7 +100,7 @@ class PlotBoxModal extends Component {
                     x: x,
                     y: y,
                     type: 'scatter',
-                    mode: 'points',
+                    mode: 'markers',
                     marker: {color: 'red'},
                   },
                 ]}

@@ -213,20 +213,9 @@ def get_data():
     # print(locations_df.head(1))
 
     # print("\n")
-    # print(stormevents_df.head(1))
+    print(stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True])
     # print("\n")
     # return_bucket(session)
-
-    # # Create a trace
-    # trace = go.Scatter(
-    #     x = random_x,
-    #     y = random_y,
-    #     mode = 'markers'
-    # )
-    #
-    # data = [trace]
-    #
-    # py.plot(data, filename='basic-scatter')
 
 
 
