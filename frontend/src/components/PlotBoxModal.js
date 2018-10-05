@@ -19,6 +19,9 @@ class PlotBoxModal extends Component {
 
     let data=this.props.LoadCSV.csv_data
     let passedData=[]
+    let x=[]
+    let y=[]
+
     for(var idx in data){
       if(idx==0){
         continue
@@ -31,10 +34,19 @@ class PlotBoxModal extends Component {
         data[idx][5]==undefined |
         data[idx][6]==undefined |
         data[idx][7]==undefined |
-        data[idx][8]==undefined 
+        data[idx][8]==undefined
       ){
         continue
       }
+
+
+
+      if(data[idx][5]==data[idx][7] &&
+        data[idx][6]==data[idx][8]){
+          x.push(data[idx][5])
+          y.push(data[idx][6])
+        }
+
       let stm_obj={
           'type': 'rect',
           'x0': data[idx][1],
@@ -58,13 +70,13 @@ class PlotBoxModal extends Component {
 
 
 
-      // passedData.push(stm_obj)
+      passedData.push(stm_obj)
       passedData.push(loc_obj)
 
 
 
     }
-    console.log(passedData);
+    // console.log(passedData);
     return (
       <div>
       <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
@@ -83,6 +95,15 @@ class PlotBoxModal extends Component {
 
             <div className="modal-body">
             <Plot
+                  data={[
+                  {
+                    x: x,
+                    y: y,
+                    type: 'scatter',
+                    mode: 'points',
+                    marker: {color: 'red'},
+                  },
+                ]}
                layout={{title: 'Boxes',
                'shapes': passedData
              }}

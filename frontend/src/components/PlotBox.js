@@ -14,9 +14,27 @@ class PlotBox extends Component {
 
   render() {
 
+    let x=[]
+    let y=[]
+
+    if(this.props.LoadCSV.plot_data[5]==this.props.LoadCSV.plot_data[7] &&
+      this.props.LoadCSV.plot_data[6]==this.props.LoadCSV.plot_data[8]){
+        x.push(this.props.LoadCSV.plot_data[5])
+        y.push(this.props.LoadCSV.plot_data[6])
+      }
+
 
     return (
       <Plot
+            data={[
+            {
+              x: x,
+              y: y,
+              type: 'scatter',
+              mode: 'points',
+              marker: {color: 'red'},
+            },
+          ]}
          layout={{title: 'Boxes',
          'shapes': [
                  {
@@ -36,7 +54,7 @@ class PlotBox extends Component {
                      'x1': this.props.LoadCSV.plot_data[7],
                      'y1': this.props.LoadCSV.plot_data[8],
                      'line': {
-                         'color': 'rgba(22, 0, 128, 1)',
+                         'color': 'rgba(255, 0, 0, 1)',
                      },
                  },
 
