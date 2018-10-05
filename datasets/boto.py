@@ -158,7 +158,7 @@ filter_stormevents method
 def filter_stormevents(row,locations):
     st=locations.apply(lambda x: intersction_test(x,row),axis=1)
     # sleep(3)
-    Track.info("filter_stormevents Testing Intersection "+str(row.name)+", "+str(row["IS_INTERSECTING"]))
+    Track.info("filter_stormevents Testing Intersection "+str(row.name))
     return row
 
 def locations_lon_lat(row):
@@ -208,7 +208,7 @@ def get_data(output_dir):
     stormevents_df['STATIONID']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.head(5).apply(lambda x: filter_stormevents(x,locations_df), axis=1)
+    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
     # print(locations_df.head(1))
 
