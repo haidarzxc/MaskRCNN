@@ -43,10 +43,10 @@ def load_CSV_file(fileName):
     csv_path=os.path.abspath(fileName)
     try:
         csv_file=pd.read_csv(csv_path)
-        Track.info("csv file read")
+        Track.info(fileName +": csv file read")
         return csv_file
     except:
-        Track.warn("unable to open")
+        Track.warn(fileName +": unable to open CSV")
 
 def retrieve_WSR_88D_RDA_locations(url,output_dir):
     data=dict()
@@ -58,7 +58,7 @@ def retrieve_WSR_88D_RDA_locations(url,output_dir):
     except:
         Track.warn("Request is failed")
         return
-        
+
     Track.info("Request is successful")
     Track.info("Scraping...")
     c=0
