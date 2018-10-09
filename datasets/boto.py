@@ -108,6 +108,12 @@ intersction_test method
                 ->function returns boolean value
              -> returns row
 '''
+# NOTE: for frontend csv
+boxes={}
+boxes['location_begin_point']=[]
+boxes['location_end_point']=[]
+boxes['storm_begin_point']=[]
+boxes['storm_end_point']=[]
 
 def intersction_test(location,storm):
 
@@ -120,6 +126,12 @@ def intersction_test(location,storm):
     location_box=Box(location_begin_point,location_end_point)
     storm_box=Box(storm_begin_point, storm_end_point)
 
+    # NOTE: for frontend csv
+    boxes['location_begin_point'].append(location_begin_point)
+    boxes['location_end_point'].append(location_end_point)
+    boxes['storm_begin_point'].append(storm_begin_point)
+    boxes['storm_end_point'].append(storm_end_point)
+
     intersection=is_intersecting(location_box,storm_box)
 
     if intersection:
@@ -130,6 +142,8 @@ def intersction_test(location,storm):
 
 
     return storm
+
+
 
 '''
 filter_stormevents method
@@ -144,7 +158,7 @@ filter_stormevents method
 def filter_stormevents(row,locations):
     st=locations.apply(lambda x: intersction_test(x,row),axis=1)
     # sleep(3)
-    Track.info("filter_stormevents Testing Intersection "+str(row.name)+", "+str(row["IS_INTERSECTING"]))
+    Track.info("filter_stormevents Testing Intersection "+str(row.name))
     return row
 
 def locations_lon_lat(row):
@@ -159,7 +173,8 @@ def locations_lon_lat(row):
     # sec [-2:] | min [-4:-2] | deg [:-4]
     try:
 
-        lon_float=float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600)
+        # NOTE: all lon (longtudes) are negative
+        lon_float=(float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600))*-1
         lat_float=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
 
         row['BEGIN_LON']=lon_float-local.HORIZONTAL_SHIFT
@@ -172,7 +187,7 @@ def locations_lon_lat(row):
 
     return row
 
-def get_data():
+def get_data(output_dir):
     session=create_session()
     Track.info("Session Created.")
 
@@ -198,27 +213,19 @@ def get_data():
     # print(locations_df.head(1))
 
     # print("\n")
-    # print(stormevents_df.head(1))
+
+    # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+    # print(stormevents_filtered_df)
+    # stormevents_filtered_df.to_csv(output_dir)
     # print("\n")
-    # return_bucket(session)
-
-    # # Create a trace
-    # trace = go.Scatter(
-    #     x = random_x,
-    #     y = random_y,
-    #     mode = 'markers'
-    # )
-    #
-    # data = [trace]
-    #
-    # py.plot(data, filename='basic-scatter')
+    return_bucket(session)
 
 
 
 
 
 
-# get_data()
+get_data("NCDC_stormevents\\intersections.csv")
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
