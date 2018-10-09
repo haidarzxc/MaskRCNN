@@ -47,8 +47,8 @@ def create_session():
     )
     return session.resource('s3')
 
-def return_bucket(session):
-
+def return_bucket(row,session):
+    print(row)
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
         # print(bucket.Object("1991/12/26/KTLX/KTLX19911226_025749.gz"))
@@ -75,7 +75,16 @@ def return_bucket(session):
             # station id
             object_dict["STD"]=meta_data_date[:-8]
 
-            print(object_dict)
+            # construct timestamp
+            bucket_begin_time=datetime.datetime(int(object_dict["YEAR"]),
+                                                int(object_dict["MONTH"]),
+                                                int(object_dict["DAY"]),
+                                                int(object_dict["DAY"]),
+                                                int(object_dict["MIN"]),
+                                                int(object_dict["SEC"]))
+
+            bucket_end_time=bucket_begin_time+pd.Timedelta(minutes=local.META_DATA_END_TIME_MIN_SHIFT)
+            
             if x==4:
                 break
             x+=1
@@ -159,7 +168,7 @@ def to_UTC_time(row):
         row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Eastern').tz_convert('UTC')
     elif(row['CZ_TIMEZONE']=='CST-6'):
         row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Central').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Central').tz_convert('UTC')
+        # row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Central').tz_convert('UTC')
     elif(row['CZ_TIMEZONE']=='MST-7'):
         row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Mountain').tz_convert('UTC')
         row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Mountain').tz_convert('UTC')
@@ -204,7 +213,7 @@ def filter_stormevents(row,locations,session):
     # time intersection test
 
     to_UTC_time(row)
-    # return_bucket(session)
+    return_bucket(row,session)
 
 
 
@@ -258,9 +267,10 @@ def get_data(output_dir):
     stormevents_df['STATIONID']=pd.Series()
     stormevents_df['BEGIN_TIME_UTC']=pd.Series()
     stormevents_df['END_TIME_UTC']=pd.Series()
+    stormevents_df['TIME_RANGE']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+    stormevents_df=stormevents_df.head(1).apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
     # print("\n")
     # print(locations_df.head(1))
 
