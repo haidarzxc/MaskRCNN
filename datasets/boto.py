@@ -208,17 +208,17 @@ def get_data(output_dir):
     stormevents_df['STATIONID']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
+    # stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
     # print("\n")
     # print(locations_df.head(1))
 
     # print("\n")
 
-    stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
-    print(stormevents_filtered_df)
-    stormevents_filtered_df.to_csv(output_dir)
+    # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+    # print(stormevents_filtered_df)
+    # stormevents_filtered_df.to_csv(output_dir)
     # print("\n")
-    # return_bucket(session)
+    return_bucket(session)
 
 
 
