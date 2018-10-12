@@ -47,8 +47,19 @@ def create_session():
     )
     return session.resource('s3')
 
+def date_range_intersection_test(bucket_begin_time,
+                                    bucket_end_time,
+                                    BEGIN_TIME_UTC,
+                                    END_TIME_UTC
+                                ):
+    # (StartA <= EndB) and (EndA >= StartB)
+    if (bucket_begin_time <= END_TIME_UTC) and (bucket_end_time >= BEGIN_TIME_UTC):
+        return True;
+    return False
+
+
+
 def return_bucket(row,session):
-    print(row)
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
         # print(bucket.Object("1991/12/26/KTLX/KTLX19911226_025749.gz"))
@@ -59,7 +70,8 @@ def return_bucket(row,session):
             # NOTE: KTLX19910605_162126.gz
             # format <SSSS><YYYY><MONTH><DAY>_<HOUR><MINUTE><SECOND>
             meta_data=object.key.split("/")[4].split('_')
-
+            if not object.key.endswith(".gz"):
+                continue
             meta_data_time=meta_data[1].replace(".gz","")
             meta_data_date=meta_data[0]
 
@@ -75,7 +87,12 @@ def return_bucket(row,session):
             # station id
             object_dict["STD"]=meta_data_date[:-8]
 
+            if not int(object_dict["YEAR"])==2017:
+                print(object_dict["YEAR"],end='\r')
+                continue
+
             # construct timestamp
+            print(object.key, object_dict)
             bucket_begin_time=datetime.datetime(int(object_dict["YEAR"]),
                                                 int(object_dict["MONTH"]),
                                                 int(object_dict["DAY"]),
@@ -83,11 +100,20 @@ def return_bucket(row,session):
                                                 int(object_dict["MIN"]),
                                                 int(object_dict["SEC"]))
 
-            bucket_end_time=bucket_begin_time+pd.Timedelta(minutes=local.META_DATA_END_TIME_MIN_SHIFT)
+            bucket_end_time=bucket_begin_time+pd.Timedelta(seconds=local.META_DATA_END_TIME_SEC_SHIFT)
 
-            if x==4:
-                break
-            x+=1
+
+            time_intersection=date_range_intersection_test(bucket_begin_time
+                                        ,bucket_end_time,
+                                        row['BEGIN_TIME_UTC'],
+                                        row['END_TIME_UTC']
+                                        )
+            if time_intersection:
+                print("---------------------------------------------------------------")
+
+            # if x==4:
+            #     break
+            # x+=1
 
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
@@ -151,7 +177,8 @@ def intersction_test(location,storm):
 
 
 def convert_time(time,zone,format='%Y-%m-%d %X'):
-    return time.tz_localize(zone).tz_convert('UTC').strftime(format)
+    time_str=time.tz_localize(zone).tz_convert('UTC').strftime(format)
+    return pd.to_datetime(time_str)
 
 
 def to_UTC_time(row):
@@ -218,13 +245,13 @@ filter_stormevents method
 
 def filter_stormevents(row,locations,session):
     # space interestion test
-    # st=locations.apply(lambda x: intersction_test(x,row),axis=1)
+    st=locations.apply(lambda x: intersction_test(x,row),axis=1)
 
-
-    # time intersection test
-
+    # time conversion to UTC
     to_UTC_time(row)
-    # return_bucket(row,session)
+
+    # time range intersection test
+    return_bucket(row,session)
 
 
 
@@ -300,7 +327,7 @@ def get_data(output_dir):
 
 
 
-# get_data("NCDC_stormevents\\intersections.csv")
+get_data("NCDC_stormevents\\intersections.csv")
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
