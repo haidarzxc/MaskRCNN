@@ -7,7 +7,7 @@ parent_directory = os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
 
-from datasets.boto import filter_stormevents,boxes
+from datasets.boto import filter_stormevents,boxes,to_UTC_time
 from datasets.intersect import *
 
 
@@ -131,6 +131,18 @@ def export_boxes_to_csv(output_dir):
     df.to_csv(output_dir)
     # print(df)
 
+def test_To_UTC_time(output_dir):
+    test_df=pd.DataFrame()
+    test_df['BEGIN_DATE_TIME']=pd.Series(['06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','11-MAR-17 21:00:00'])
+    test_df['END_DATE_TIME']=pd.Series(['06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00','06-APR-17 15:09:00' ,'12-MAR-17 2:00:00'])
+    test_df['CZ_TIMEZONE']=pd.Series(['EST-5','CST-6','MST-7','PST-8','AST-4','AKST-9','HST-10','GST10','SST-11','CST-6'])
+    test_df['BEGIN_TIME_UTC']=pd.Series()
+    test_df['END_TIME_UTC']=pd.Series()
+
+    test_df=test_df.apply(lambda x:to_UTC_time(x),axis=1)
+    test_df.to_csv(output_dir)
+    print(test_df)
 
 
-export_boxes_to_csv("frontend\\src\\static\\boxes.csv")
+test_To_UTC_time("NCDC_stormevents\\test_To_UTC_time.csv")
+# export_boxes_to_csv("frontend\\src\\static\\boxes.csv")

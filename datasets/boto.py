@@ -84,7 +84,7 @@ def return_bucket(row,session):
                                                 int(object_dict["SEC"]))
 
             bucket_end_time=bucket_begin_time+pd.Timedelta(minutes=local.META_DATA_END_TIME_MIN_SHIFT)
-            
+
             if x==4:
                 break
             x+=1
@@ -150,6 +150,10 @@ def intersction_test(location,storm):
     return storm
 
 
+def convert_time(time,zone,format='%Y-%m-%d %X'):
+    return time.tz_localize(zone).tz_convert('UTC').strftime(format)
+
+
 def to_UTC_time(row):
     # CZ_TIMEZONE
     # EST-5, CST-6, MST-7, PST-8, AST-4, AKST-9, HST-10, GST10, SST-11
@@ -163,37 +167,44 @@ def to_UTC_time(row):
     row['BEGIN_DATE_TIME']=storm_begin_datetime-pd.Timedelta(minutes=local.STORM_BEGIN_TIME_MIN_SHIFT)
     row['END_DATE_TIME']=storm_end_datetime+pd.Timedelta(minutes=local.STORM_END_TIME_MIN_SHIFT)
 
-    if(row['CZ_TIMEZONE']=='EST-5'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Eastern').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Eastern').tz_convert('UTC')
-    elif(row['CZ_TIMEZONE']=='CST-6'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Central').tz_convert('UTC')
-        # row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Central').tz_convert('UTC')
-    elif(row['CZ_TIMEZONE']=='MST-7'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Mountain').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Mountain').tz_convert('UTC')
-    elif(row['CZ_TIMEZONE']=='PST-8'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Pacific').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Pacific').tz_convert('UTC')
-    elif(row['CZ_TIMEZONE']=='AST-4'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('Canada/Atlantic').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('Canada/Atlantic').tz_convert('UTC')
-    elif(row['CZ_TIMEZONE']=='AKST-9'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Alaska').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Alaska').tz_convert('UTC')
-    elif(row['CZ_TIMEZONE']=='HST-10'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Hawaii').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Hawaii').tz_convert('UTC')
-    # elif(row['CZ_TIMEZONE']=='GST10'):
-    #     row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Hawaii').tz_convert('UTC')
-    #     row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Hawaii').tz_convert('UTC')
-    elif(row['CZ_TIMEZONE']=='SST-11'):
-        row['BEGIN_TIME_UTC']=row['BEGIN_DATE_TIME'].tz_localize('US/Samoa').tz_convert('UTC')
-        row['END_TIME_UTC']=row['END_DATE_TIME'].tz_localize('US/Samoa').tz_convert('UTC')
-    else:
-        Track.warn("Exception: time_zone not tracked "+row['CZ_TIMEZONE'])
+    try:
+        if(row['CZ_TIMEZONE']=='EST-5'):
+            convert_time(row['BEGIN_DATE_TIME'],'US/Eastern')
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Eastern')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Eastern')
+        elif(row['CZ_TIMEZONE']=='CST-6'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Central')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Central')
+        elif(row['CZ_TIMEZONE']=='MST-7'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Mountain')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Mountain')
+        elif(row['CZ_TIMEZONE']=='PST-8'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Pacific')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Pacific')
+        elif(row['CZ_TIMEZONE']=='AST-4'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'Canada/Atlantic')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'Canada/Atlantic')
+        elif(row['CZ_TIMEZONE']=='AKST-9'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Alaska')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Alaska')
+        elif(row['CZ_TIMEZONE']=='HST-10'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Hawaii')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Hawaii')
+            # varify time zone GST10
+        elif(row['CZ_TIMEZONE']=='GST10'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'Pacific/Guam')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'Pacific/Guam')
+        elif(row['CZ_TIMEZONE']=='SST-11'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Samoa')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Samoa')
+        else:
+            Track.warn("Exception: time_zone not tracked "+row['CZ_TIMEZONE'])
+    except:
+        pass
 
 
+
+    return row
 
 '''
 filter_stormevents method
@@ -213,7 +224,7 @@ def filter_stormevents(row,locations,session):
     # time intersection test
 
     to_UTC_time(row)
-    return_bucket(row,session)
+    # return_bucket(row,session)
 
 
 
@@ -270,7 +281,7 @@ def get_data(output_dir):
     stormevents_df['TIME_RANGE']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.head(1).apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
     # print("\n")
     # print(locations_df.head(1))
 
@@ -278,9 +289,9 @@ def get_data(output_dir):
 
     print(stormevents_df)
 
-    # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+    stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
     # print(stormevents_filtered_df)
-    # stormevents_filtered_df.to_csv(output_dir)
+    stormevents_filtered_df.to_csv(output_dir)
     # print("\n")
 
 
@@ -289,7 +300,7 @@ def get_data(output_dir):
 
 
 
-get_data("NCDC_stormevents\\intersections.csv")
+# get_data("NCDC_stormevents\\intersections.csv")
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')

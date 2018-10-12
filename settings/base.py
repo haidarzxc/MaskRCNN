@@ -8,7 +8,7 @@ VERTICAL_SHIFT=3
 STORM_BEGIN_TIME_MIN_SHIFT=1
 STORM_END_TIME_MIN_SHIFT=1
 
-# AMAZON S3 end time wether meta_data shift 
+# AMAZON S3 end time wether meta_data shift 310 seconds
 META_DATA_END_TIME_MIN_SHIFT=5
 
 # radar 88D_locations URL
