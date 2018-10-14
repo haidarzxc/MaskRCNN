@@ -365,9 +365,10 @@ def get_data(output_dir):
 
 
 
-
+Track.start_timer()
 get_data("NCDC_stormevents\\intersections.csv")
-
+Track.stop_timer()
+Track.get_exection_time()
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
 
