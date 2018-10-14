@@ -7,7 +7,7 @@ parent_directory = os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
 
-from datasets.boto import filter_stormevents,boxes,to_UTC_time
+from datasets.boto import filter_stormevents,boxes,to_UTC_time,date_range_intersection_test
 from datasets.intersect import *
 
 
@@ -146,19 +146,147 @@ def test_To_UTC_time(output_dir):
 
 def test_date_range_intersection_test():
     '''
-    2017-01-01 01:40:29
+    format
+        yyyy-mm-dd hh:mm:ss
+
+    date_range_intersection_test() method arguments
+        1.bucket_begin_time
+        2.bucket_end_time
+        3.BEGIN_TIME_UTC
+        4.END_TIME_UTC
     '''
+    result=None
+
+    cases={
+        # overlapping day
+        "caseA":dict(
+            date1A='2017-01-01 00:00:00',
+            date1B='2017-01-02 00:00:00',
+            date2A='2017-01-02 00:00:00',
+            date2B='2017-01-03 00:00:00',
+            result="",
+            correct_result=True
+        ),
+        # NOT overlapping day
+        "caseB":dict(
+            date1A='2017-01-01 00:00:00',
+            date1B='2017-01-02 00:00:00',
+            date2A='2017-01-03 00:00:00',
+            date2B='2017-01-04 00:00:00',
+            result="",
+            correct_result=False
+        ),
+        # overlapping month
+        "caseC":dict(
+            date1A='2017-01-01 00:00:00',
+            date1B='2017-02-01 00:00:00',
+            date2A='2017-02-01 00:00:00',
+            date2B='2017-03-01 00:00:00',
+            result="",
+            correct_result=True
+        ),
+        # NOT overlapping month
+        "caseD":dict(
+            date1A='2017-01-01 00:00:00',
+            date1B='2017-02-01 00:00:00',
+            date2A='2017-03-01 00:00:00',
+            date2B='2017-04-01 00:00:00',
+            result="",
+            correct_result=False
+        ),
+        # overlapping year
+        "caseE":dict(
+            date1A='2015-01-01 00:00:00',
+            date1B='2016-01-01 00:00:00',
+            date2A='2015-01-01 00:00:00',
+            date2B='2017-01-01 00:00:00',
+            result="",
+            correct_result=True
+        ),
+        # NOT overlapping year
+        "caseF":dict(
+            date1A='2015-01-01 00:00:00',
+            date1B='2016-01-01 00:00:00',
+            date2A='2017-01-01 00:00:00',
+            date2B='2018-01-01 00:00:00',
+            result="",
+            correct_result=False
+        ),
+        # overlapping hour
+        "caseG":dict(
+            date1A='2017-01-01 10:00:00',
+            date1B='2017-01-01 11:00:00',
+            date2A='2017-01-01 10:00:00',
+            date2B='2017-01-01 12:00:00',
+            result="",
+            correct_result=True
+        ),
+        # NOT overlapping hour
+        "caseH":dict(
+            date1A='2017-01-01 10:00:00',
+            date1B='2017-01-01 11:00:00',
+            date2A='2017-01-01 12:00:00',
+            date2B='2017-01-01 13:00:00',
+            result="",
+            correct_result=False
+        ),
+        # overlapping minutes
+        "caseI":dict(
+            date1A='2017-01-01 10:01:00',
+            date1B='2017-01-01 10:10:00',
+            date2A='2017-01-01 10:05:00',
+            date2B='2017-01-01 10:20:00',
+            result="",
+            correct_result=True
+        ),
+        # NOT overlapping minutes
+        "caseJ":dict(
+            date1A='2017-01-01 10:01:00',
+            date1B='2017-01-01 10:10:00',
+            date2A='2017-01-01 10:15:00',
+            date2B='2017-01-01 10:20:00',
+            result="",
+            correct_result=False
+        ),
+        # overlapping Seconds
+        "caseK":dict(
+            date1A='2017-01-01 10:01:01',
+            date1B='2017-01-01 10:01:05',
+            date2A='2017-01-01 10:01:02',
+            date2B='2017-01-01 10:01:10',
+            result="",
+            correct_result=True
+        ),
+        # NOT overlapping Seconds
+        "caseL":dict(
+            date1A='2017-01-01 10:01:01',
+            date1B='2017-01-01 10:01:05',
+            date2A='2017-01-01 10:01:06',
+            date2B='2017-01-01 10:01:10',
+            result="",
+            correct_result=False
+        ),
 
 
-    test_df=pd.DataFrame()
-    test_df['BEGIN_DATE_TIME']=pd.Series([])
-    test_df['BEGIN_DATE_TIME']=pd.Series([])
-    test_df['BEGIN_DATE_TIME']=pd.Series([])
-    test_df['BEGIN_DATE_TIME']=pd.Series([])
-    test_df['IS_OVERLAPPING']=pd.Series([])
+    }
 
-    test_df=test_df.apply(lambda x:to_UTC_time(x),axis=1)
-    test_df.to_csv(output_dir)
+    # run cases
+    for case in cases:
+        result=date_range_intersection_test(cases[case]['date1A'],
+                                            cases[case]['date1B'],
+                                            cases[case]['date2A'],
+                                            cases[case]['date2B'])
+        cases[case]['result']=result
 
+    # test cases (assert testunit will be integrated later on...)
+    for case in cases:
+        case_test=cases[case]['result'] is cases[case]['correct_result']
+        if not case_test:
+            print("failing case...")
+            break;
+        print(case,case_test)
+
+
+test_date_range_intersection_test()
 # test_To_UTC_time("NCDC_stormevents\\test_To_UTC_time.csv")
 # export_boxes_to_csv("frontend\\src\\static\\boxes.csv")

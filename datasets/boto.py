@@ -333,7 +333,7 @@ def get_data(output_dir):
 
 
 
-get_data("NCDC_stormevents\\intersections.csv")
+# get_data("NCDC_stormevents\\intersections.csv")
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
