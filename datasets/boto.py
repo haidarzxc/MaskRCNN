@@ -62,16 +62,22 @@ def date_range_intersection_test(bucket_begin_time,
 def return_bucket(row,session):
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
+
         # print(bucket.Object("1991/12/26/KTLX/KTLX19911226_025749.gz"))
         x=0
-        for object in bucket.objects.all():
+
+        # using row BEGIN_TIME_UTC and STATIONID
+        # to construct prefix for bucket objects filter
+        prefrix_datetime=row['BEGIN_TIME_UTC'].strftime("%Y/%m/%d")+"/"+row['STATIONID']
+
+        for object in bucket.objects.filter(Prefix=prefrix_datetime):
             object_dict=dict()
 
             # NOTE: KTLX19910605_162126.gz
             # format <SSSS><YYYY><MONTH><DAY>_<HOUR><MINUTE><SECOND>
             meta_data=object.key.split("/")[4].split('_')
-            if not object.key.endswith(".gz"):
-                continue
+            # if not object.key.endswith(".gz"):
+            #     continue
             meta_data_time=meta_data[1].replace(".gz","")
             meta_data_date=meta_data[0]
 
@@ -87,12 +93,12 @@ def return_bucket(row,session):
             # station id
             object_dict["STD"]=meta_data_date[:-8]
 
-            if not int(object_dict["YEAR"])==2017:
-                print(object_dict["YEAR"],end='\r')
-                continue
+            # if not int(object_dict["YEAR"])==2017:
+            #     print(object_dict["YEAR"],end='\r')
+            #     continue
 
             # construct timestamp
-            print(object.key, object_dict)
+
             bucket_begin_time=datetime.datetime(int(object_dict["YEAR"]),
                                                 int(object_dict["MONTH"]),
                                                 int(object_dict["DAY"]),
@@ -102,18 +108,18 @@ def return_bucket(row,session):
 
             bucket_end_time=bucket_begin_time+pd.Timedelta(seconds=local.META_DATA_END_TIME_SEC_SHIFT)
 
-
             time_intersection=date_range_intersection_test(bucket_begin_time
                                         ,bucket_end_time,
                                         row['BEGIN_TIME_UTC'],
                                         row['END_TIME_UTC']
                                         )
+            print(object.key,object_dict,x)
             if time_intersection:
                 print("---------------------------------------------------------------")
 
             # if x==4:
             #     break
-            # x+=1
+            x+=1
 
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
@@ -308,7 +314,7 @@ def get_data(output_dir):
     stormevents_df['TIME_RANGE']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+    stormevents_df=stormevents_df.head(1).apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
     # print("\n")
     # print(locations_df.head(1))
 

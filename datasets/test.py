@@ -144,5 +144,21 @@ def test_To_UTC_time(output_dir):
     print(test_df)
 
 
-test_To_UTC_time("NCDC_stormevents\\test_To_UTC_time.csv")
+def test_date_range_intersection_test():
+    '''
+    2017-01-01 01:40:29
+    '''
+
+
+    test_df=pd.DataFrame()
+    test_df['BEGIN_DATE_TIME']=pd.Series([])
+    test_df['BEGIN_DATE_TIME']=pd.Series([])
+    test_df['BEGIN_DATE_TIME']=pd.Series([])
+    test_df['BEGIN_DATE_TIME']=pd.Series([])
+    test_df['IS_OVERLAPPING']=pd.Series([])
+
+    test_df=test_df.apply(lambda x:to_UTC_time(x),axis=1)
+    test_df.to_csv(output_dir)
+
+# test_To_UTC_time("NCDC_stormevents\\test_To_UTC_time.csv")
 # export_boxes_to_csv("frontend\\src\\static\\boxes.csv")
