@@ -131,22 +131,22 @@ def return_bucket(row,session):
             print(object.key,object_dict,time_intersection,x)
 
             # adding row to intersections
-
-            intersections.loc[counter]=[
-                                    object.key,
-                                    row['IS_INTERSECTING'],
-                                    time_intersection,
-                                    row['BEGIN_LAT'],
-                                    row['BEGIN_LON'],
-                                    row['END_LAT'],
-                                    row['END_LON'],
-                                    row['STATIONID'],
-                                    row['BEGIN_TIME_UTC'],
-                                    row['END_TIME_UTC'],
-                                    bucket_begin_time,
-                                    bucket_end_time
-                ]
-            counter+=1
+            if time_intersection:
+                intersections.loc[counter]=[
+                                        object.key,
+                                        row['IS_INTERSECTING'],
+                                        time_intersection,
+                                        row['BEGIN_LAT'],
+                                        row['BEGIN_LON'],
+                                        row['END_LAT'],
+                                        row['END_LON'],
+                                        row['STATIONID'],
+                                        row['BEGIN_TIME_UTC'],
+                                        row['END_TIME_UTC'],
+                                        bucket_begin_time,
+                                        bucket_end_time
+                    ]
+                counter+=1
 
 
             # if x==4:
@@ -349,11 +349,12 @@ def get_data(output_dir):
 
     Track.info("Intersection Test")
     stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+
     # print("\n")
     # print(locations_df.head(1))
 
     # print("\n")
-
+    # filter_stormevents(stormevents_df.iloc[48811],locations_df,session)
     # print(stormevents_df)
 
     # global df intersections "NCDC_stormevents\\bounding_box_datetime_filtered_intersections.csv"
