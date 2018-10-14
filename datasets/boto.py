@@ -57,9 +57,22 @@ def date_range_intersection_test(bucket_begin_time,
         return True;
     return False
 
-
+counter=0
+intersections=pd.DataFrame()
+intersections['BEGIN_LAT']=pd.Series()
+intersections['BEGIN_LON']=pd.Series()
+intersections['END_LAT']=pd.Series()
+intersections['END_LON']=pd.Series()
+intersections['STATIONID']=pd.Series()
+intersections['BEGIN_TIME_UTC']=pd.Series()
+intersections['END_TIME_UTC']=pd.Series()
+intersections['bucket_begin_time']=pd.Series()
+intersections['bucket_end_time']=pd.Series()
 
 def return_bucket(row,session):
+    global counter
+
+
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
 
@@ -98,11 +111,10 @@ def return_bucket(row,session):
             #     continue
 
             # construct timestamp
-
             bucket_begin_time=datetime.datetime(int(object_dict["YEAR"]),
                                                 int(object_dict["MONTH"]),
                                                 int(object_dict["DAY"]),
-                                                int(object_dict["DAY"]),
+                                                int(object_dict["HOUR"]),
                                                 int(object_dict["MIN"]),
                                                 int(object_dict["SEC"]))
 
@@ -113,9 +125,23 @@ def return_bucket(row,session):
                                         row['BEGIN_TIME_UTC'],
                                         row['END_TIME_UTC']
                                         )
-            print(object.key,object_dict,x)
+            print(object.key,object_dict,time_intersection,x)
+
+            # adding row to intersections
             if time_intersection:
-                print("---------------------------------------------------------------")
+                intersections.loc[counter]=[
+                                    row['BEGIN_LAT'],
+                                    row['BEGIN_LON'],
+                                    row['END_LAT'],
+                                    row['END_LON'],
+                                    row['STATIONID'],
+                                    row['BEGIN_TIME_UTC'],
+                                    row['END_TIME_UTC'],
+                                    bucket_begin_time,
+                                    bucket_end_time
+                ]
+                counter+=1
+
 
             # if x==4:
             #     break
@@ -257,7 +283,8 @@ def filter_stormevents(row,locations,session):
     to_UTC_time(row)
 
     # time range intersection test
-    return_bucket(row,session)
+    if row['IS_INTERSECTING'] == True:
+        return_bucket(row,session)
 
 
 
@@ -291,6 +318,7 @@ def locations_lon_lat(row):
     return row
 
 def get_data(output_dir):
+    global intersections
     session=create_session()
     Track.info("Session Created.")
 
@@ -311,16 +339,21 @@ def get_data(output_dir):
     stormevents_df['STATIONID']=pd.Series()
     stormevents_df['BEGIN_TIME_UTC']=pd.Series()
     stormevents_df['END_TIME_UTC']=pd.Series()
-    stormevents_df['TIME_RANGE']=pd.Series()
+    # stormevents_df['TIME_RANGE']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.head(1).apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
     # print("\n")
     # print(locations_df.head(1))
 
     # print("\n")
 
-    print(stormevents_df)
+    # print(stormevents_df)
+
+    # global df intersections "NCDC_stormevents\\bounding_box_datetime_filtered_intersections.csv"
+    intersections=intersections.drop_duplicates()
+    print(intersections)
+    intersections.to_csv("NCDC_stormevents\\bounding_box_datetime_filtered_intersections.csv")
 
     stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
     # print(stormevents_filtered_df)
@@ -333,7 +366,7 @@ def get_data(output_dir):
 
 
 
-# get_data("NCDC_stormevents\\intersections.csv")
+get_data("NCDC_stormevents\\intersections.csv")
 
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
