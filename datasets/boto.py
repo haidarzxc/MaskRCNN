@@ -8,10 +8,8 @@ from time import sleep
 pd.options.mode.chained_assignment = None
 import re
 
-import plotly
-import plotly.plotly as py
-import plotly.graph_objs as go
-
+import pytz
+import datetime
 
 # NOTE: switch python PATH to look at parent_directory
 parent_directory = os.path.dirname(\
@@ -26,7 +24,6 @@ import utils.track as tr
 from datasets.intersect import *
 
 Track=tr.Track()
-plotly.tools.set_credentials_file(username=local.username, api_key=local.plotlyApiKey)
 
 '''
 RADAR CENTER LOCATION
@@ -50,19 +47,53 @@ def create_session():
     )
     return session.resource('s3')
 
-def return_bucket(session):
+def date_range_intersection_test(bucket_begin_time,
+                                    bucket_end_time,
+                                    BEGIN_TIME_UTC,
+                                    END_TIME_UTC
+                                ):
+    # (StartA <= EndB) and (EndA >= StartB)
+    if (bucket_begin_time <= END_TIME_UTC) and (bucket_end_time >= BEGIN_TIME_UTC):
+        return True;
+    return False
+
+counter=0
+intersections=pd.DataFrame()
+intersections['KEY']=pd.Series()
+intersections['IS_BOX_INTERSECTING']=pd.Series()
+intersections['IS_TIME_INTERSECTING']=pd.Series()
+intersections['BEGIN_LAT']=pd.Series()
+intersections['BEGIN_LON']=pd.Series()
+intersections['END_LAT']=pd.Series()
+intersections['END_LON']=pd.Series()
+intersections['STATIONID']=pd.Series()
+intersections['BEGIN_TIME_UTC']=pd.Series()
+intersections['END_TIME_UTC']=pd.Series()
+intersections['bucket_begin_time']=pd.Series()
+intersections['bucket_end_time']=pd.Series()
+
+def return_bucket(row,session):
+    global counter
+
 
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
+
         # print(bucket.Object("1991/12/26/KTLX/KTLX19911226_025749.gz"))
         x=0
-        for object in bucket.objects.all():
+
+        # using row BEGIN_TIME_UTC and STATIONID
+        # to construct prefix for bucket objects filter
+        prefrix_datetime=row['BEGIN_TIME_UTC'].strftime("%Y/%m/%d")+"/"+row['STATIONID']
+
+        for object in bucket.objects.filter(Prefix=prefrix_datetime):
             object_dict=dict()
 
             # NOTE: KTLX19910605_162126.gz
             # format <SSSS><YYYY><MONTH><DAY>_<HOUR><MINUTE><SECOND>
             meta_data=object.key.split("/")[4].split('_')
-
+            # if not object.key.endswith(".gz"):
+            #     continue
             meta_data_time=meta_data[1].replace(".gz","")
             meta_data_date=meta_data[0]
 
@@ -78,9 +109,48 @@ def return_bucket(session):
             # station id
             object_dict["STD"]=meta_data_date[:-8]
 
-            print(object_dict)
-            if x==4:
-                break
+            # if not int(object_dict["YEAR"])==2017:
+            #     print(object_dict["YEAR"],end='\r')
+            #     continue
+
+            # construct timestamp
+            bucket_begin_time=datetime.datetime(int(object_dict["YEAR"]),
+                                                int(object_dict["MONTH"]),
+                                                int(object_dict["DAY"]),
+                                                int(object_dict["HOUR"]),
+                                                int(object_dict["MIN"]),
+                                                int(object_dict["SEC"]))
+
+            bucket_end_time=bucket_begin_time+pd.Timedelta(seconds=local.META_DATA_END_TIME_SEC_SHIFT)
+
+            time_intersection=date_range_intersection_test(bucket_begin_time
+                                        ,bucket_end_time,
+                                        row['BEGIN_TIME_UTC'],
+                                        row['END_TIME_UTC']
+                                        )
+            print(object.key,object_dict,time_intersection,x)
+
+            # adding row to intersections
+            if time_intersection:
+                intersections.loc[counter]=[
+                                        object.key,
+                                        row['IS_INTERSECTING'],
+                                        time_intersection,
+                                        row['BEGIN_LAT'],
+                                        row['BEGIN_LON'],
+                                        row['END_LAT'],
+                                        row['END_LON'],
+                                        row['STATIONID'],
+                                        row['BEGIN_TIME_UTC'],
+                                        row['END_TIME_UTC'],
+                                        bucket_begin_time,
+                                        bucket_end_time
+                    ]
+                counter+=1
+
+
+            # if x==4:
+            #     break
             x+=1
 
     except botocore.exceptions.ClientError as e:
@@ -144,6 +214,62 @@ def intersction_test(location,storm):
     return storm
 
 
+def convert_time(time,zone,format='%Y-%m-%d %X'):
+    time_str=time.tz_localize(zone).tz_convert('UTC').strftime(format)
+    return pd.to_datetime(time_str)
+
+
+def to_UTC_time(row):
+    # CZ_TIMEZONE
+    # EST-5, CST-6, MST-7, PST-8, AST-4, AKST-9, HST-10, GST10, SST-11
+
+    # converting string date time to pd timestamp
+    format = '%d-%b-%y %X'
+    storm_begin_datetime=pd.to_datetime(row['BEGIN_DATE_TIME'], format=format)
+    storm_end_datetime=pd.to_datetime(row['END_DATE_TIME'], format=format)
+
+    # add shift values
+    row['BEGIN_DATE_TIME']=storm_begin_datetime-pd.Timedelta(minutes=local.STORM_BEGIN_TIME_MIN_SHIFT)
+    row['END_DATE_TIME']=storm_end_datetime+pd.Timedelta(minutes=local.STORM_END_TIME_MIN_SHIFT)
+
+    try:
+        if(row['CZ_TIMEZONE']=='EST-5'):
+            convert_time(row['BEGIN_DATE_TIME'],'US/Eastern')
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Eastern')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Eastern')
+        elif(row['CZ_TIMEZONE']=='CST-6'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Central')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Central')
+        elif(row['CZ_TIMEZONE']=='MST-7'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Mountain')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Mountain')
+        elif(row['CZ_TIMEZONE']=='PST-8'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Pacific')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Pacific')
+        elif(row['CZ_TIMEZONE']=='AST-4'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'Canada/Atlantic')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'Canada/Atlantic')
+        elif(row['CZ_TIMEZONE']=='AKST-9'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Alaska')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Alaska')
+        elif(row['CZ_TIMEZONE']=='HST-10'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Hawaii')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Hawaii')
+            # varify time zone GST10
+        elif(row['CZ_TIMEZONE']=='GST10'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'Pacific/Guam')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'Pacific/Guam')
+        elif(row['CZ_TIMEZONE']=='SST-11'):
+            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Samoa')
+            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Samoa')
+        else:
+            Track.warn("Exception: time_zone not tracked "+row['CZ_TIMEZONE'])
+    except:
+        pass
+
+
+
+    return row
 
 '''
 filter_stormevents method
@@ -155,9 +281,19 @@ filter_stormevents method
              -> returns row
 '''
 
-def filter_stormevents(row,locations):
+def filter_stormevents(row,locations,session):
+    # space interestion test
     st=locations.apply(lambda x: intersction_test(x,row),axis=1)
-    # sleep(3)
+
+    # time conversion to UTC
+    to_UTC_time(row)
+
+    # time range intersection test
+    if row['IS_INTERSECTING'] == True:
+        return_bucket(row,session)
+
+
+
     Track.info("filter_stormevents Testing Intersection "+str(row.name))
     return row
 
@@ -188,6 +324,7 @@ def locations_lon_lat(row):
     return row
 
 def get_data(output_dir):
+    global intersections
     session=create_session()
     Track.info("Session Created.")
 
@@ -201,32 +338,44 @@ def get_data(output_dir):
     locations_df['END_LON']=pd.Series()
     locations_df=locations_df.apply(locations_lon_lat, axis=1)
 
-    stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON']]
+    stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
     # stormevents_df dropping NaN rows
     stormevents_df=stormevents_df.dropna(thresh=2)
     stormevents_df['IS_INTERSECTING']=pd.Series()
     stormevents_df['STATIONID']=pd.Series()
+    stormevents_df['BEGIN_TIME_UTC']=pd.Series()
+    stormevents_df['END_TIME_UTC']=pd.Series()
+    # stormevents_df['TIME_RANGE']=pd.Series()
 
     Track.info("Intersection Test")
-    # stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df), axis=1)
+    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+
     # print("\n")
     # print(locations_df.head(1))
 
     # print("\n")
+    # filter_stormevents(stormevents_df.iloc[48811],locations_df,session)
+    # print(stormevents_df)
 
-    # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+    # global df intersections "NCDC_stormevents\\bounding_box_datetime_filtered_intersections.csv"
+    intersections=intersections.drop_duplicates()
+    print(intersections)
+    intersections.to_csv("NCDC_stormevents\\bounding_box_datetime_filtered_intersections.csv")
+
+    stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
     # print(stormevents_filtered_df)
-    # stormevents_filtered_df.to_csv(output_dir)
+    stormevents_filtered_df.to_csv(output_dir)
     # print("\n")
-    return_bucket(session)
 
 
 
 
 
 
+Track.start_timer()
 get_data("NCDC_stormevents\\intersections.csv")
-
+Track.stop_timer()
+Track.get_exection_time()
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
 
