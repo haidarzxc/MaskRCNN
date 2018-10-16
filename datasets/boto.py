@@ -58,6 +58,7 @@ def date_range_intersection_test(bucket_begin_time,
     return False
 
 counter=0
+total_size=0
 intersections=pd.DataFrame()
 intersections['KEY']=pd.Series()
 intersections['SIZE']=pd.Series()
@@ -75,7 +76,7 @@ intersections['bucket_end_time']=pd.Series()
 
 def return_bucket(row,session):
     global counter
-
+    global total_size
 
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
@@ -133,6 +134,9 @@ def return_bucket(row,session):
 
             # adding row to intersections
             if time_intersection:
+                print(object)
+                path="Radar_intersections\\"+object.key.replace("/","-")
+                bucket.download_file(object.key,path)
                 intersections.loc[counter]=[
                                         object.key,
                                         object.size*0.000001,
@@ -149,7 +153,7 @@ def return_bucket(row,session):
                                         bucket_end_time
                     ]
                 counter+=1
-
+                total_size+=object.size*0.000001
 
             # if x==4:
             #     break
@@ -378,6 +382,7 @@ Track.start_timer()
 get_data("NCDC_stormevents\\intersections.csv")
 Track.stop_timer()
 Track.get_exection_time()
+print("total_size: (in Mb)",total_size)
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
 
