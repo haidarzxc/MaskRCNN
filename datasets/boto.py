@@ -60,6 +60,7 @@ def date_range_intersection_test(bucket_begin_time,
 counter=0
 intersections=pd.DataFrame()
 intersections['KEY']=pd.Series()
+intersections['SIZE']=pd.Series()
 intersections['IS_BOX_INTERSECTING']=pd.Series()
 intersections['IS_TIME_INTERSECTING']=pd.Series()
 intersections['BEGIN_LAT']=pd.Series()
@@ -132,8 +133,10 @@ def return_bucket(row,session):
 
             # adding row to intersections
             if time_intersection:
+                print(object.size)
                 intersections.loc[counter]=[
                                         object.key,
+                                        object.size*0.000001,
                                         row['IS_INTERSECTING'],
                                         time_intersection,
                                         row['BEGIN_LAT'],
@@ -348,7 +351,7 @@ def get_data(output_dir):
     # stormevents_df['TIME_RANGE']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+    stormevents_df=stormevents_df.head(1).apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
 
     # print("\n")
     # print(locations_df.head(1))
