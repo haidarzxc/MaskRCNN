@@ -134,7 +134,6 @@ def return_bucket(row,session):
 
             # adding row to intersections
             if time_intersection:
-                print(object)
                 path="Radar_intersections\\"+object.key.replace("/","-")
                 bucket.download_file(object.key,path)
                 intersections.loc[counter]=[
