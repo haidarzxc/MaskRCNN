@@ -129,11 +129,10 @@ def return_bucket(row,session):
                                         row['BEGIN_TIME_UTC'],
                                         row['END_TIME_UTC']
                                         )
-            print(object.key,object_dict,time_intersection,x)
+            print(object.key,object.size,object_dict,time_intersection,x)
 
             # adding row to intersections
             if time_intersection:
-                print(object.size)
                 intersections.loc[counter]=[
                                         object.key,
                                         object.size*0.000001,
