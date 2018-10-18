@@ -16,7 +16,7 @@ parent_directory = os.path.dirname(\
                     os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
-
+print(parent_directory)
 import settings.local as local
 from NCDC_stormevents_data_loader import load_CSV_file, get_NCDC_data,\
                                     retrieve_WSR_88D_RDA_locations
