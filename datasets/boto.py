@@ -77,7 +77,6 @@ intersections['bucket_end_time']=pd.Series()
 def return_bucket(row,session):
     global counter
     global total_size
-
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
 
@@ -130,12 +129,10 @@ def return_bucket(row,session):
                                         row['BEGIN_TIME_UTC'],
                                         row['END_TIME_UTC']
                                         )
-            print(object.key,object.size,object_dict,time_intersection,x)
+            print(object.key,object.size,object_dict,time_intersection,x,row.name)
 
             # adding row to intersections
             if time_intersection:
-                path="Radar_intersections\\"+object.key.replace("/","-")
-                bucket.download_file(object.key,path)
                 intersections.loc[counter]=[
                                         object.key,
                                         object.size*0.000001,
@@ -153,7 +150,6 @@ def return_bucket(row,session):
                     ]
                 counter+=1
                 total_size+=object.size*0.000001
-
             # if x==4:
             #     break
             x+=1
@@ -328,6 +324,29 @@ def locations_lon_lat(row):
 
     return row
 
+def iterate_intersections(row):
+
+    try:
+        session=create_session()
+        bucket=session.Bucket("noaa-nexrad-level2")
+
+        obj=bucket.Object(row['KEY'])
+        print(obj.key,row.name)
+        path="Radar_intersections/"+obj.key.replace("/","-")
+        bucket.download_file(obj.key,path)
+
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            Track.warn("The object does not exist.")
+        else:
+            raise
+            Track.warn("Error.")
+
+
+def download_intersections(output_dir):
+    file=load_CSV_file(output_dir)
+    file.apply(iterate_intersections,axis=1)
+
 def get_data(output_dir):
     global intersections
     session=create_session()
@@ -353,7 +372,7 @@ def get_data(output_dir):
     # stormevents_df['TIME_RANGE']=pd.Series()
 
     Track.info("Intersection Test")
-    stormevents_df=stormevents_df.apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
+    stormevents_df=stormevents_df.head().apply(lambda x: filter_stormevents(x,locations_df,session), axis=1)
 
     # print("\n")
     # print(locations_df.head(1))
@@ -364,8 +383,8 @@ def get_data(output_dir):
 
     # global df intersections "NCDC_stormevents\\bounding_box_datetime_filtered_intersections.csv"
     intersections=intersections.drop_duplicates()
-    print(intersections)
-    intersections.to_csv("NCDC_stormevents\\bounding_box_datetime_filtered_intersections.csv")
+    # print(intersections)
+    intersections.to_csv("NCDC_stormevents/bounding_box_datetime_filtered_intersections.csv")
 
     stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
     # print(stormevents_filtered_df)
@@ -378,10 +397,11 @@ def get_data(output_dir):
 
 
 Track.start_timer()
-get_data("NCDC_stormevents\\intersections.csv")
+get_data("NCDC_stormevents/intersections.csv")
+download_intersections("NCDC_stormevents/bounding_box_datetime_filtered_intersections.csv")
 Track.stop_timer()
 Track.get_exection_time()
-print("total_size: (in Mb)",total_size)
+
 # get_NCDC_data("NCDC_stormevents",2017)
 # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
 
