@@ -347,6 +347,28 @@ def download_intersections(output_dir):
     file=load_CSV_file(output_dir)
     file.apply(iterate_intersections,axis=1)
 
+def get_data_size(output_dir,year="2017"):
+    counter=0
+    size_df=pd.DataFrame()
+    size_df['KEY']=pd.Series()
+    size_df['SIZE']=pd.Series()
+    try:
+        session=create_session()
+        bucket=session.Bucket("noaa-nexrad-level2")
+        objects=bucket.objects.filter(Prefix=year)
+        for object in objects:
+            print(object.key,object.size,counter)
+            size_df.loc[counter]=[object.key,object.size*0.000001]
+            counter+=1
+        size_df.to_csv(output_dir)
+
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            Track.warn("The object does not exist.")
+        else:
+            raise
+            Track.warn("Error.")
+
 def get_data(output_dir):
     global intersections
     session=create_session()
@@ -397,8 +419,9 @@ def get_data(output_dir):
 
 
 Track.start_timer()
-#get_data("NCDC_stormevents/intersections.csv")
-download_intersections("NCDC_stormevents/bounding_box_datetime_filtered_intersections.csv")
+# get_data("NCDC_stormevents/intersections.csv")
+# download_intersections("NCDC_stormevents/bounding_box_datetime_filtered_intersections.csv")
+get_data_size('NCDC_stormevents/size_2017.csv')
 Track.stop_timer()
 Track.get_exection_time()
 
