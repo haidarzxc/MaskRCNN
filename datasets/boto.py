@@ -397,7 +397,7 @@ def get_data(output_dir):
 
 
 Track.start_timer()
-get_data("NCDC_stormevents/intersections.csv")
+#get_data("NCDC_stormevents/intersections.csv")
 download_intersections("NCDC_stormevents/bounding_box_datetime_filtered_intersections.csv")
 Track.stop_timer()
 Track.get_exection_time()
