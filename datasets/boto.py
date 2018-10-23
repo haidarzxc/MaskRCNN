@@ -386,6 +386,7 @@ def download_intersections(input_dir,output_dir):
 
 def get_data_size(output_dir,year="2017"):
     counter=0
+    total_volume=0
     size_df=pd.DataFrame()
     size_df['KEY']=pd.Series()
     size_df['SIZE']=pd.Series()
@@ -395,9 +396,11 @@ def get_data_size(output_dir,year="2017"):
         objects=bucket.objects.filter(Prefix=year)
         for object in objects:
             print(object.key,object.size,counter)
-            size_df.loc[counter]=[object.key,object.size*0.000001]
+            total_voluem+=object.size
+            # size_df.loc[counter]=[object.key,object.size*0.000001]
             counter+=1
-        size_df.to_csv(output_dir)
+        # size_df.to_csv(output_dir)
+        print(total_volume)
 
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
@@ -469,12 +472,12 @@ if __name__ == '__main__':
     #         "NEXRAD",
     # "NCDC_stormevents/NEXRAD_intersections.csv")
 
-    get_data(
-            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-            "GOES")
+    # get_data(
+    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+    #         "GOES")
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
-    # get_data_size('NCDC_stormevents/size_2017.csv')
+    get_data_size('NCDC_stormevents/size_2017.csv')
 
 
     # get_NCDC_data("NCDC_stormevents",2017)
