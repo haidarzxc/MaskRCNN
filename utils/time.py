@@ -1,6 +1,6 @@
 import pandas as pd
 import settings.local as local
-
+# http://strftime.org/
 def date_range_intersection_test(bucket_begin_time,
                                     bucket_end_time,
                                     BEGIN_TIME_UTC,

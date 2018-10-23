@@ -175,13 +175,19 @@ def bucket_goes(row,session):
         #      These are compressed and encapsulated using the netCDF4
         #      standard.
 
+        prefrix_datetime="ABI-L1b-RadC"+"/"+row['BEGIN_TIME_UTC'].strftime("%Y/%j")
+        x=0
+        for object in bucket.objects.filter(Prefix=prefrix_datetime):
 
-
-        prefrix_datetime=row['BEGIN_TIME_UTC'].strftime("%Y/%m/%d")+"/"
-
-        for object in bucket.objects.all():
             meta_data=object.key.split('_')
-            print(meta_data,object.key)
+            # att=datetime.datetime(year, 1, 1) + datetime.timedelta(days - 1)
+            
+            print(meta_data)
+            if x==4:
+                break
+            x+=1
+
+
 
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
