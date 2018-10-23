@@ -154,6 +154,18 @@ def bucket_nexrad(row,session):
             raise
             Track.warn("Error.")
 
+def bucket_goes(row,session):
+    try:
+        bucket=session.Bucket("noaa-goes16")
+        print(bucket)
+
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            Track.warn("The object does not exist.")
+        else:
+            raise
+            Track.warn("Error.")
+
 '''
 intersction_test method
     arguments -> location: one row of radar locations
@@ -234,6 +246,13 @@ def filter_stormevents_nexrad(row,locations,session):
 
 
     Track.info("filter_stormevents_nexrad Testing Intersection "+str(row.name))
+    return row
+
+def filter_stormevents_goes(row,session):
+    # time conversion to UTC
+    to_UTC_time(row)
+
+    bucket_goes(row,session)
     return row
 
 def locations_lon_lat(row):
@@ -332,7 +351,7 @@ def get_data(output_dir_stormevents, output_dir_intersections, data_type):
         stormevents_df['BEGIN_TIME_UTC']=pd.Series()
         stormevents_df['END_TIME_UTC']=pd.Series()
 
-        Track.info("Intersection Test")
+        Track.info("NEXRAD Intersection Test")
         stormevents_df=stormevents_df.apply(lambda x: filter_stormevents_nexrad(x,locations_df,session), axis=1)
 
 
@@ -353,16 +372,22 @@ def get_data(output_dir_stormevents, output_dir_intersections, data_type):
         stormevents_df['BEGIN_TIME_UTC']=pd.Series()
         stormevents_df['END_TIME_UTC']=pd.Series()
 
+        Track.info("GOES Intersection Test")
+        stormevents_df=stormevents_df.head(1).apply(lambda x: filter_stormevents_goes(x,session), axis=1)
+
+        print(stormevents_df.head(1))
+
 
 
 if __name__ == '__main__':
     Track.start_timer()
-    # get_data("NCDC_stormevents/intersections.csv",
-    #         "NCDC_stormevents/bounding_box_datetime_filtered_intersections.csv",
+    # get_data("NCDC_stormevents/NEXRAD_intersections.csv",
+    #         "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
     #         "NEXRAD")
 
-    # get_data("NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-    #         "GOES")
+    get_data("NCDC_stormevents/GOES_intersections.csv",
+            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+            "GOES")
 
     # download_intersections("NCDC_stormevents/bounding_box_datetime_filtered_intersections.csv")
     # get_data_size('NCDC_stormevents/size_2017.csv')
