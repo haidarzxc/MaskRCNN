@@ -500,22 +500,22 @@ def calculate_area(row):
 
 
 
-def bounding_box_area_filter():
+def bounding_box_area_filter(output_dir):
     stormevents_csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
 
     stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
     # stormevents_df dropping NaN rows
     stormevents_df=stormevents_df.dropna(thresh=2)
-    stormevents_df['IS_INTERSECTING']=pd.Series()
-    stormevents_df['STATIONID']=pd.Series()
-    stormevents_df['BEGIN_TIME_UTC']=pd.Series()
-    stormevents_df['END_TIME_UTC']=pd.Series()
     stormevents_df['AREA']=pd.Series()
 
     Track.info("AREA Calculation")
     stormevents_df=stormevents_df.apply(lambda x: calculate_area(x), axis=1)
 
-    print(stormevents_df)
+
+    stormevents_df_sorted=stormevents_df.sort_values(by=['AREA'])
+    print(stormevents_df_sorted)
+
+    stormevents_df_sorted.to_csv(output_dir)
 
 if __name__ == '__main__':
     Track.start_timer()
@@ -528,7 +528,7 @@ if __name__ == '__main__':
     #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
     #         "GOES")
 
-    bounding_box_area_filter()
+    bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size('NCDC_stormevents/size_2017.csv')
