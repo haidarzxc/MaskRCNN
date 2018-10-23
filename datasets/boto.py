@@ -396,7 +396,7 @@ def get_data_size(output_dir,year="2017"):
         objects=bucket.objects.filter(Prefix=year)
         for object in objects:
             print(object.key,object.size,counter)
-            total_voluem+=object.size
+            total_volume+=object.size
             # size_df.loc[counter]=[object.key,object.size*0.000001]
             counter+=1
         # size_df.to_csv(output_dir)
