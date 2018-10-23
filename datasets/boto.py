@@ -524,11 +524,11 @@ if __name__ == '__main__':
     #         "NEXRAD",
     # "NCDC_stormevents/NEXRAD_intersections.csv")
 
-    # get_data(
-    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-    #         "GOES")
+    get_data(
+            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+            "GOES")
 
-    bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
+    # bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size('NCDC_stormevents/size_2017.csv')
