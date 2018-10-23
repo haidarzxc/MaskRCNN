@@ -7,6 +7,7 @@ import numpy as np
 from time import sleep
 pd.options.mode.chained_assignment = None
 import re
+import math
 
 import pytz
 import datetime
@@ -463,7 +464,58 @@ def get_data(output_dir_intersections, data_type, output_dir_stormevents=None):
         goes_intersections=goes_intersections.drop_duplicates()
         goes_intersections.to_csv(output_dir_intersections)
 
+def calculate_distance(x1,x2,y1,y2):
+    return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
+'''
+    top,Left            .----------.    storm_end_point
+                        |          |    top,Right
+                        |          |
+                        |          |
+    storm_begin_point   .----------.   bottom,Right
+    bottom,left
+'''
+
+def calculate_area(row):
+    storm_begin_point=Point(row['BEGIN_LON'], row['BEGIN_LAT'])
+    storm_end_point=Point(row['END_LON'],row['END_LAT'])
+
+    storm_box=Box(storm_begin_point, storm_end_point)
+
+    width=calculate_distance(storm_box.top,
+                            storm_box.top,
+                            storm_box.left,
+                            storm_box.right)
+
+    height=calculate_distance(storm_box.bottom,
+                                storm_box.bottom,
+                                storm_box.left,
+                                storm_box.right)
+    # print(width,height)
+
+    area=width*height
+    row['AREA']=area
+
+    return row
+
+
+
+def bounding_box_area_filter():
+    stormevents_csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
+
+    stormevents_df=stormevents_csv_file[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
+    # stormevents_df dropping NaN rows
+    stormevents_df=stormevents_df.dropna(thresh=2)
+    stormevents_df['IS_INTERSECTING']=pd.Series()
+    stormevents_df['STATIONID']=pd.Series()
+    stormevents_df['BEGIN_TIME_UTC']=pd.Series()
+    stormevents_df['END_TIME_UTC']=pd.Series()
+    stormevents_df['AREA']=pd.Series()
+
+    Track.info("AREA Calculation")
+    stormevents_df=stormevents_df.apply(lambda x: calculate_area(x), axis=1)
+
+    print(stormevents_df)
 
 if __name__ == '__main__':
     Track.start_timer()
@@ -476,8 +528,10 @@ if __name__ == '__main__':
     #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
     #         "GOES")
 
+    bounding_box_area_filter()
+
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
-    get_data_size('NCDC_stormevents/size_2017.csv')
+    # get_data_size('NCDC_stormevents/size_2017.csv')
 
 
     # get_NCDC_data("NCDC_stormevents",2017)
