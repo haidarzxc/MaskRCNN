@@ -133,7 +133,7 @@ def bucket_nexrad(row,session):
                                         row['BEGIN_TIME_UTC'],
                                         row['END_TIME_UTC']
                                         )
-            print(object.key,object.size,object_dict,time_intersection,x,row.name)
+            print(object.key,object.size,time_intersection,x,row.name)
 
             # adding row to nexrad_intersections
             if time_intersection:
@@ -234,7 +234,7 @@ def bucket_goes(row,session):
                                         bucket_end_time
                     ]
                 counter+=1
-            print(object.key,time_intersection,x,row.name)
+            print(object.key,object.size,time_intersection,x,row.name)
             x+=1
 
 
@@ -416,7 +416,7 @@ def get_data(output_dir_intersections, data_type, output_dir_stormevents=None):
     session=create_session()
     Track.info("Session Created.")
 
-    stormevents_csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
+    stormevents_csv_file=load_CSV_file("NCDC_stormevents/area_filtered_stormevents.csv")
 
     if(data_type=="NEXRAD"):
         locations_csv_file=load_CSV_file("NCDC_stormevents/88D_locations.csv")
@@ -527,10 +527,10 @@ if __name__ == '__main__':
     Track.start_timer()
     bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
-    # get_data(
-    #         "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
-    #         "NEXRAD",
-    # "NCDC_stormevents/NEXRAD_intersections.csv")
+    get_data(
+            "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
+            "NEXRAD",
+    "NCDC_stormevents/NEXRAD_intersections.csv")
 
     # get_data(
     #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
