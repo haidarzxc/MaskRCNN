@@ -525,10 +525,10 @@ if __name__ == '__main__':
     Track.start_timer()
     # bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
-    # get_data(
-    #         "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
-    #         "NEXRAD",
-    # "NCDC_stormevents/NEXRAD_intersections.csv")
+    get_data(
+            "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
+            "NEXRAD",
+    "NCDC_stormevents/NEXRAD_intersections.csv")
 
     # get_data(
     #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
