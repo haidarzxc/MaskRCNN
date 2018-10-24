@@ -464,6 +464,8 @@ def get_data(output_dir_intersections, data_type, output_dir_stormevents=None):
         goes_intersections=goes_intersections.drop_duplicates()
         goes_intersections.to_csv(output_dir_intersections)
 
+
+
 def calculate_distance(x1,x2,y1,y2):
     return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
@@ -513,22 +515,27 @@ def bounding_box_area_filter(output_dir):
 
 
     stormevents_df_sorted=stormevents_df.sort_values(by=['AREA'])
-    print(stormevents_df_sorted)
+    stormevents_df_threshold=stormevents_df_sorted.loc[stormevents_df['AREA'] >= local.bounding_box_area_threshold]
+    print(stormevents_df_threshold)
 
-    stormevents_df_sorted.to_csv(output_dir)
+    stormevents_df_threshold.to_csv(output_dir)
+
+
+
 
 if __name__ == '__main__':
     Track.start_timer()
+    bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
+
     # get_data(
     #         "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
     #         "NEXRAD",
     # "NCDC_stormevents/NEXRAD_intersections.csv")
 
-    get_data(
-            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-            "GOES")
+    # get_data(
+    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+    #         "GOES")
 
-    # bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size('NCDC_stormevents/size_2017.csv')
