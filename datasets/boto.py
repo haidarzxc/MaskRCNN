@@ -52,7 +52,7 @@ def create_session():
 
 
 counter=0
-total_size=0
+
 nexrad_intersections=pd.DataFrame()
 nexrad_intersections['KEY']=pd.Series()
 nexrad_intersections['SIZE']=pd.Series()
@@ -80,11 +80,9 @@ goes_intersections['bucket_end_time']=pd.Series()
 
 def bucket_nexrad(row,session):
     global counter
-    global total_size
     try:
         bucket=session.Bucket("noaa-nexrad-level2")
 
-        # print(bucket.Object("1991/12/26/KTLX/KTLX19911226_025749.gz"))
         x=0
 
         # using row BEGIN_TIME_UTC and STATIONID
@@ -114,9 +112,6 @@ def bucket_nexrad(row,session):
             # station id
             object_dict["STD"]=meta_data_date[:-8]
 
-            # if not int(object_dict["YEAR"])==2017:
-            #     print(object_dict["YEAR"],end='\r')
-            #     continue
 
             # construct timestamp
             bucket_begin_time=datetime.datetime(int(object_dict["YEAR"]),
@@ -153,7 +148,6 @@ def bucket_nexrad(row,session):
                                         bucket_end_time
                     ]
                 counter+=1
-                total_size+=object.size*0.000001
             # if x==4:
             #     break
             x+=1
@@ -234,6 +228,7 @@ def bucket_goes(row,session):
                                         bucket_end_time
                     ]
                 counter+=1
+
             print(object.key,object.size,time_intersection,x,row.name)
             x+=1
 
@@ -413,6 +408,9 @@ def get_data_size(output_dir,year="2017"):
 def get_data(output_dir_intersections, data_type, output_dir_stormevents=None):
     global nexrad_intersections
     global goes_intersections
+    global counter
+    counter=0
+
     session=create_session()
     Track.info("Session Created.")
 
@@ -458,7 +456,7 @@ def get_data(output_dir_intersections, data_type, output_dir_stormevents=None):
         stormevents_df['END_TIME_UTC']=pd.Series()
 
         Track.info("GOES Intersection Test")
-        stormevents_df=stormevents_df.apply(lambda x: filter_stormevents_goes(x,session), axis=1)
+        stormevents_df=stormevents_df.head().apply(lambda x: filter_stormevents_goes(x,session), axis=1)
 
         # global df goes_intersections
         goes_intersections=goes_intersections.drop_duplicates()
@@ -525,16 +523,16 @@ def bounding_box_area_filter(output_dir):
 
 if __name__ == '__main__':
     Track.start_timer()
-    bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
-
-    get_data(
-            "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
-            "NEXRAD",
-    "NCDC_stormevents/NEXRAD_intersections.csv")
+    # bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
     # get_data(
-    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-    #         "GOES")
+    #         "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
+    #         "NEXRAD",
+    # "NCDC_stormevents/NEXRAD_intersections.csv")
+
+    get_data(
+            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+            "GOES")
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
