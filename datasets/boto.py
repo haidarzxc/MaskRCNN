@@ -456,7 +456,7 @@ def get_data(output_dir_intersections, data_type, output_dir_stormevents=None):
         stormevents_df['END_TIME_UTC']=pd.Series()
 
         Track.info("GOES Intersection Test")
-        stormevents_df=stormevents_df.head().apply(lambda x: filter_stormevents_goes(x,session), axis=1)
+        stormevents_df=stormevents_df.apply(lambda x: filter_stormevents_goes(x,session), axis=1)
 
         # global df goes_intersections
         goes_intersections=goes_intersections.drop_duplicates()
@@ -530,9 +530,9 @@ if __name__ == '__main__':
     #         "NEXRAD",
     # "NCDC_stormevents/NEXRAD_intersections.csv")
 
-    get_data(
-            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-            "GOES")
+    # get_data(
+    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+    #         "GOES")
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
