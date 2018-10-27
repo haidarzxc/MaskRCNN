@@ -393,7 +393,7 @@ def get_file_size(input_dir):
     print(total_volume)
 
 
-def get_data_size(output_dir=None,year="2017"):
+def get_data_size(bucket,output_dir=None,year="2017"):
     counter=0
     total_volume=0
     size_df=pd.DataFrame()
@@ -401,9 +401,10 @@ def get_data_size(output_dir=None,year="2017"):
     size_df['SIZE']=pd.Series()
     try:
         session=create_session()
-        bucket=session.Bucket("noaa-nexrad-level2")
+        bucket=session.Bucket(bucket)
 
         objects=bucket.objects.filter(Prefix=year)
+        
         for object in objects:
             print(object.key,object.size,counter)
             total_volume+=object.size
@@ -550,8 +551,9 @@ if __name__ == '__main__':
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
-    # get_data_size('NCDC_stormevents/size_2017.csv')
-    get_file_size('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
+    # get_data_size("noaa-nexrad-level2",'NCDC_stormevents/size_2017.csv')
+    get_data_size("noaa-goes16",year="ABI-L1b-RadC/2017")
+    # get_file_size('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
 
     # get_NCDC_data("NCDC_stormevents",2017)
     # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
