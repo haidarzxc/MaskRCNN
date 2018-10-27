@@ -380,7 +380,20 @@ def download_intersections(input_dir,output_dir):
     file=load_CSV_file(input_dir)
     file.apply(lambda x:iterate_intersections(x,output_dir),axis=1)
 
-def get_data_size(output_dir,year="2017"):
+
+total_volume=0
+def iterate_intersections_v1(row):
+    global total_volume
+    total_volume+=row['SIZE']
+    print(row.name,row['SIZE'],total_volume)
+
+def get_file_size(input_dir):
+    file=load_CSV_file(input_dir)
+    file.apply(lambda x:iterate_intersections_v1(x),axis=1)
+    print(total_volume)
+
+
+def get_data_size(output_dir=None,year="2017"):
     counter=0
     total_volume=0
     size_df=pd.DataFrame()
@@ -389,6 +402,7 @@ def get_data_size(output_dir,year="2017"):
     try:
         session=create_session()
         bucket=session.Bucket("noaa-nexrad-level2")
+
         objects=bucket.objects.filter(Prefix=year)
         for object in objects:
             print(object.key,object.size,counter)
@@ -530,14 +544,14 @@ if __name__ == '__main__':
     #         "NEXRAD",
     # "NCDC_stormevents/NEXRAD_intersections.csv")
 
-    get_data(
-            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-            "GOES")
+    # get_data(
+    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+    #         "GOES")
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size('NCDC_stormevents/size_2017.csv')
-
+    get_file_size('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
 
     # get_NCDC_data("NCDC_stormevents",2017)
     # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
