@@ -393,7 +393,7 @@ def iterate_intersections(row,output_dir):
 
 def download_intersections(input_dir,output_dir):
     file=load_CSV_file(input_dir)
-    file.head(5).apply(lambda x:iterate_intersections(x,output_dir),axis=1)
+    file.apply(lambda x:iterate_intersections(x,output_dir),axis=1)
 
 
 total_volume=0
