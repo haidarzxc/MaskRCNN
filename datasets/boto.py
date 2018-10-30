@@ -367,10 +367,21 @@ def iterate_intersections(row,output_dir):
         session=create_session()
         bucket=session.Bucket("noaa-nexrad-level2")
 
+        os.chdir(os.path.dirname(os.path.realpath(output_dir)).split(output_dir)[0])
+
         obj=bucket.Object(row['KEY'])
-        print(obj.key,row.name)
-        path=output_dir+"/"+obj.key.replace("/","-")
-        bucket.download_file(obj.key,path)
+        key_split=row['KEY'].split("/")
+
+        rep=row['KEY'].rpartition("/")
+        path=output_dir+"/"+rep[0]
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+
+        os.chdir(path)
+        bucket.download_file(obj.key,rep[2])
+        print(obj.key,row.name,path)
+
 
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
@@ -382,7 +393,7 @@ def iterate_intersections(row,output_dir):
 
 def download_intersections(input_dir,output_dir):
     file=load_CSV_file(input_dir)
-    file.apply(lambda x:iterate_intersections(x,output_dir),axis=1)
+    file.head(5).apply(lambda x:iterate_intersections(x,output_dir),axis=1)
 
 
 total_volume=0
@@ -549,12 +560,12 @@ if __name__ == '__main__':
     #         "NEXRAD",
     # "NCDC_stormevents/NEXRAD_intersections.csv")
 
-    get_data(
-            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-            "GOES")
+    # get_data(
+    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+    #         "GOES")
 
 
-    # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
+    download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size("noaa-nexrad-level2",'NCDC_stormevents/size_2017.csv')
     # get_data_size("noaa-goes16",year="ABI-L1b-RadC/2017")
     # get_file_size('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
