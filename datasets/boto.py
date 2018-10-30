@@ -218,16 +218,20 @@ def bucket_goes(row,session):
                                         row['END_TIME_UTC']
                                         )
             if time_intersection:
-                goes_intersections.loc[counter]=[
-                                        object.key,
-                                        object.size*0.000001,
-                                        time_intersection,
-                                        row['BEGIN_TIME_UTC'],
-                                        row['END_TIME_UTC'],
-                                        bucket_begin_time,
-                                        bucket_end_time
-                    ]
-                counter+=1
+                # goes_intersections.loc[counter]=[
+                #                         object.key,
+                #                         object.size*0.000001,
+                #                         time_intersection,
+                #                         row['BEGIN_TIME_UTC'],
+                #                         row['END_TIME_UTC'],
+                #                         bucket_begin_time,
+                #                         bucket_end_time
+                #     ]
+                # counter+=1
+
+                with open("NCDC_stormevents/TXT_GOES_datetime_filtered_intersections.csv", "a") as myfile:
+                    rec=str(object.key)+","+str(object.size*0.000001)+","+str(time_intersection)+","+str(row['BEGIN_TIME_UTC'])+","+str(row['END_TIME_UTC'])+","+str(bucket_begin_time)+","+str(bucket_end_time)+"\n"
+                    myfile.write(rec)
 
             print(object.key,object.size,time_intersection,x,row.name)
             x+=1
@@ -404,7 +408,7 @@ def get_data_size(bucket,output_dir=None,year="2017"):
         bucket=session.Bucket(bucket)
 
         objects=bucket.objects.filter(Prefix=year)
-        
+
         for object in objects:
             print(object.key,object.size,counter)
             total_volume+=object.size
@@ -545,14 +549,14 @@ if __name__ == '__main__':
     #         "NEXRAD",
     # "NCDC_stormevents/NEXRAD_intersections.csv")
 
-    # get_data(
-    #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
-    #         "GOES")
+    get_data(
+            "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
+            "GOES")
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size("noaa-nexrad-level2",'NCDC_stormevents/size_2017.csv')
-    get_data_size("noaa-goes16",year="ABI-L1b-RadC/2017")
+    # get_data_size("noaa-goes16",year="ABI-L1b-RadC/2017")
     # get_file_size('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
 
     # get_NCDC_data("NCDC_stormevents",2017)
