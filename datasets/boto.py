@@ -362,7 +362,7 @@ def locations_lon_lat(row):
     return row
 
 def iterate_intersections(row,output_dir):
-
+    global total
     try:
         session=create_session()
         bucket=session.Bucket("noaa-nexrad-level2")
@@ -370,7 +370,6 @@ def iterate_intersections(row,output_dir):
         os.chdir(os.path.dirname(os.path.realpath(output_dir)).split(output_dir)[0])
 
         obj=bucket.Object(row['KEY'])
-        key_split=row['KEY'].split("/")
 
         rep=row['KEY'].rpartition("/")
         path=output_dir+"/"+rep[0]
@@ -380,9 +379,9 @@ def iterate_intersections(row,output_dir):
 
         os.chdir(path)
         bucket.download_file(obj.key,rep[2])
-        Track.info(str(obj.key)+", "+str(row.name)+", "+path)
-        print(obj.key,row.name,path)
-
+        total+=(obj.get()['ContentLength']*0.000001)
+        Track.info(str(obj.key)+", "+str(row.name)+", "+path+", "+str(total))
+        print(obj.key,row.name,path,total)
 
     except botocore.exceptions.ClientError as e:
         if e.response['Error']['Code'] == "404":
@@ -391,12 +390,14 @@ def iterate_intersections(row,output_dir):
             raise
             Track.warn("Error.")
 
-
+total=0
 def download_intersections(input_dir,output_dir):
+
     file=load_CSV_file(input_dir)
+    file=file.sort_values(by='KEY')
     Track.createLogFile("nexrad_intersections/log.log")
     file.apply(lambda x:iterate_intersections(x,output_dir),axis=1)
-
+    Track.info("total volume (mb): "+str(total))
 
 total_volume=0
 def iterate_intersections_v1(row):
