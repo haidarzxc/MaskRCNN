@@ -380,6 +380,7 @@ def iterate_intersections(row,output_dir):
 
         os.chdir(path)
         bucket.download_file(obj.key,rep[2])
+        Track.info(str(obj.key)+", "+str(row.name)+", "+path)
         print(obj.key,row.name,path)
 
 
@@ -393,6 +394,7 @@ def iterate_intersections(row,output_dir):
 
 def download_intersections(input_dir,output_dir):
     file=load_CSV_file(input_dir)
+    Track.createLogFile("nexrad_intersections/log.log")
     file.apply(lambda x:iterate_intersections(x,output_dir),axis=1)
 
 

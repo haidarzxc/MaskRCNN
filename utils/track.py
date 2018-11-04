@@ -27,6 +27,11 @@ class Track:
     def get_end_time(self):
         return self.end_time
 
+    def createLogFile(self,output_dir):
+        for handler in logging.root.handlers[:]:
+            logging.root.removeHandler(handler)
+        logging.basicConfig(filename=output_dir, level=logging.INFO)
+
     def get_exection_time(self):
         if self.start_time and self.end_time:
             logging.info(str(self.end_time-self.start_time)+" seconds")
