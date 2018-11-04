@@ -395,6 +395,7 @@ def download_intersections(input_dir,output_dir):
 
     file=load_CSV_file(input_dir)
     file=file.sort_values(by='KEY')
+    file=file.drop_duplicates(['KEY'])
     Track.createLogFile("nexrad_intersections/log.log")
     file.apply(lambda x:iterate_intersections(x,output_dir),axis=1)
     Track.info("total volume (mb): "+str(total))
@@ -407,6 +408,7 @@ def iterate_intersections_v1(row):
 
 def get_file_size(input_dir):
     file=load_CSV_file(input_dir)
+    file=file.drop_duplicates(['KEY'])
     file.apply(lambda x:iterate_intersections_v1(x),axis=1)
     print(total_volume)
 
