@@ -408,7 +408,7 @@ def iterate_intersections_v1(row):
 
 def get_file_size(input_dir):
     file=load_CSV_file(input_dir,["KEY", "SIZE", "IS_TIME_INTERSECTING", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"])
-    # file=file.drop_duplicates(['KEY'])
+    file=file.drop_duplicates(['KEY'])
     file.apply(lambda x:iterate_intersections_v1(x),axis=1)
     print(total_volume)
 
