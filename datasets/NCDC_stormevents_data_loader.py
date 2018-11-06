@@ -39,10 +39,10 @@ def get_NCDC_data(output_dir,year=None):
             print("\n")
 
 
-def load_CSV_file(fileName):
+def load_CSV_file(fileName,header=None):
     csv_path=os.path.abspath(fileName)
     try:
-        csv_file=pd.read_csv(csv_path)
+        csv_file=pd.read_csv(csv_path,names=header)
         Track.info(fileName +": csv file read")
         return csv_file
     except:
