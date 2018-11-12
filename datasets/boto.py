@@ -570,10 +570,10 @@ if __name__ == '__main__':
     #         "GOES")
 
 
-    # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
+    download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size("noaa-nexrad-level2",'NCDC_stormevents/size_2017.csv')
     # get_data_size("noaa-goes16",year="ABI-L1b-RadC/2017")
-    get_file_size('goes_intersections/TXT_GOES_datetime_filtered_intersections.csv')
+    # get_file_size('goes_intersections/TXT_GOES_datetime_filtered_intersections.csv')
 
     # get_NCDC_data("NCDC_stormevents",2017)
     # retrieve_WSR_88D_RDA_locations(local.WSR_88D_LOCATIONS,'NCDC_stormevents/88D_locations.csv')
