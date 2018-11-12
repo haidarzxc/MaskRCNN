@@ -11,7 +11,8 @@ build/
 *.egg-info/
 *.egg
 
-Radar_intersections/
+nexrad_intersections/
+goes_intersections/
 
 # Temporary files
 *.swn

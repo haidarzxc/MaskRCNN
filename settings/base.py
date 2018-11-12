@@ -1,8 +1,11 @@
 # base
 
 # shift units
-HORIZONTAL_SHIFT=3
-VERTICAL_SHIFT=3
+HORIZONTAL_SHIFT=2
+VERTICAL_SHIFT=2
+
+# bounding box area threshold
+bounding_box_area_threshold=6.25E-06
 
 # stormevents excel sheet time margin shift
 STORM_BEGIN_TIME_MIN_SHIFT=1
