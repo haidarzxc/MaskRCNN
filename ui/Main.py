@@ -13,42 +13,45 @@ from kivy.uix.popup import Popup
 from kivy.uix.settings import SettingItem
 from kivy.uix.button import Button
 import os
-from customSettings import Settings
-from customSettings import SettingsWithSidebar
 import json
 from table import *
+
+
+
+
+
+
+
+
+class Root(BoxLayout):
+    sm=None
+    upperbound=1
+    lowerbound=0
+    def __init__(self, **kwargs):
+        super(Root,self).__init__(**kwargs)
+
+
+    def changeScreen(self, buttonTxt):
+        # print(Root.upperbound)
+        if buttonTxt == "next":
+            Root.upperbound+=100
+            next(Root.upperbound,0)
+            Grid()
+            Clock.tick()
+            self.ids.screen_manager.current="table_screen"
+        elif buttonTxt=="prevous":
+            Root.upperbound-=100
+            prevous(Root.upperbound,0)
+            Grid()
+            self.ids.screen_manager.do_layout()
+            self.ids.screen_manager.current="table_screen"
+        Root.sm=self.ids.screen_manager
+
 
 class MainApp(App):
     def build(self):
         self.settings_cls = SettingsWithSidebar
-    	return Root()
-
-    x=["Alpha","Bravo","Charley","Delta","Echo","Foxtrot","xray"]
-    def populateList(lst):
-        with open('retrofit.json') as data_file:
-            data = json.load(data_file)
-        data[3]["options"]=lst
-        with open('retrofit.json', 'w') as outfile:
-            json.dump(data, outfile)
-        return lst
-    populateList(x)
-
-    def build_settings(self,settings):
-        settings.bind(on_close=self.stop)
-        settings.bind(on_config_change=self.On_config_change)
-        return settings
-
-    def On_config_change(self, settings, config, section, key, value):
-        if section==u'app':
-            if key==u'button_run':
-                super(MainApp, self).close_settings()
-                Root.sm.current="query_screen"
-                Grid()
-            elif key==u'stndDate':
-                if(value==u'start_Date'):
-                    print "start date" ,value
-                else:
-                    print "end Date", value
+        return Root()
 
 
 Factory.register('Root', cls=Root)

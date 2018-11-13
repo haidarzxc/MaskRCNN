@@ -1,0 +1,73 @@
+<Root>:
+    ScreenManager:
+        id: screen_manager
+        MainScreen:
+            name: "main_screen"
+        TableScreen:
+            name: "table_screen"
+
+<ToolbarScreen@Screen>:
+    size_hint_y: None
+    #height: 50
+    ActionBar:
+        id: actBar
+        pos_hint: {'top':1}
+        ActionView:
+            use_separator: True
+            ActionPrevious:
+                title: 'Storms'
+                with_previous: True
+            ActionOverflow:
+
+            ActionGroup:
+                text: 'More'
+                ActionButton:
+                    text: 'Next'
+                    on_release:app.root.changeScreen(self.text.lower())
+                ActionButton:
+                    text: 'Prevous'
+                    on_release:app.root.changeScreen(self.text.lower())
+
+<MainScreen@Screen>:
+    GridLayout:
+        rows:2
+        ToolbarScreen:
+        Body:
+
+<Body@Screen>:
+    BoxLayout:
+
+<TableScreen@Screen>:
+    GridLayout:
+        rows:2
+        ToolbarScreen:
+        AnchorLayout:
+
+            ScrollView:
+                Grid:
+
+<TableHeader>
+    size_hint_y: None
+    height: '30dp'
+    width: '100dp'
+
+    canvas.before:
+        Color:
+            rgb: 0.5, 0.5, 0.5
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<Record>:
+    size_hint_y: None
+    height: '30dp'
+    width: '100dp'
+
+    canvas.before:
+        Color:
+            rgb: 0.2, 0.2, 0.2
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+
