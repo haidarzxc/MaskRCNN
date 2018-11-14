@@ -492,7 +492,9 @@ def get_data(output_dir_intersections, data_type, output_dir_stormevents=None):
 
 
         # global df nexrad_intersections
-        nexrad_intersections=nexrad_intersections.drop_duplicates()
+        header=["KEY","FOREIGN_KEY", "SIZE", "IS_INTERSECTING", "IS_TIME_INTERSECTING","BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON", "STATIONID", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
+        nexrad_intersections=load_CSV_file("NCDC_stormevents/TXT_NEXRAD_bounding_box_datetime_filtered_intersections.csv",header)
+        # nexrad_intersections=nexrad_intersections.drop_duplicates()
         nexrad_intersections.to_csv(output_dir_intersections)
 
 
