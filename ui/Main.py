@@ -37,15 +37,16 @@ class Root(BoxLayout):
             Root.upperbound+=100
             next(Root.upperbound,0)
             Grid()
-            Clock.tick()
             self.ids.screen_manager.current="table_screen"
         elif buttonTxt=="prevous":
             Root.upperbound-=100
             prevous(Root.upperbound,0)
             Grid()
-            self.ids.screen_manager.do_layout()
             self.ids.screen_manager.current="table_screen"
         Root.sm=self.ids.screen_manager
+
+    def clear_canvas(self):
+        print("hello")
 
 
 class MainApp(App):

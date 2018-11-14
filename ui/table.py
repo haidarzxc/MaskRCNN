@@ -48,15 +48,15 @@ class Grid(GridLayout):
 
         storms_filtered=storms[storm_cols]
         storms_header=storms_header.append(storms_filtered, ignore_index=True)
-        # print(storms_header[0:upperbound])
-        # storms_header=storms_header.head(10).to_dict('records')
-        storms_header=storms_header.head(upperbound).to_dict('records')
+        print(storms_header[0:upperbound])
+        storms_header=storms_header.head(10).to_dict('records')
+
+        # storms_header=storms_header[0:upperbound].to_dict('records')
         self.data=storms_header
 
 
     def renderData(self):
         self.clear_widgets()
-        print(self.data)
         for i in range(len(self.data)):
             if i < 1:
                 row = self.createHeader(i)
