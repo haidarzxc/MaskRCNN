@@ -10,7 +10,8 @@
         ListView:
             id: Storms_list_id
             adapter:
-                ListAdapter(data=main.data(), cls=main.StudentListButton)
+                ListAdapter(data=main.data(), cls=main.ListButton)
+
 
 <Toolbar>:
     ActionBar:
@@ -26,10 +27,7 @@
             ActionGroup:
                 text: 'More'
                 ActionButton:
-                    text: 'Next'
-                    on_press: app.root.next()
-                ActionButton:
-                    text: 'Prevous'
-                    on_press: app.root.prevous()
+                    text: 'view'
+                    on_press: app.root.view()
 
 

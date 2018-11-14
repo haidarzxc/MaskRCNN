@@ -21,11 +21,9 @@ class Root(FloatLayout):
     def __init__(self, **kwargs):
         super(Root,self).__init__(**kwargs)
 
-    def next(self, *args):
-        print("next",self.storms_list_view.adapter.selection)
 
-    def prevous(self):
-        print("prevous",self.storms_list_view.adapter.selection)
+    def view(self):
+        print("view",self.storms_list_view.adapter.selection)
 
 
 
