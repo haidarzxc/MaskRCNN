@@ -5,53 +5,33 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
 Config.set('graphics', 'fullscreen', '0')
 Config.set('graphics','show_cursor','1')
-from kivy.uix.settings import SettingsWithSidebar
 from kivy.uix.floatlayout import FloatLayout
 from kivy.factory import Factory
 from kivy.properties import ObjectProperty
-from kivy.uix.popup import Popup
-from kivy.uix.settings import SettingItem
 from kivy.uix.button import Button
 import os
-import json
-from table import *
+from Table import *
 
+class Toolbar(BoxLayout):
+    pass
 
-
-
-
-
-
-
-class Root(BoxLayout):
+class Root(FloatLayout):
     sm=None
-    upperbound=1
-    lowerbound=0
+    storms_list_view = ObjectProperty()
     def __init__(self, **kwargs):
         super(Root,self).__init__(**kwargs)
 
+    def next(self, *args):
+        print("next",self.storms_list_view.adapter.selection)
 
-    def changeScreen(self, buttonTxt):
-        # print(Root.upperbound)
-        if buttonTxt == "next":
-            Root.upperbound+=100
-            next(Root.upperbound,0)
-            Grid()
-            self.ids.screen_manager.current="table_screen"
-        elif buttonTxt=="prevous":
-            Root.upperbound-=100
-            prevous(Root.upperbound,0)
-            Grid()
-            self.ids.screen_manager.current="table_screen"
-        Root.sm=self.ids.screen_manager
+    def prevous(self):
+        print("prevous",self.storms_list_view.adapter.selection)
 
-    def clear_canvas(self):
-        print("hello")
+
 
 
 class MainApp(App):
     def build(self):
-        self.settings_cls = SettingsWithSidebar
         return Root()
 
 

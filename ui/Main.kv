@@ -1,14 +1,18 @@
-<Root>:
-    ScreenManager:
-        id: screen_manager
-        MainScreen:
-            name: "main_screen"
-        TableScreen:
-            name: "table_screen"
+# Reference Main.py
+#: import main Main
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
 
-<ToolbarScreen@Screen>:
-    size_hint_y: None
-    #height: 50
+<Root>:
+    storms_list_view: Storms_list_id
+    Toolbar:
+    BoxLayout:
+        size_hint_y: (0.92)
+        ListView:
+            id: Storms_list_id
+            adapter:
+                ListAdapter(data=main.data(), cls=main.StudentListButton)
+
+<Toolbar>:
     ActionBar:
         id: actBar
         pos_hint: {'top':1}
@@ -23,51 +27,9 @@
                 text: 'More'
                 ActionButton:
                     text: 'Next'
-                    on_release:app.root.changeScreen(self.text.lower())
+                    on_press: app.root.next()
                 ActionButton:
                     text: 'Prevous'
-                    on_release:app.root.changeScreen(self.text.lower())
-
-<MainScreen@Screen>:
-    GridLayout:
-        rows:2
-        ToolbarScreen:
-        Body:
-
-<Body@Screen>:
-    BoxLayout:
-
-<TableScreen@Screen>:
-    GridLayout:
-        rows:2
-        ToolbarScreen:
-        AnchorLayout:
-
-            ScrollView:
-                Grid:
-
-<TableHeader>
-    size_hint_y: None
-    height: '30dp'
-    width: '100dp'
-
-    canvas.before:
-        Color:
-            rgb: 0.5, 0.5, 0.5
-        Rectangle:
-            pos: self.pos
-            size: self.size
-
-<Record>:
-    size_hint_y: None
-    height: '30dp'
-    width: '100dp'
-
-    canvas.before:
-        Color:
-            rgb: 0.2, 0.2, 0.2
-        Rectangle:
-            pos: self.pos
-            size: self.size
+                    on_press: app.root.prevous()
 
 
