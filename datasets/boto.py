@@ -132,24 +132,42 @@ def bucket_nexrad(row,session):
 
             # adding row to nexrad_intersections
             if time_intersection:
-                nexrad_intersections.loc[counter]=[
-                                        object.key,
-                                        object.size*0.000001,
-                                        row['IS_INTERSECTING'],
-                                        time_intersection,
-                                        row['BEGIN_LAT'],
-                                        row['BEGIN_LON'],
-                                        row['END_LAT'],
-                                        row['END_LON'],
-                                        row['STATIONID'],
-                                        row['BEGIN_TIME_UTC'],
-                                        row['END_TIME_UTC'],
-                                        bucket_begin_time,
-                                        bucket_end_time
-                    ]
-                counter+=1
+                # nexrad_intersections.loc[counter]=[
+                #                         object.key,
+                #                         object.size*0.000001,
+                #                         row['IS_INTERSECTING'],
+                #                         time_intersection,
+                #                         row['BEGIN_LAT'],
+                #                         row['BEGIN_LON'],
+                #                         row['END_LAT'],
+                #                         row['END_LON'],
+                #                         row['STATIONID'],
+                #                         row['BEGIN_TIME_UTC'],
+                #                         row['END_TIME_UTC'],
+                #                         bucket_begin_time,
+                #                         bucket_end_time
+                #     ]
+                # counter+=1
+                with open("NCDC_stormevents/TXT_NEXRAD_bounding_box_datetime_filtered_intersections.csv", "a") as myfile:
+                    rec=str(object.key)+ \
+                    ","+str(row.name)+ \
+                    ","+str(object.size*0.000001)+ \
+                    ","+str(row['IS_INTERSECTING'])+ \
+                    ","+str(time_intersection)+ \
+                    ","+str(row['BEGIN_LAT'])+ \
+                    ","+str(row['BEGIN_LON'])+ \
+                    ","+str(row['END_LAT'])+ \
+                    ","+str(row['END_LON'])+ \
+                    ","+str(row['STATIONID'])+ \
+                    ","+str(row['BEGIN_TIME_UTC'])+ \
+                    ","+str(row['END_TIME_UTC'])+ \
+                    ","+str(bucket_begin_time)+ \
+                    ","+str(bucket_end_time)+ \
+                    "\n"
+                    myfile.write(rec)
             # if x==4:
             #     break
+            print(object.key,object.size,time_intersection,x,row.name)
             x+=1
 
     except botocore.exceptions.ClientError as e:
@@ -560,17 +578,17 @@ if __name__ == '__main__':
     Track.start_timer()
     # bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
-    # get_data(
-    #         "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
-    #         "NEXRAD",
-    # "NCDC_stormevents/NEXRAD_intersections.csv")
+    get_data(
+            "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
+            "NEXRAD",
+    "NCDC_stormevents/NEXRAD_intersections.csv")
 
     # get_data(
     #         "NCDC_stormevents/GOES_datetime_filtered_intersections.csv",
     #         "GOES")
 
 
-    download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
+    # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
     # get_data_size("noaa-nexrad-level2",'NCDC_stormevents/size_2017.csv')
     # get_data_size("noaa-goes16",year="ABI-L1b-RadC/2017")
     # get_file_size('goes_intersections/TXT_GOES_datetime_filtered_intersections.csv')
