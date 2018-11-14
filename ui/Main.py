@@ -20,6 +20,7 @@ parent_directory = os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
+from utils.time import to_UTC_time
 
 class Toolbar(BoxLayout):
     pass
@@ -29,14 +30,26 @@ class Root(BoxLayout):
     items_list = ObjectProperty(None)
     column_headings = ObjectProperty(None)
     rv_data = ListProperty([])
+    storms=load_CSV_file('NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv')
+    storms['BEGIN_TIME_UTC']=pd.Series()
+    storms['END_TIME_UTC']=pd.Series()
+
+    # time conversion to UTC
+
+    nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
+    row=None
     def __init__(self, **kwargs):
         super(Root,self).__init__(**kwargs)
+        self.storms=self.storms.apply(self.convert_time,axis=1)
         self.get_dataframe()
 
+    def convert_time(self,row):
+        to_UTC_time(row)
+        return row
+
     def get_dataframe(self):
-        storm_cols=['BEGIN_DATE_TIME','END_DATE_TIME','BEGIN_LON','BEGIN_LAT']
-        storms=load_CSV_file('NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv')
-        storms_filtered=storms[storm_cols]
+        storm_cols=['BEGIN_TIME_UTC','END_TIME_UTC','BEGIN_LON','BEGIN_LAT']
+        storms_filtered=self.storms[storm_cols]
 
         # Extract and create column headings
         for heading in storms_filtered.columns:
@@ -54,10 +67,15 @@ class Root(BoxLayout):
         print("Button: text={0}, index={1}".format(instance.text, instance.index))
         print(self.rv_data[instance.index])
         print("Pandas: Index={}".format(self.rv_data[instance.index]['Index']))
+        self.row=self.rv_data[instance.index]['Index']
 
     def view(self):
-        print("view")
-
+        print("view",self.row)
+        if self.row:
+            storm_row=self.storms.iloc[int(self.row)]
+            nexrad_Objects=self.nexrad.loc[(self.nexrad['BEGIN_TIME_UTC'] == storm_row['BEGIN_TIME_UTC']) & \
+                                            (self.nexrad['END_TIME_UTC'] == storm_row['END_TIME_UTC'])]
+            print(nexrad_Objects)
 
 class MainApp(App):
     def build(self):
