@@ -21,6 +21,7 @@ parent_directory = os.path.dirname(\
 sys.path.insert(0,parent_directory)
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 from utils.time import to_UTC_time
+from Graph import graph,get_aws_object
 
 class Toolbar(BoxLayout):
     pass
@@ -35,6 +36,7 @@ class Root(BoxLayout):
 
     nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
     row=None
+
     def __init__(self, **kwargs):
         super(Root,self).__init__(**kwargs)
         self.get_dataframe()
@@ -58,11 +60,23 @@ class Root(BoxLayout):
         print("get_row:")
         self.row=self.rv_data[instance.index]['Index']
 
+    def download_file(self, row):
+        output_dir="nexrad_intersections/ui_objects"
+        rep=row['KEY'].rpartition("/")
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        print("DOWNLOADING",row['KEY'])
+        get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
+
     def view(self):
         print("view",self.row)
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
             print(nexrad_Objects)
+
+            nexrad_Objects.apply(self.download_file,axis=1)
+
+            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
 
 class MainApp(App):
     def build(self):
