@@ -74,9 +74,9 @@ class Root(BoxLayout):
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
             print(nexrad_Objects)
 
-            nexrad_Objects.apply(self.download_file,axis=1)
+            # nexrad_Objects.apply(self.download_file,axis=1)
 
-            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
+            graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
 
 class MainApp(App):
     def build(self):
