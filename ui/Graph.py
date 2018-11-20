@@ -19,7 +19,7 @@ class ScrollableWindow(QtGui.QMainWindow):
         self.widget = QtGui.QWidget()
         self.setCentralWidget(self.widget)
         self.widget.setLayout(QtGui.QVBoxLayout())
-        self.widget.layout().setContentsMargins(0,0,0,0)
+        self.widget.layout().setContentsMargins(5,5,5,5)
         self.widget.layout().setSpacing(5)
 
         self.fig = fig
