@@ -4,6 +4,7 @@ import settings.local as local
 import boto3
 import os
 import math
+from netCDF4 import Dataset
 
 
 import matplotlib.pyplot as plt
@@ -50,12 +51,16 @@ def get_aws_object(bucket,key,output_dir):
     bucket=session.Bucket(bucket)
     bucket.download_file(key,output_dir)
 
-def render(ax,title,path):
-    radar = pyart.io.read_nexrad_archive(path)
-    display = pyart.graph.RadarDisplay(radar)
-    display.plot('reflectivity', 0, title=title,ax=ax)
+def render(ax,title,path,type):
+    if type=="nexrad":
+        radar = pyart.io.read_nexrad_archive(path)
+        display = pyart.graph.RadarDisplay(radar)
+        display.plot('reflectivity', 0, title=title,ax=ax)
+    elif type=="goes":
+        dataset = Dataset(path)
+        # display = pyart.graph.RadarDisplay(dataset)
 
-def graph(objects):
+def graph(objects,type):
     objects_length=len(objects)
     rows=math.ceil(objects_length/2)
 
@@ -65,7 +70,7 @@ def graph(objects):
         object=objects.iloc[[0]]
         path="ui_objects/"+object['KEY'].values[0].split('/')[4]
         print('GRAPHING',path)
-        render(ax,object['KEY'].values[0].split('/')[4],path)
+        render(ax,object['KEY'].values[0].split('/')[4],path,type)
         ScrollableWindow(fig)
         return
 
@@ -76,7 +81,7 @@ def graph(objects):
             object=objects.iloc[[c]]
             path="ui_objects/"+object['KEY'].values[0].split('/')[4]
             print((c+1),'GRAPHING',path)
-            render(ax,object['KEY'].values[0].split('/')[4],path)
+            render(ax,object['KEY'].values[0].split('/')[4],path,type)
             c+=1
 
     ScrollableWindow(fig)
