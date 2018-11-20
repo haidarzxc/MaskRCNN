@@ -12,6 +12,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 import os
 from Table import *
+from pathlib import Path
 
 import os, sys, inspect
 import pandas as pd
@@ -65,18 +66,25 @@ class Root(BoxLayout):
         rep=row['KEY'].rpartition("/")
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
-        print("DOWNLOADING",row['KEY'])
-        get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
+
+        file = Path(output_dir+"/"+rep[2])
+        if not file.is_file():
+            # file exists
+            print("DOWNLOADING",row['KEY'])
+            get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
+        else:
+            print(row['KEY'], 'Exists!')
 
     def view(self):
-        print("view",self.row)
+        # print("view",self.row)
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
-            print(nexrad_Objects)
+            # print(nexrad_Objects)
 
-            # nexrad_Objects.apply(self.download_file,axis=1)
+            nexrad_Objects.apply(self.download_file,axis=1)
 
-            graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
+            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
+            graph(nexrad_Objects)
 
 class MainApp(App):
     def build(self):

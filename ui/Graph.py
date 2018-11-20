@@ -3,6 +3,39 @@ import pyart
 import settings.local as local
 import boto3
 import os
+import math
+
+
+import matplotlib.pyplot as plt
+from PyQt4 import QtGui
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+
+class ScrollableWindow(QtGui.QMainWindow):
+    def __init__(self, fig):
+        self.qapp = QtGui.QApplication([])
+
+        QtGui.QMainWindow.__init__(self)
+        self.widget = QtGui.QWidget()
+        self.setCentralWidget(self.widget)
+        self.widget.setLayout(QtGui.QVBoxLayout())
+        self.widget.layout().setContentsMargins(0,0,0,0)
+        self.widget.layout().setSpacing(5)
+
+        self.fig = fig
+        self.canvas = FigureCanvas(self.fig)
+        self.canvas.draw()
+        self.scroll = QtGui.QScrollArea(self.widget)
+        self.scroll.setWidget(self.canvas)
+
+        self.nav = NavigationToolbar(self.canvas, self.widget)
+        self.widget.layout().addWidget(self.nav)
+        self.widget.layout().addWidget(self.scroll)
+
+        self.show()
+        exit(self.qapp.exec_())
+
+
 
 def create_session():
     session = boto3.Session(
@@ -18,23 +51,18 @@ def get_aws_object(bucket,key,output_dir):
     bucket.download_file(key,output_dir)
 
 
-def graph(path):
-# open the file, create the displays and figure
-    radar = pyart.io.read_nexrad_archive(path)
-    display = pyart.graph.RadarDisplay(radar)
-    fig = plt.figure(figsize=(10, 8))
-    fig.subplots_adjust(hspace=0.4)
-    nplots = 10
-    for snum in range(10):
-        ax = fig.add_subplot(nplots, 4, snum+1)
-        display.plot('reflectivity', 0,
-                     vmin=-32, vmax=64, ax=ax)
-        display.plot_range_ring(radar.range['data'][-1]/1000., ax=ax)
-        display.set_limits(xlim=(-500, 500), ylim=(-500, 500), ax=ax)
-    # plot super resolution reflectivity
+def graph(objects):
+    rows=int(len(objects)/2)
+    fig, axes = plt.subplots(ncols=2, nrows=rows, figsize=(19,39))
+    c=0
+    for ax in axes.flatten():
+        object=objects.iloc[[c]]
+        path="nexrad_intersections/ui_objects/"+object['KEY'].values[0].split('/')[4]
+        print('GRAPHING',path)
+        radar = pyart.io.read_nexrad_archive(path)
+        display = pyart.graph.RadarDisplay(radar)
+        display.plot('reflectivity', 0, title=object['KEY'].values[0].split('/')[4],
+                        ax=ax)
+        c+=1
+    ScrollableWindow(fig)
 
-
-    # --------------
-
-
-    plt.show()
