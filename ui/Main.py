@@ -62,14 +62,13 @@ class Root(BoxLayout):
         self.row=self.rv_data[instance.index]['Index']
 
     def download_file(self, row):
-        output_dir="nexrad_intersections/ui_objects"
+        output_dir="ui_objects"
         rep=row['KEY'].rpartition("/")
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
         file = Path(output_dir+"/"+rep[2])
         if not file.is_file():
-            # file exists
             print("DOWNLOADING",row['KEY'])
             get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
         else:
@@ -79,12 +78,13 @@ class Root(BoxLayout):
         # print("view",self.row)
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
-            # print(nexrad_Objects)
+
 
             nexrad_Objects.apply(self.download_file,axis=1)
 
             # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
             graph(nexrad_Objects)
+            print('total objs',len(nexrad_Objects))
 
 class MainApp(App):
     def build(self):

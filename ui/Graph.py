@@ -50,19 +50,34 @@ def get_aws_object(bucket,key,output_dir):
     bucket=session.Bucket(bucket)
     bucket.download_file(key,output_dir)
 
+def render(ax,title,path):
+    radar = pyart.io.read_nexrad_archive(path)
+    display = pyart.graph.RadarDisplay(radar)
+    display.plot('reflectivity', 0, title=title,ax=ax)
 
 def graph(objects):
-    rows=int(len(objects)/2)
+    objects_length=len(objects)
+    rows=math.ceil(objects_length/2)
+
+    # single graph
+    if rows==1 and objects_length==1:
+        fig, ax = plt.subplots(ncols=1, nrows=rows, figsize=(10,5))
+        object=objects.iloc[[0]]
+        path="nexrad_intersections/ui_objects/"+object['KEY'].values[0].split('/')[4]
+        print('GRAPHING',path)
+        render(ax,object['KEY'].values[0].split('/')[4],path)
+        ScrollableWindow(fig)
+        return
+
     fig, axes = plt.subplots(ncols=2, nrows=rows, figsize=(19,39))
     c=0
     for ax in axes.flatten():
-        object=objects.iloc[[c]]
-        path="nexrad_intersections/ui_objects/"+object['KEY'].values[0].split('/')[4]
-        print('GRAPHING',path)
-        radar = pyart.io.read_nexrad_archive(path)
-        display = pyart.graph.RadarDisplay(radar)
-        display.plot('reflectivity', 0, title=object['KEY'].values[0].split('/')[4],
-                        ax=ax)
-        c+=1
+        if c<objects_length:
+            object=objects.iloc[[c]]
+            path="ui_objects/"+object['KEY'].values[0].split('/')[4]
+            print((c+1),'GRAPHING',path)
+            render(ax,object['KEY'].values[0].split('/')[4],path)
+            c+=1
+
     ScrollableWindow(fig)
 

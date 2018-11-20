@@ -13,6 +13,7 @@ build/
 
 nexrad_intersections/
 goes_intersections/
+ui_objects/
 
 # Temporary files
 *.swn
