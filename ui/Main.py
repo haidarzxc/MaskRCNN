@@ -36,6 +36,7 @@ class Root(BoxLayout):
 
 
     nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
+    goes=load_CSV_file('goes_intersections/GOES_datetime_filtered_intersections.csv')
     row=None
 
     def __init__(self, **kwargs):
@@ -61,7 +62,7 @@ class Root(BoxLayout):
         print("get_row:")
         self.row=self.rv_data[instance.index]['Index']
 
-    def download_file(self, row):
+    def download_file(self, row,type):
         output_dir="ui_objects"
         rep=row['KEY'].rpartition("/")
         if not os.path.exists(output_dir):
@@ -70,21 +71,36 @@ class Root(BoxLayout):
         file = Path(output_dir+"/"+rep[2])
         if not file.is_file():
             print("DOWNLOADING",row['KEY'])
-            get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
+            if type=="nexrad":
+                get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
+            elif type=="goes":
+                get_aws_object("noaa-goes16",row['KEY'],output_dir+"/"+rep[2])
         else:
             print(row['KEY'], 'Exists!')
 
-    def view(self):
+    def view_nexrad(self):
         # print("view",self.row)
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
 
 
-            nexrad_Objects.apply(self.download_file,axis=1)
+            nexrad_Objects.apply(lambda x: self.download_file(x,"nexrad"),axis=1)
 
             # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
-            graph(nexrad_Objects)
-            print('total objs',len(nexrad_Objects))
+            graph(nexrad_Objects,'nexrad')
+            # print('total objs',len(nexrad_Objects))
+
+    def view_goes(self):
+        # print("view",self.row)
+        if self.row:
+            goes_Objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == int(self.row))]
+            print(goes_Objects)
+
+            goes_Objects.apply(lambda x: self.download_file(x,"goes"),axis=1)
+
+            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
+            graph(goes_Objects,"goes")
+            # print('total objs',len(goes_Objects))
 
 class MainApp(App):
     def build(self):
