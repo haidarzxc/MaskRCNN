@@ -36,6 +36,7 @@ class Root(BoxLayout):
 
 
     nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
+    goes=load_CSV_file('goes_intersections/GOES_datetime_filtered_intersections.csv')
     row=None
 
     def __init__(self, **kwargs):
@@ -74,7 +75,7 @@ class Root(BoxLayout):
         else:
             print(row['KEY'], 'Exists!')
 
-    def view(self):
+    def view_nexrad(self):
         # print("view",self.row)
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
@@ -85,6 +86,18 @@ class Root(BoxLayout):
             # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
             graph(nexrad_Objects)
             print('total objs',len(nexrad_Objects))
+
+    def view_goes(self):
+        # print("view",self.row)
+        if self.row:
+            goes_Objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == int(self.row))]
+            print(goes_Objects)
+
+            # goes_Objects.apply(self.download_file,axis=1)
+            #
+            # # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
+            # graph(nexrad_Objects)
+            # print('total objs',len(nexrad_Objects))
 
 class MainApp(App):
     def build(self):
