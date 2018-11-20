@@ -63,7 +63,7 @@ def graph(objects):
     if rows==1 and objects_length==1:
         fig, ax = plt.subplots(ncols=1, nrows=rows, figsize=(10,5))
         object=objects.iloc[[0]]
-        path="nexrad_intersections/ui_objects/"+object['KEY'].values[0].split('/')[4]
+        path="ui_objects/"+object['KEY'].values[0].split('/')[4]
         print('GRAPHING',path)
         render(ax,object['KEY'].values[0].split('/')[4],path)
         ScrollableWindow(fig)
