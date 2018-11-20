@@ -1,0 +1,66 @@
+
+
+<SelectableButton>:
+    canvas.before:
+        Color:
+            rgba: (0, 0.517, 0.705, 1) if self.selected else (0, 0.517, 0.705, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    background_color: [1, 0, 0, 1]  if self.selected else [1, 1, 1, 1]  # dark red else dark grey
+    on_release: app.root.get_row(self)
+
+<Root>:
+    column_headings: column_headings
+    orientation: "vertical"
+    BoxLayout:
+        size_hint_y: (0.1)
+        Toolbar:
+    GridLayout:
+        canvas.before:
+            Color:
+                rgba: (1, 0.2, 0, .5)     # 50% translucent orange red
+            Rectangle:
+                pos: self.pos
+                size: self.size
+
+        id: column_headings
+        size_hint: 1, None
+        size_hint_y: None
+        height: 25
+        cols: 4
+
+    BoxLayout:
+        RecycleView:
+            viewclass: 'SelectableButton'
+            data: root.rv_data
+            SelectableRecycleGridLayout:
+                cols: 4
+                key_selection: 'selectable'
+                default_size: None, dp(26)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                multiselect: True
+                touch_multiselect: True
+
+
+
+<Toolbar>:
+    ActionBar:
+        id: actBar
+        pos_hint: {'top':1}
+        ActionView:
+            use_separator: True
+            ActionPrevious:
+                title: 'Storms'
+                with_previous: True
+            ActionOverflow:
+
+            ActionGroup:
+                text: 'More'
+                ActionButton:
+                    text: 'view'
+                    on_press: app.root.view()
+
+
