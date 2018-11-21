@@ -67,10 +67,11 @@ class Root(BoxLayout):
     def view(self):
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
+            goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == int(self.row))]
             output_dir="ui_objects"
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-            graph(nexrad_Objects)
+            graph(nexrad_Objects,goes_objects)
 
 class MainApp(App):
     def build(self):
