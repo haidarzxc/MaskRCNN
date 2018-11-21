@@ -55,8 +55,11 @@ class ScrollableWindow(QtGui.QMainWindow):
         self.export = QtGui.QPushButton('Export Instances', self)
         self.export.clicked.connect(self.handleExport)
 
-        self.status_label = QtGui.QLabel()
-        self.status_label.setText("total: "+str(self.nexrad_length))
+        self.nexrad_label = QtGui.QLabel()
+        self.nexrad_label.setText("Nexrad| total: "+str(self.nexrad_length))
+
+        self.goes_label = QtGui.QLabel()
+        self.goes_label.setText("Goes| total: "+str(self.goes_length))
 
         self.fig = plt.Figure()
 
@@ -74,7 +77,9 @@ class ScrollableWindow(QtGui.QMainWindow):
         self.bar.layout().addWidget(self.prev)
         self.bar.layout().addWidget(self.next)
         self.bar.layout().addWidget(self.export)
-        self.bar.layout().addWidget(self.status_label)
+        self.bar.layout().addWidget(self.nexrad_label)
+        self.bar.layout().addWidget(self.goes_label)
+
         self.bar.layout().addStretch()
         self.bar.layout().addStretch()
 
@@ -122,7 +127,7 @@ class ScrollableWindow(QtGui.QMainWindow):
             self.download_file(object['KEY'],"nexrad")
             path=self.output_dir+object['KEY'].values[0].split('/')[4]
             self.render(str(self.counter+1)+"-"+object['KEY'].values[0].split('/')[4],path)
-            self.status_label.setText(str(self.counter+1)+" out of "+str(self.nexrad_length))
+            self.nexrad_label.setText("NEXRAD| "+str(self.counter+1)+" out of "+str(self.nexrad_length))
             print('NEXT EVENT DONE',self.counter)
 
     def handlePrev(self):
@@ -131,7 +136,7 @@ class ScrollableWindow(QtGui.QMainWindow):
             object=self.nexrad.iloc[[self.counter]]
             path=self.output_dir+object['KEY'].values[0].split('/')[4]
             self.render(str(self.counter+1)+"-"+object['KEY'].values[0].split('/')[4],path)
-            self.status_label.setText(str(self.counter+1)+" out of "+str(self.nexrad_length))
+            self.nexrad_label.setText("NEXRAD| "+str(self.counter+1)+" out of "+str(self.nexrad_length))
             print('PREV EVENT DONE',self.counter)
 
     def handleExport(self):
