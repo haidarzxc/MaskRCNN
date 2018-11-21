@@ -12,7 +12,7 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 import os
 from Table import *
-from pathlib import Path
+
 
 import os, sys, inspect
 import pandas as pd
@@ -67,6 +67,9 @@ class Root(BoxLayout):
     def view(self):
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
+            output_dir="ui_objects"
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
             graph(nexrad_Objects)
 
 class MainApp(App):
