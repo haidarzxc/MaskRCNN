@@ -43,6 +43,7 @@ class Root(BoxLayout):
         super(Root,self).__init__(**kwargs)
         self.get_dataframe()
 
+
     def get_dataframe(self):
         storm_cols=['BEGIN_DATE_TIME','END_DATE_TIME','BEGIN_LON','BEGIN_LAT']
         storms_filtered=self.storms[storm_cols]
@@ -78,29 +79,17 @@ class Root(BoxLayout):
         else:
             print(row['KEY'], 'Exists!')
 
-    def view_nexrad(self):
+    def view(self):
         # print("view",self.row)
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
 
 
-            nexrad_Objects.apply(lambda x: self.download_file(x,"nexrad"),axis=1)
+            # nexrad_Objects.apply(lambda x: self.download_file(x,"nexrad"),axis=1)
 
             # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
-            graph(nexrad_Objects,'nexrad')
+            graph(nexrad_Objects)
             # print('total objs',len(nexrad_Objects))
-
-    def view_goes(self):
-        # print("view",self.row)
-        if self.row:
-            goes_Objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == int(self.row))]
-            print(goes_Objects)
-
-            goes_Objects.apply(lambda x: self.download_file(x,"goes"),axis=1)
-
-            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
-            graph(goes_Objects,"goes")
-            # print('total objs',len(goes_Objects))
 
 class MainApp(App):
     def build(self):

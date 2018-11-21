@@ -6,15 +6,24 @@ import os
 import math
 from netCDF4 import Dataset
 
+import pylab as pl
+
 
 import matplotlib.pyplot as plt
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.figure import Figure
+
+
 
 class ScrollableWindow(QtGui.QMainWindow):
-    def __init__(self, fig):
+    def __init__(self,objects):
         self.qapp = QtGui.QApplication([])
+
+        self.objects=objects
+        self.counter=-1
+        self.objects_length=len(objects)
 
         QtGui.QMainWindow.__init__(self)
         self.widget = QtGui.QWidget()
@@ -23,19 +32,71 @@ class ScrollableWindow(QtGui.QMainWindow):
         self.widget.layout().setContentsMargins(5,5,5,5)
         self.widget.layout().setSpacing(5)
 
-        self.fig = fig
+        self.prev = QtGui.QPushButton('prev', self)
+        self.prev.clicked.connect(self.handlePrev)
+
+        self.next = QtGui.QPushButton('next', self)
+        self.next.clicked.connect(self.handleNext)
+
+        self.status_label = QtGui.QLabel()
+        self.status_label.setText("total: "+str(self.objects_length))
+
+        self.fig = Figure()
+
         self.canvas = FigureCanvas(self.fig)
         self.canvas.draw()
         self.scroll = QtGui.QScrollArea(self.widget)
         self.scroll.setWidget(self.canvas)
 
         self.nav = NavigationToolbar(self.canvas, self.widget)
+
+        self.bar = QtGui.QWidget()
+        self.bar.setLayout(QtGui.QHBoxLayout())
+
+        self.bar.layout().addWidget(self.prev)
+        self.bar.layout().addWidget(self.next)
+        self.bar.layout().addWidget(self.status_label)
+        self.bar.layout().addStretch()
+        self.bar.layout().addStretch()
+
+        self.widget.layout().addWidget(self.bar)
         self.widget.layout().addWidget(self.nav)
         self.widget.layout().addWidget(self.scroll)
 
         self.show()
         exit(self.qapp.exec_())
 
+    def render(self,title,path):
+        ax = self.fig.add_subplot(111)
+        ax.clear()
+        radar = pyart.io.read_nexrad_archive(path)
+        display = pyart.graph.RadarDisplay(radar)
+        display.plot('reflectivity', 0, title=title,ax=ax,colorbar_flag=False)
+
+
+
+        self.canvas.draw()
+
+    def handleNext(self):
+        if self.counter<self.objects_length:
+            self.counter+=1
+            object=self.objects.iloc[[self.counter]]
+
+            path="ui_objects/"+object['KEY'].values[0].split('/')[4]
+            self.render(str(self.counter)+"-"+object['KEY'].values[0].split('/')[4],path)
+            self.status_label.setText(str(self.counter)+" out of "+str(self.objects_length))
+
+
+    def handlePrev(self):
+        if self.counter>=0:
+            if not self.counter==0:
+                self.counter-=1
+
+            object=self.objects.iloc[[self.counter]]
+
+            path="ui_objects/"+object['KEY'].values[0].split('/')[4]
+            self.render(str(self.counter)+"-"+object['KEY'].values[0].split('/')[4],path)
+            self.status_label.setText(str(self.counter)+" out of "+str(self.objects_length))
 
 
 def create_session():
@@ -51,38 +112,7 @@ def get_aws_object(bucket,key,output_dir):
     bucket=session.Bucket(bucket)
     bucket.download_file(key,output_dir)
 
-def render(ax,title,path,type):
-    if type=="nexrad":
-        radar = pyart.io.read_nexrad_archive(path)
-        display = pyart.graph.RadarDisplay(radar)
-        display.plot('reflectivity', 0, title=title,ax=ax)
-    elif type=="goes":
-        dataset = Dataset(path)
-        # display = pyart.graph.RadarDisplay(dataset)
 
-def graph(objects,type):
-    objects_length=len(objects)
-    rows=math.ceil(objects_length/2)
-
-    # single graph
-    if rows==1 and objects_length==1:
-        fig, ax = plt.subplots(ncols=1, nrows=rows, figsize=(10,5))
-        object=objects.iloc[[0]]
-        path="ui_objects/"+object['KEY'].values[0].split('/')[4]
-        print('GRAPHING',path)
-        render(ax,object['KEY'].values[0].split('/')[4],path,type)
-        ScrollableWindow(fig)
-        return
-
-    fig, axes = plt.subplots(ncols=2, nrows=rows, figsize=(19,39))
-    c=0
-    for ax in axes.flatten():
-        if c<objects_length:
-            object=objects.iloc[[c]]
-            path="ui_objects/"+object['KEY'].values[0].split('/')[4]
-            print((c+1),'GRAPHING',path)
-            render(ax,object['KEY'].values[0].split('/')[4],path,type)
-            c+=1
-
-    ScrollableWindow(fig)
+def graph(objects):
+    ScrollableWindow(objects)
 
