@@ -16,6 +16,19 @@ from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 
 
+def create_session():
+    session = boto3.Session(
+        aws_access_key_id=local.AWSAccessKeyId,
+        aws_secret_access_key=local.AWSSecretKey,
+    )
+    return session.resource('s3')
+
+
+def get_aws_object(bucket,key,output_dir):
+    session=create_session()
+    bucket=session.Bucket(bucket)
+    bucket.download_file(key,output_dir)
+
 
 class ScrollableWindow(QtGui.QMainWindow):
     def __init__(self,objects):
@@ -78,39 +91,28 @@ class ScrollableWindow(QtGui.QMainWindow):
         self.canvas.draw()
 
     def handleNext(self):
-        if self.counter<self.objects_length:
+        if self.counter<self.objects_length-1:
             self.counter+=1
+            print("next",self.counter,self.objects_length)
             object=self.objects.iloc[[self.counter]]
 
             path="ui_objects/"+object['KEY'].values[0].split('/')[4]
-            self.render(str(self.counter)+"-"+object['KEY'].values[0].split('/')[4],path)
-            self.status_label.setText(str(self.counter)+" out of "+str(self.objects_length))
+            self.render(str(self.counter+1)+"-"+object['KEY'].values[0].split('/')[4],path)
+            self.status_label.setText(str(self.counter+1)+" out of "+str(self.objects_length))
 
 
     def handlePrev(self):
         if self.counter>=0:
-            if not self.counter==0:
-                self.counter-=1
-
+            self.counter-=1
+            print('prev',self.counter,self.objects_length)
             object=self.objects.iloc[[self.counter]]
 
             path="ui_objects/"+object['KEY'].values[0].split('/')[4]
-            self.render(str(self.counter)+"-"+object['KEY'].values[0].split('/')[4],path)
-            self.status_label.setText(str(self.counter)+" out of "+str(self.objects_length))
+            self.render(str(self.counter+1)+"-"+object['KEY'].values[0].split('/')[4],path)
+            self.status_label.setText(str(self.counter+1)+" out of "+str(self.objects_length))
 
 
-def create_session():
-    session = boto3.Session(
-        aws_access_key_id=local.AWSAccessKeyId,
-        aws_secret_access_key=local.AWSSecretKey,
-    )
-    return session.resource('s3')
 
-
-def get_aws_object(bucket,key,output_dir):
-    session=create_session()
-    bucket=session.Bucket(bucket)
-    bucket.download_file(key,output_dir)
 
 
 def graph(objects):

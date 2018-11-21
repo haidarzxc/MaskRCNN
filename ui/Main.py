@@ -60,36 +60,14 @@ class Root(BoxLayout):
         self.rv_data = [{'text': str(x[0]), 'Index': str(x[1]), 'selectable': True} for x in data]
 
     def get_row(self, instance):
-        print("get_row:")
         self.row=self.rv_data[instance.index]['Index']
+        print("get_row:",self.row)
 
-    def download_file(self, row,type):
-        output_dir="ui_objects"
-        rep=row['KEY'].rpartition("/")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-
-        file = Path(output_dir+"/"+rep[2])
-        if not file.is_file():
-            print("DOWNLOADING",row['KEY'])
-            if type=="nexrad":
-                get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
-            elif type=="goes":
-                get_aws_object("noaa-goes16",row['KEY'],output_dir+"/"+rep[2])
-        else:
-            print(row['KEY'], 'Exists!')
 
     def view(self):
-        # print("view",self.row)
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
-
-
-            # nexrad_Objects.apply(lambda x: self.download_file(x,"nexrad"),axis=1)
-
-            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
             graph(nexrad_Objects)
-            # print('total objs',len(nexrad_Objects))
 
 class MainApp(App):
     def build(self):
