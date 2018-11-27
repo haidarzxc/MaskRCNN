@@ -12,6 +12,8 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 import os
 from Table import *
+from datetime import datetime
+from datetime import timedelta
 
 
 import os, sys, inspect
@@ -63,6 +65,29 @@ class Root(BoxLayout):
         self.row=self.rv_data[instance.index]['Index']
         print("get_row:",self.row)
 
+    def iterate(self,nexrad_row,goes_objects):
+        # print(goes_objects['bucket_begin_time'].values)
+        # print("---")
+        # print(nexrad_row['bucket_begin_time'])
+        nexrad_datetime=datetime.strptime(nexrad_row['bucket_begin_time'],'%Y-%m-%d %X')
+        if len(goes_objects)>0:
+
+            # goes_objects.index = pd.to_datetime(goes_objects['bucket_begin_time'])
+            #
+            # goes_30min_window=goes_objects['bucket_begin_time'].between_time(
+            #         str(nexrad_datetime.time()),
+            #         str((nexrad_datetime + timedelta(minutes=30)).time()))
+            # print(goes_30min_window)
+
+            nearest_object=min(goes_objects['bucket_begin_time'],
+                key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime))
+            print(nearest_object)
+        else:
+            print("No Goes objects")
+
+    def clip(self,nexrad_objects,goes_objects):
+        # print(len(nexrad_objects),len(goes_objects))
+        nexrad_objects.head(1).apply(lambda x: self.iterate(x,goes_objects),axis=1)
 
     def view(self):
         if self.row:
@@ -71,7 +96,11 @@ class Root(BoxLayout):
             output_dir="ui_objects"
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-            graph(nexrad_Objects,goes_objects)
+
+            nexrad_Objects=nexrad_Objects.sort_values(by=['bucket_begin_time'])
+            goes_objects=goes_objects.sort_values(by=['bucket_begin_time'])
+            self.clip(nexrad_Objects,goes_objects)
+            # graph(nexrad_Objects,goes_objects)
 
 class MainApp(App):
     def build(self):
