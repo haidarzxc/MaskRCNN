@@ -320,7 +320,7 @@ def locations_lon_lat(row):
 
     return row
 
-def iterate_intersections(row,output_dir):
+def iterate_nexrad_intersections(row,output_dir):
     global total
     try:
         session=create_session()
@@ -349,14 +349,35 @@ def iterate_intersections(row,output_dir):
             raise
             Track.warn("Error.")
 
+def iterate_goes_intersections(row,output_dir):
+    global total
+    try:
+        session=create_session()
+        bucket=session.Bucket("noaa-goes16")
+        obj=bucket.Object(row['KEY'])
+        bucket.download_file(obj.key,output_dir+"/"+obj.key.replace('/',"_"))
+        total+=(obj.get()['ContentLength']*0.000001)
+        Track.info(str(obj.key)+", "+str(row.name)+", "+output_dir+", "+str(total))
+        print(obj.key,row.name,output_dir,total)
+
+    except botocore.exceptions.ClientError as e:
+        if e.response['Error']['Code'] == "404":
+            Track.warn("The object does not exist.")
+        else:
+            raise
+            Track.warn("Error.")
+
 total=0
-def download_intersections(input_dir,output_dir):
+def download_intersections(bucket,input_dir,output_dir):
 
     file=load_CSV_file(input_dir)
     file=file.sort_values(by='KEY')
     file=file.drop_duplicates(['KEY'])
-    Track.createLogFile("nexrad_intersections/log.log")
-    file.apply(lambda x:iterate_intersections(x,output_dir),axis=1)
+    Track.createLogFile(output_dir+"/log.log")
+    if bucket=="noaa-goes16":
+        file.apply(lambda x:iterate_goes_intersections(x,output_dir),axis=1)
+    elif bucket=="noaa-nexrad-level2":
+        file.apply(lambda x:iterate_nexrad_intersections(x,output_dir),axis=1)
     Track.info("total volume (mb): "+str(total))
 
 total_volume=0
@@ -558,7 +579,7 @@ if __name__ == '__main__':
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
-    download_intersections("NCDC_stormevents/TXT_data_size.csv","nexrad_intersections/2017-12-21_2017-12-31")
+    download_intersections("noaa-goes16","NCDC_stormevents/TXT_data_size.csv","goes_intersections/2017-12-21_2017-12-31")
 
 
 
