@@ -562,14 +562,14 @@ if __name__ == '__main__':
 
 
 
-    get_goes_size("noaa-goes16",
-                    output_dir='NCDC_stormevents/TXT_data_size.csv',
-                    product="ABI-L1b-RadC",
-                    year="2017",
-                    start_date='2017-12-10',
-                    end_date='2017-12-31',
-                    channel='C08'
-                    )
+    # get_goes_size("noaa-goes16",
+    #                 output_dir='NCDC_stormevents/TXT_data_size.csv',
+    #                 product="ABI-L1b-RadC",
+    #                 year="2017",
+    #                 start_date='2017-12-10',
+    #                 end_date='2017-12-31',
+    #                 channel='C08'
+    #                 )
     # get_file_size('goes_intersections/TXT_GOES_datetime_filtered_intersections.csv')
 
     # get_NCDC_data("NCDC_stormevents",2017)
