@@ -72,22 +72,30 @@ class Root(BoxLayout):
         nexrad_datetime=datetime.strptime(nexrad_row['bucket_begin_time'],'%Y-%m-%d %X')
         if len(goes_objects)>0:
 
-            # goes_objects.index = pd.to_datetime(goes_objects['bucket_begin_time'])
-            #
-            # goes_30min_window=goes_objects['bucket_begin_time'].between_time(
-            #         str(nexrad_datetime.time()),
-            #         str((nexrad_datetime + timedelta(minutes=30)).time()))
+            goes_objects.index = pd.to_datetime(goes_objects['bucket_begin_time'])
+
+            goes_30min_window=goes_objects['bucket_begin_time'].between_time(
+                    str(nexrad_datetime.time()),
+                    str((nexrad_datetime + timedelta(minutes=30)).time()))
             # print(goes_30min_window)
 
             nearest_object=min(goes_objects['bucket_begin_time'],
                 key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime))
-            print(nearest_object)
+            print("nearest_object",nearest_object,nexrad_datetime)
+
+            # min_datetime=datetime.strptime(goes_objects.iloc[0]['bucket_begin_time'],'%Y-%m-%d %X')
+            # idx=goes_objects.iloc[0]
+            # for index, row in goes_objects.iterrows():
+            #     # print(row['bucket_begin_time'])
+            #
+            #
+            # print(min_datetime,nexrad_datetime)
         else:
             print("No Goes objects")
 
     def clip(self,nexrad_objects,goes_objects):
-        # print(len(nexrad_objects),len(goes_objects))
-        nexrad_objects.head(1).apply(lambda x: self.iterate(x,goes_objects),axis=1)
+        print(len(nexrad_objects),len(goes_objects))
+        nexrad_objects.apply(lambda x: self.iterate(x,goes_objects),axis=1)
 
     def view(self):
         if self.row:
