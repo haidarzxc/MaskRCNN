@@ -558,6 +558,7 @@ if __name__ == '__main__':
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
+    download_intersections("NCDC_stormevents/TXT_data_size.csv","nexrad_intersections/2017-12-21_2017-12-31")
 
 
 
