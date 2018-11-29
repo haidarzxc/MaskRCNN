@@ -34,17 +34,11 @@ class Clip():
                     str((nexrad_datetime + timedelta(minutes=30)).time()))
             # print(goes_30min_window)
 
-            nearest_object=min(goes_objects['bucket_begin_time'],
-                key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime))
-            print("nearest_object",nearest_object,nexrad_datetime)
+            nearest_object_index=goes_objects['bucket_begin_time'].tolist().index(min(goes_objects['bucket_begin_time'],
+                key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
 
-            # min_datetime=datetime.strptime(goes_objects.iloc[0]['bucket_begin_time'],'%Y-%m-%d %X')
-            # idx=goes_objects.iloc[0]
-            # for index, row in goes_objects.iterrows():
-            #     # print(row['bucket_begin_time'])
-            #
-            #
-            # print(min_datetime,nexrad_datetime)
+            print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
+
         else:
             print("No Goes objects")
 
