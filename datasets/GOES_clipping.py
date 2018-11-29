@@ -21,7 +21,7 @@ class Clip():
                             begin_end_date='31-DEC-17')
 
     def clip_Goes_object(self,goes_object,nexrad_object):
-        print(goes_object,nexrad_object)
+        print(goes_object['KEY'],nexrad_object['KEY'])
 
     def iterate_goes(self,nexrad_row,goes_objects):
         # print(goes_objects['bucket_begin_time'].values)
