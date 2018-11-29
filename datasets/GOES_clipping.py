@@ -20,6 +20,9 @@ class Clip():
         self.iterate_storms(begin_start_date='01-DEC-17',
                             begin_end_date='31-DEC-17')
 
+    def clip_Goes_object(self,goes_object,nexrad_object):
+        print(goes_object,nexrad_object)
+
     def iterate_goes(self,nexrad_row,goes_objects):
         # print(goes_objects['bucket_begin_time'].values)
         # print("---")
@@ -37,7 +40,8 @@ class Clip():
             nearest_object_index=goes_objects['bucket_begin_time'].tolist().index(min(goes_objects['bucket_begin_time'],
                 key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
 
-            print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
+            self.clip_Goes_object(goes_objects.iloc[nearest_object_index],nexrad_row)
+            # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
         else:
             print("No Goes objects")
@@ -46,7 +50,7 @@ class Clip():
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
 
-        nexrad_objects.head().apply(lambda x: self.iterate_goes(x,goes_objects),axis=1)
+        nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects),axis=1)
 
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None):
