@@ -5,8 +5,15 @@ parent_directory = os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
+
+from datasets.boto import create_session, \
+                            iterate_nexrad_intersections, \
+                            iterate_goes_intersections
 from datetime import datetime
 from datetime import timedelta
+from pathlib import Path
+import boto3
+import botocore
 
 class Clip():
     storms=load_CSV_file('NCDC_stormevents/area_filtered_stormevents.csv')
@@ -20,13 +27,16 @@ class Clip():
         self.iterate_storms(begin_start_date='01-DEC-17',
                             begin_end_date='31-DEC-17')
 
+
     def clip_Goes_object(self,goes_object,nexrad_object):
-        print(goes_object['KEY'],nexrad_object['KEY'])
+        goes_dir='goes_intersections/2017-12-01_2017-12-31/'
+        if not Path(goes_dir+goes_object['KEY'].replace('/',"_")).is_file():
+            iterate_goes_intersections(goes_object,goes_dir)
+        if not Path('nexrad_intersections/'+nexrad_object['KEY']).is_file():
+            iterate_nexrad_intersections(nexrad_object,'nexrad_intersections')
+
 
     def iterate_goes(self,nexrad_row,goes_objects):
-        # print(goes_objects['bucket_begin_time'].values)
-        # print("---")
-        # print(nexrad_row['bucket_begin_time'])
         nexrad_datetime=datetime.strptime(nexrad_row['bucket_begin_time'],'%Y-%m-%d %X')
         if len(goes_objects)>0:
 
@@ -35,7 +45,7 @@ class Clip():
             goes_30min_window=goes_objects['bucket_begin_time'].between_time(
                     str(nexrad_datetime.time()),
                     str((nexrad_datetime + timedelta(minutes=30)).time()))
-            # print(goes_30min_window)
+
 
             nearest_object_index=goes_objects['bucket_begin_time'].tolist().index(min(goes_objects['bucket_begin_time'],
                 key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
