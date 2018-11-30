@@ -14,6 +14,8 @@ from datetime import timedelta
 from pathlib import Path
 import boto3
 import botocore
+from netCDF4 import Dataset
+import matplotlib.pyplot as plt
 
 class Clip():
     storms=load_CSV_file('NCDC_stormevents/area_filtered_stormevents.csv')
@@ -33,7 +35,15 @@ class Clip():
         if not Path(goes_dir+goes_object['KEY'].replace('/',"_")).is_file():
             iterate_goes_intersections(goes_object,goes_dir)
         if not Path('nexrad_intersections/'+nexrad_object['KEY']).is_file():
+            current_working_dir=os.getcwd()
             iterate_nexrad_intersections(nexrad_object,'nexrad_intersections')
+            os.chdir(current_working_dir)
+
+        goes_netCdf= Dataset(goes_dir+goes_object['KEY'].replace('/',"_"),"r")
+
+        # print(goes_netCdf.variables)
+        data = goes_netCdf.variables['Rad']
+        print(data)
 
 
     def iterate_goes(self,nexrad_row,goes_objects):
