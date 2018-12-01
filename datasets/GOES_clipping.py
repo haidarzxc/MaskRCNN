@@ -20,6 +20,69 @@ import matplotlib.pyplot as plt
 import pyart
 from mpl_toolkits.basemap import Basemap, cm
 
+from PyQt4 import QtGui
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+
+class Frame(QtGui.QMainWindow):
+    def __init__(self,data,lon,lat,nexrad_object):
+        self.qapp = QtGui.QApplication([])
+        self.nexrad_object=nexrad_object
+        self.data=data
+        self.lon=lon
+        self.lat=lat
+
+        QtGui.QMainWindow.__init__(self)
+        self.widget = QtGui.QWidget()
+        self.setCentralWidget(self.widget)
+        self.widget.setLayout(QtGui.QVBoxLayout())
+        self.widget.layout().setContentsMargins(0,0,0,0)
+        self.widget.layout().setSpacing(5)
+
+        self.fig = plt.Figure(figsize=(16,15))
+        self.fig.subplots_adjust(hspace=.1)
+        self.canvas = FigureCanvas(self.fig)
+
+
+
+        ax0 = self.fig.add_subplot(2, 1, 2)
+        bbox = [np.min(lon),np.min(lat),np.max(lon),np.max(lat)]
+        n_add = 0
+        m = Basemap(llcrnrlon=bbox[0]-n_add,llcrnrlat=bbox[1]-n_add,
+                    urcrnrlon=bbox[2]+n_add,urcrnrlat=bbox[3]+n_add,
+                    resolution='i',
+                    projection='cyl',ax=ax0)
+        m.drawcoastlines(linewidth=0.5)
+        m.drawcountries(linewidth=0.25)
+
+        m.pcolormesh(lon.data, lat.data, data, latlon=True)
+        parallels = np.linspace(np.min(lat),np.max(lat),5.)
+        m.drawparallels(parallels,labels=[True,False,False,False])
+        meridians = np.linspace(np.min(lon),np.max(lon),5.)
+        m.drawmeridians(meridians,labels=[False,False,False,True])
+
+
+
+        ax1 = self.fig.add_subplot(2, 1, 1)
+        radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
+        display = pyart.graph.RadarDisplay(radar)
+        display.plot('reflectivity', 0, title="title",ax=ax1,colorbar_flag=False)
+
+
+
+        self.canvas.draw()
+        self.scroll = QtGui.QScrollArea(self.widget)
+        self.scroll.setWidget(self.canvas)
+
+        self.nav = NavigationToolbar(self.canvas, self.widget)
+        self.widget.layout().addWidget(self.nav)
+        self.widget.layout().addWidget(self.scroll)
+
+
+        # self.fig.savefig("MaskRCNN", dpi=100)
+        self.show()
+        exit(self.qapp.exec_())
+
 class Clip():
     storms=load_CSV_file('NCDC_stormevents/area_filtered_stormevents.csv')
     nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
@@ -32,27 +95,10 @@ class Clip():
         self.iterate_storms(begin_start_date='01-DEC-17',
                             begin_end_date='31-DEC-17')
 
-    def draw_goes(self,data,lon,lat):
-        bbox = [np.min(lon),np.min(lat),np.max(lon),np.max(lat)]
-        fig = plt.figure(figsize=(6,3),dpi=200)
-        n_add = 0
-        m = Basemap(llcrnrlon=bbox[0]-n_add,llcrnrlat=bbox[1]-n_add,
-                    urcrnrlon=bbox[2]+n_add,urcrnrlat=bbox[3]+n_add,
-                    resolution='i',
-                    projection='cyl')
-        m.drawcoastlines(linewidth=0.5)
-        m.drawcountries(linewidth=0.25)
-        m.pcolormesh(lon.data, lat.data, data, latlon=True)
-        parallels = np.linspace(np.min(lat),np.max(lat),5.)
-        m.drawparallels(parallels,labels=[True,False,False,False])
-        meridians = np.linspace(np.min(lon),np.max(lon),5.)
-        m.drawmeridians(meridians,labels=[False,False,False,True])
-        cb = m.colorbar()
+    def render_objects(self,goes_netCdf,lon,lat,nexrad_object):
+        Frame(goes_netCdf,lon,lat,nexrad_object)
 
-        # plt.savefig('goes_16_demo.png',dpi=200,transparent=True)
-        plt.show()
-
-    def geo_coordinates(self, goes_netCdf):
+    def geo_coordinates(self, goes_netCdf,nexrad_object):
         proj_info = goes_netCdf.variables['goes_imager_projection']
         lon_origin = proj_info.longitude_of_projection_origin
         H = proj_info.perspective_point_height+proj_info.semi_major_axis
@@ -86,7 +132,8 @@ class Clip():
 
         # print('{} N, {} W'.format(lat[318,1849],abs(lon[318,1849])))
 
-        self.draw_goes(goes_netCdf.variables['Rad'][:],lon,lat)
+        # self.draw_goes(goes_netCdf.variables['Rad'][0:499,0:499],lon,lat)
+        self.render_objects(goes_netCdf.variables['Rad'][:],lon,lat,nexrad_object)
 
 
 
@@ -102,7 +149,7 @@ class Clip():
         goes_netCdf= Dataset(goes_dir+goes_object['KEY'].replace('/',"_"),"r")
 
         # print(goes_netCdf.variables)
-        self.geo_coordinates(goes_netCdf)
+        self.geo_coordinates(goes_netCdf,nexrad_object)
         # goes_netCdf.close()
 
 
