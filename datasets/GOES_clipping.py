@@ -19,6 +19,7 @@ from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import pyart
 from mpl_toolkits.basemap import Basemap, cm
+import math
 
 from PyQt4 import QtGui
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -98,15 +99,67 @@ class Clip():
     def render_objects(self,goes_netCdf,lon,lat,nexrad_object):
         Frame(goes_netCdf,lon,lat,nexrad_object)
 
-    def geo_coordinates(self, goes_netCdf,nexrad_object):
+    def clip_goes(self,goes_netCdf,storm_row):
+        data=goes_netCdf['Rad']
+
+        g_w=2500
+        g_h=1500
+
+        g_x0=-152.109282
+        g_y0=14.571340
+        g_x1=-52.946879
+        g_y1=56.761450
+
+        s_x0=storm_row['END_LON']
+        s_y0=storm_row['BEGIN_LAT']
+        s_x1=storm_row['BEGIN_LON']
+        s_y1=storm_row['END_LAT']
+
+        '''
+                        2500
+                .----------|----------.(g_x1,g_y1)
+                |          |          |
+        1500 ---|----------|----------|---
+                |          |          |
+    (g_x0,g_y0) .----------|----------.
+                           |
+        '''
+        s_x=(g_x1-g_x0)/g_w
+        s_y=(g_y1-g_y0)/g_h
+        print(s_x,s_y)
+
+        c0=(s_x0-g_x0)/s_x
+        c1=(s_x1-g_x1)/s_x
+        r0=(s_y0-g_y0)/s_y
+        r1=(s_y1-g_y1)/s_y
+
+        print(c0,c1,r0,r1)
+
+        c0_int=abs(math.ceil(c0))
+        c1_int=abs(math.ceil(c1))
+        r0_int=abs(math.ceil(r0))
+        r1_int=abs(math.ceil(r1))
+        print("r0_int",r0_int,
+              "r1_int",r1_int,
+              "c0_int",c0_int,
+              "c1_int",c1_int)
+        # [r0..r1,c0..c1]
+        clipped=data[r1_int:r0_int, c0_int:c1_int]
+        return clipped,r0_int, r1_int, c0_int, c1_int
+
+    def geo_coordinates(self, goes_netCdf,nexrad_object,storm_row):
         proj_info = goes_netCdf.variables['goes_imager_projection']
         lon_origin = proj_info.longitude_of_projection_origin
         H = proj_info.perspective_point_height+proj_info.semi_major_axis
         r_eq = proj_info.semi_major_axis
         r_pol = proj_info.semi_minor_axis
 
-        lat_rad_1d = goes_netCdf.variables['x'][:]
-        lon_rad_1d = goes_netCdf.variables['y'][:]
+        clipped, r0_int, r1_int, c0_int, c1_int=self.clip_goes(goes_netCdf,storm_row)
+
+
+        lat_rad_1d = goes_netCdf.variables['x'][c0_int:c1_int]
+        lon_rad_1d = goes_netCdf.variables['y'][r1_int:r0_int]
+
 
         lat_rad,lon_rad = np.meshgrid(lat_rad_1d,lon_rad_1d)
 
@@ -133,11 +186,15 @@ class Clip():
         # print('{} N, {} W'.format(lat[318,1849],abs(lon[318,1849])))
 
         # self.draw_goes(goes_netCdf.variables['Rad'][0:499,0:499],lon,lat)
-        self.render_objects(goes_netCdf.variables['Rad'][:],lon,lat,nexrad_object)
+        print("lat_rad_1d shape",np.shape(lat_rad_1d))
+        print("lat_rad_1d shape",np.shape(lon_rad_1d))
+        print("clipped shape",np.shape(clipped))
+        print(storm_row)
+        self.render_objects(clipped,lon,lat,nexrad_object)
 
 
 
-    def clip_Goes_object(self,goes_object,nexrad_object):
+    def clip_Goes_object(self,goes_object,nexrad_object,storm_row):
         goes_dir='goes_intersections/2017-12-01_2017-12-31/'
         if not Path(goes_dir+goes_object['KEY'].replace('/',"_")).is_file():
             iterate_goes_intersections(goes_object,goes_dir)
@@ -149,12 +206,13 @@ class Clip():
         goes_netCdf= Dataset(goes_dir+goes_object['KEY'].replace('/',"_"),"r")
 
         # print(goes_netCdf.variables)
-        self.geo_coordinates(goes_netCdf,nexrad_object)
+        self.geo_coordinates(goes_netCdf,nexrad_object,storm_row)
         # goes_netCdf.close()
 
 
-    def iterate_goes(self,nexrad_row,goes_objects):
+    def iterate_goes(self,nexrad_row,goes_objects,storm_row):
         nexrad_datetime=datetime.strptime(nexrad_row['bucket_begin_time'],'%Y-%m-%d %X')
+
         if len(goes_objects)>0:
 
             goes_objects.index = pd.to_datetime(goes_objects['bucket_begin_time'])
@@ -167,7 +225,8 @@ class Clip():
             nearest_object_index=goes_objects['bucket_begin_time'].tolist().index(min(goes_objects['bucket_begin_time'],
                 key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
 
-            self.clip_Goes_object(goes_objects.iloc[nearest_object_index],nexrad_row)
+
+            self.clip_Goes_object(goes_objects.iloc[nearest_object_index],nexrad_row,storm_row)
             # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
         else:
@@ -176,12 +235,13 @@ class Clip():
     def get_intersected_objects(self,storm_row):
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
-
-        nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects),axis=1)
+        # print("before iterate_goes",storm_row.name)
+        nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
 
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None):
-        storms=self.storms
+        storms=self.storms.sort_values(by=['AREA'],ascending=False)
+
         storms['BEGIN_DATE_TIME']=storms['BEGIN_DATE_TIME'].apply(lambda x: pd.Timestamp(x))
         if begin_start_date and begin_end_date:
 
@@ -189,9 +249,8 @@ class Clip():
             begin_end_date=pd.Timestamp(begin_end_date)
             storms=storms.loc[(storms['BEGIN_DATE_TIME'] > begin_start_date) &
                                 (storms['BEGIN_DATE_TIME'] < begin_end_date)]
-
-
-        storms.head(1).apply(self.get_intersected_objects,axis=1)
+        # print(storms)
+        storms.head(4).apply(self.get_intersected_objects,axis=1)
 
 
 
