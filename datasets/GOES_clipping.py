@@ -47,6 +47,7 @@ class Frame(QtGui.QMainWindow):
 
 
         ax0 = self.fig.add_subplot(2, 1, 2)
+
         bbox = [np.min(lon),np.min(lat),np.max(lon),np.max(lat)]
         n_add = 0
         m = Basemap(llcrnrlon=bbox[0]-n_add,llcrnrlat=bbox[1]-n_add,
@@ -135,16 +136,16 @@ class Clip():
 
         print(c0,c1,r0,r1)
 
-        c0_int=abs(math.ceil(c0))
+        c0_int=abs(math.floor(c0))
         c1_int=abs(math.ceil(c1))
-        r0_int=abs(math.ceil(r0))
+        r0_int=abs(math.floor(r0))
         r1_int=abs(math.ceil(r1))
         print("r0_int",r0_int,
               "r1_int",r1_int,
               "c0_int",c0_int,
               "c1_int",c1_int)
         # [r0..r1,c0..c1]
-        clipped=data[r1_int:r0_int, c0_int:c1_int]
+        clipped=data[r0_int:r1_int, c0_int:c1_int]
         return clipped,r0_int, r1_int, c0_int, c1_int
 
     def geo_coordinates(self, goes_netCdf,nexrad_object,storm_row):
@@ -158,7 +159,7 @@ class Clip():
 
 
         lat_rad_1d = goes_netCdf.variables['x'][c0_int:c1_int]
-        lon_rad_1d = goes_netCdf.variables['y'][r1_int:r0_int]
+        lon_rad_1d = goes_netCdf.variables['y'][r0_int:r1_int]
 
 
         lat_rad,lon_rad = np.meshgrid(lat_rad_1d,lon_rad_1d)
@@ -249,8 +250,8 @@ class Clip():
             begin_end_date=pd.Timestamp(begin_end_date)
             storms=storms.loc[(storms['BEGIN_DATE_TIME'] > begin_start_date) &
                                 (storms['BEGIN_DATE_TIME'] < begin_end_date)]
-        # print(storms)
-        storms.head(4).apply(self.get_intersected_objects,axis=1)
+        print(storms)
+        # storms.head(4).apply(self.get_intersected_objects,axis=1)
 
 
 

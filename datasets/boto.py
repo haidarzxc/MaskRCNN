@@ -523,21 +523,21 @@ def calculate_distance(x1,x2,y1,y2):
 def calculate_area(row):
     storm_begin_point=Point(row['BEGIN_LON'], row['BEGIN_LAT'])
     storm_end_point=Point(row['END_LON'],row['END_LAT'])
-
+    print((row['END_LON']-row['END_LAT'])*(row['BEGIN_LON']-row['BEGIN_LAT']))
     storm_box=Box(storm_begin_point, storm_end_point)
-
-    width=calculate_distance(storm_box.top,
-                            storm_box.top,
+    width=calculate_distance(storm_box.bottom,
+                            storm_box.bottom,
                             storm_box.left,
                             storm_box.right)
 
     height=calculate_distance(storm_box.bottom,
-                                storm_box.bottom,
+                                storm_box.top,
                                 storm_box.left,
-                                storm_box.right)
+                                storm_box.left)
     # print(width,height)
 
     area=width*height
+    print(width,height,area)
     row['AREA']=area
 
     return row
