@@ -290,10 +290,10 @@ def test_date_range_intersection_test():
 
 def test_Area():
     test_df=pd.DataFrame()
-    test_df['BEGIN_LON']=pd.Series([-118.4535,-2])
-    test_df['BEGIN_LAT']=pd.Series([46.0757,0])
-    test_df['END_LON']=pd.Series([-118.9053,2])
-    test_df['END_LAT']=pd.Series([46.078,4])
+    test_df['BEGIN_LON']=pd.Series([-118.4535,-2,-12])
+    test_df['BEGIN_LAT']=pd.Series([46.0757,0,0])
+    test_df['END_LON']=pd.Series([-118.9053,2,0])
+    test_df['END_LAT']=pd.Series([46.078,4,20])
     test_df['AREA']=pd.Series([])
 
     test_df=test_df.apply(lambda x: calculate_area(x), axis=1)
