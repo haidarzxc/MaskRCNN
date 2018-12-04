@@ -26,12 +26,12 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 
 class Frame(QtGui.QMainWindow):
-    def __init__(self,data,lon,lat,nexrad_object):
+    def __init__(self,data,nexrad_object):
         self.qapp = QtGui.QApplication([])
         self.nexrad_object=nexrad_object
         self.data=data
-        self.lon=lon
-        self.lat=lat
+        # self.lon=lon
+        # self.lat=lat
 
         QtGui.QMainWindow.__init__(self)
         self.widget = QtGui.QWidget()
@@ -47,23 +47,7 @@ class Frame(QtGui.QMainWindow):
 
 
         ax0 = self.fig.add_subplot(2, 1, 2)
-
-        bbox = [np.min(lon),np.min(lat),np.max(lon),np.max(lat)]
-        n_add = 0
-        m = Basemap(llcrnrlon=bbox[0]-n_add,llcrnrlat=bbox[1]-n_add,
-                    urcrnrlon=bbox[2]+n_add,urcrnrlat=bbox[3]+n_add,
-                    resolution='i',
-                    projection='cyl',ax=ax0)
-        m.drawcoastlines(linewidth=0.5)
-        m.drawcountries(linewidth=0.25)
-
-        m.pcolormesh(lon.data, lat.data, data, latlon=True)
-        parallels = np.linspace(np.min(lat),np.max(lat),5.)
-        m.drawparallels(parallels,labels=[True,False,False,False])
-        meridians = np.linspace(np.min(lon),np.max(lon),5.)
-        m.drawmeridians(meridians,labels=[False,False,False,True])
-
-
+        ax0.imshow(data)
 
         ax1 = self.fig.add_subplot(2, 1, 1)
         radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
@@ -97,8 +81,6 @@ class Clip():
         self.iterate_storms(begin_start_date='01-DEC-17',
                             begin_end_date='31-DEC-17')
 
-    def render_objects(self,goes_netCdf,lon,lat,nexrad_object):
-        Frame(goes_netCdf,lon,lat,nexrad_object)
 
     def clip_goes(self,goes_netCdf,storm_row):
         data=goes_netCdf['Rad']
@@ -127,14 +109,14 @@ class Clip():
         '''
         s_x=(g_x1-g_x0)/g_w
         s_y=(g_y1-g_y0)/g_h
-        print(s_x,s_y)
+        print("s_x",s_x,"s_x",s_y)
 
         c0=(s_x0-g_x0)/s_x
         c1=(s_x1-g_x1)/s_x
         r0=(s_y0-g_y0)/s_y
         r1=(s_y1-g_y1)/s_y
 
-        print(c0,c1,r0,r1)
+        # print(c0,c1,r0,r1)
 
         c0_int=abs(math.floor(c0))
         c1_int=abs(math.ceil(c1))
@@ -146,52 +128,17 @@ class Clip():
               "c1_int",c1_int)
         # [r0..r1,c0..c1]
         clipped=data[r0_int:r1_int, c0_int:c1_int]
-        return clipped,r0_int, r1_int, c0_int, c1_int
+        # print(clipped)
+        return clipped
 
     def geo_coordinates(self, goes_netCdf,nexrad_object,storm_row):
-        proj_info = goes_netCdf.variables['goes_imager_projection']
-        lon_origin = proj_info.longitude_of_projection_origin
-        H = proj_info.perspective_point_height+proj_info.semi_major_axis
-        r_eq = proj_info.semi_major_axis
-        r_pol = proj_info.semi_minor_axis
 
-        clipped, r0_int, r1_int, c0_int, c1_int=self.clip_goes(goes_netCdf,storm_row)
+        clipped=self.clip_goes(goes_netCdf,storm_row)
 
-
-        lat_rad_1d = goes_netCdf.variables['x'][c0_int:c1_int]
-        lon_rad_1d = goes_netCdf.variables['y'][r0_int:r1_int]
-
-
-        lat_rad,lon_rad = np.meshgrid(lat_rad_1d,lon_rad_1d)
-
-        lambda_0 = (lon_origin*np.pi)/180.0
-
-        a_var = np.power(np.sin(lat_rad),2.0) + \
-                (np.power(np.cos(lat_rad),2.0)* \
-                (np.power(np.cos(lon_rad),2.0)+ \
-                (((r_eq*r_eq)/(r_pol*r_pol))* \
-                np.power(np.sin(lon_rad),2.0))))
-        b_var = -2.0*H*np.cos(lat_rad)*np.cos(lon_rad)
-        c_var = (H**2.0)-(r_eq**2.0)
-
-        r_s = (-1.0*b_var - np.sqrt((b_var**2)-(4.0*a_var*c_var)))/(2.0*a_var)
-
-        s_x = r_s*np.cos(lat_rad)*np.cos(lon_rad)
-        s_y = - r_s*np.sin(lat_rad)
-        s_z = r_s*np.cos(lat_rad)*np.sin(lon_rad)
-
-        lat = (180.0/np.pi)*(np.arctan(((r_eq*r_eq)/(r_pol*r_pol))* \
-                ((s_z/np.sqrt(((H-s_x)*(H-s_x))+(s_y*s_y))))))
-        lon = (lambda_0 - np.arctan(s_y/(H-s_x)))*(180.0/np.pi)
-
-        # print('{} N, {} W'.format(lat[318,1849],abs(lon[318,1849])))
-
-        # self.draw_goes(goes_netCdf.variables['Rad'][0:499,0:499],lon,lat)
-        print("lat_rad_1d shape",np.shape(lat_rad_1d))
-        print("lat_rad_1d shape",np.shape(lon_rad_1d))
-        print("clipped shape",np.shape(clipped))
         print(storm_row)
-        self.render_objects(clipped,lon,lat,nexrad_object)
+        # stormevents_csv_file=load_CSV_file("NCDC_stormevents/StormEvents_details-ftp_v1.0_d2017_c20180918.csv")
+
+        # Frame(clipped,nexrad_object)
 
 
 
@@ -236,13 +183,12 @@ class Clip():
     def get_intersected_objects(self,storm_row):
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
-        # print("before iterate_goes",storm_row.name)
+        print("nexrad_objects",len(nexrad_objects),"goes_objects",len(goes_objects),"------------------------")
         nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
 
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None):
-        storms=self.storms.sort_values(by=['AREA'],ascending=False)
-
+        storms=self.storms.sort_values(by='AREA',ascending=False,axis=0)
         storms['BEGIN_DATE_TIME']=storms['BEGIN_DATE_TIME'].apply(lambda x: pd.Timestamp(x))
         if begin_start_date and begin_end_date:
 
@@ -250,8 +196,9 @@ class Clip():
             begin_end_date=pd.Timestamp(begin_end_date)
             storms=storms.loc[(storms['BEGIN_DATE_TIME'] > begin_start_date) &
                                 (storms['BEGIN_DATE_TIME'] < begin_end_date)]
-        print(storms)
-        # storms.head(4).apply(self.get_intersected_objects,axis=1)
+        # area_stored_storms=storms.sort_values(by='AREA',ascending=False,axis=0)
+        # print(storms)
+        storms.head(10).apply(self.get_intersected_objects,axis=1)
 
 
 

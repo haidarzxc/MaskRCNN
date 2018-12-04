@@ -566,7 +566,7 @@ def bounding_box_area_filter(output_dir):
 
 if __name__ == '__main__':
     Track.start_timer()
-    # bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
+    bounding_box_area_filter("NCDC_stormevents/area_filtered_stormevents.csv")
 
     # get_data(
     #         "NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv",
@@ -578,7 +578,7 @@ if __name__ == '__main__':
 
 
     # download_intersections("NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv","nexrad_intersections")
-    download_intersections("noaa-goes16","NCDC_stormevents/TXT_data_size.csv","goes_intersections/2017-12-01_2017-12-31")
+    # download_intersections("noaa-goes16","NCDC_stormevents/TXT_data_size.csv","goes_intersections/2017-12-01_2017-12-31")
 
 
 
