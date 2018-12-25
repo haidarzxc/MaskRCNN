@@ -11,6 +11,7 @@ from datasets.boto import create_session, \
                             iterate_nexrad_intersections, \
                             iterate_goes_intersections
 from datasets.Frame import Frame
+import settings.base as settings
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
@@ -98,7 +99,9 @@ class Clip():
               "c0_int",c0_int,
               "c1_int",c1_int)
         # [r0..r1,c0..c1]
-        clipped=data[r0_int:r1_int, c0_int:c1_int]
+        clipped=data[
+        r0_int+settings.goes_margin_left:r1_int+settings.goes_margin_right,
+        c0_int+settings.goes_margin_top:c1_int+settings.goes_margin_bottom]
         # print(clipped)
         return clipped
 
