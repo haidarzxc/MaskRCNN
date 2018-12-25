@@ -12,7 +12,9 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 import os
 from Table import *
-from pathlib import Path
+from datetime import datetime
+from datetime import timedelta
+
 
 import os, sys, inspect
 import pandas as pd
@@ -43,6 +45,7 @@ class Root(BoxLayout):
         super(Root,self).__init__(**kwargs)
         self.get_dataframe()
 
+
     def get_dataframe(self):
         storm_cols=['BEGIN_DATE_TIME','END_DATE_TIME','BEGIN_LON','BEGIN_LAT']
         storms_filtered=self.storms[storm_cols]
@@ -59,48 +62,53 @@ class Root(BoxLayout):
         self.rv_data = [{'text': str(x[0]), 'Index': str(x[1]), 'selectable': True} for x in data]
 
     def get_row(self, instance):
-        print("get_row:")
         self.row=self.rv_data[instance.index]['Index']
+        print("get_row:",self.row)
 
-    def download_file(self, row,type):
-        output_dir="ui_objects"
-        rep=row['KEY'].rpartition("/")
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+    def iterate(self,nexrad_row,goes_objects):
+        # print(goes_objects['bucket_begin_time'].values)
+        # print("---")
+        # print(nexrad_row['bucket_begin_time'])
+        nexrad_datetime=datetime.strptime(nexrad_row['bucket_begin_time'],'%Y-%m-%d %X')
+        if len(goes_objects)>0:
 
-        file = Path(output_dir+"/"+rep[2])
-        if not file.is_file():
-            print("DOWNLOADING",row['KEY'])
-            if type=="nexrad":
-                get_aws_object("noaa-nexrad-level2",row['KEY'],output_dir+"/"+rep[2])
-            elif type=="goes":
-                get_aws_object("noaa-goes16",row['KEY'],output_dir+"/"+rep[2])
+            goes_objects.index = pd.to_datetime(goes_objects['bucket_begin_time'])
+
+            goes_30min_window=goes_objects['bucket_begin_time'].between_time(
+                    str(nexrad_datetime.time()),
+                    str((nexrad_datetime + timedelta(minutes=30)).time()))
+            # print(goes_30min_window)
+
+            nearest_object=min(goes_objects['bucket_begin_time'],
+                key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime))
+            print("nearest_object",nearest_object,nexrad_datetime)
+
+            # min_datetime=datetime.strptime(goes_objects.iloc[0]['bucket_begin_time'],'%Y-%m-%d %X')
+            # idx=goes_objects.iloc[0]
+            # for index, row in goes_objects.iterrows():
+            #     # print(row['bucket_begin_time'])
+            #
+            #
+            # print(min_datetime,nexrad_datetime)
         else:
-            print(row['KEY'], 'Exists!')
+            print("No Goes objects")
 
-    def view_nexrad(self):
-        # print("view",self.row)
+    def clip(self,nexrad_objects,goes_objects):
+        print(len(nexrad_objects),len(goes_objects))
+        nexrad_objects.apply(lambda x: self.iterate(x,goes_objects),axis=1)
+
+    def view(self):
         if self.row:
             nexrad_Objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == int(self.row))]
+            goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == int(self.row))]
+            output_dir="ui_objects"
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
 
-
-            nexrad_Objects.apply(lambda x: self.download_file(x,"nexrad"),axis=1)
-
-            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
-            graph(nexrad_Objects,'nexrad')
-            # print('total objs',len(nexrad_Objects))
-
-    def view_goes(self):
-        # print("view",self.row)
-        if self.row:
-            goes_Objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == int(self.row))]
-            print(goes_Objects)
-
-            goes_Objects.apply(lambda x: self.download_file(x,"goes"),axis=1)
-
-            # graph("nexrad_intersections/2017/01/01/KNQA/KNQA20170101_060310_V06")
-            graph(goes_Objects,"goes")
-            # print('total objs',len(goes_Objects))
+            nexrad_Objects=nexrad_Objects.sort_values(by=['bucket_begin_time'])
+            goes_objects=goes_objects.sort_values(by=['bucket_begin_time'])
+            self.clip(nexrad_Objects,goes_objects)
+            # graph(nexrad_Objects,goes_objects)
 
 class MainApp(App):
     def build(self):
