@@ -18,6 +18,7 @@ from pathlib import Path
 import boto3
 import botocore
 from netCDF4 import Dataset
+import pyart
 
 
 from mpl_toolkits.basemap import Basemap, cm
@@ -105,11 +106,58 @@ class Clip():
         # print(clipped)
         return clipped
 
+    def clip_nexrad(self, nexrad_object, storm_row):
+        radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
+        refl_grid = radar.get_field(0, 'reflectivity')
+
+        g_w=2500
+        g_h=1500
+
+        g_x0=-152.109282
+        g_y0=14.571340
+        g_x1=-52.946879
+        g_y1=56.761450
+
+        s_x0=storm_row['END_LON']
+        s_y0=storm_row['BEGIN_LAT']
+        s_x1=storm_row['BEGIN_LON']
+        s_y1=storm_row['END_LAT']
+
+        # s_x0 must be less than s_x1
+        if s_x0 > s_x1:
+            tmp_s_x1=s_x1
+            s_x1=s_x0
+            s_x0=tmp_s_x1
+
+        # s_y0 must be less than s_y1
+        if s_y0 > s_y1:
+            tmp_s_y1=s_y1
+            s_y1=s_y0
+            s_y0=tmp_s_y1
+
+        s_x=(g_x1-g_x0)/g_w
+        s_y=(g_y1-g_y0)/g_h
+
+        c0=(s_x0-g_x0)/s_x
+        c1=(s_x1-g_x0)/s_x
+        r0=(s_y0-g_y0)/s_y
+        r1=(s_y1-g_y0)/s_y
+
+        c0_int=abs(math.floor(c0))
+        c1_int=abs(math.ceil(c1))
+        r0_int=abs(math.floor(r0))
+        r1_int=abs(math.ceil(r1))
+
+        print("====================================")
+        clipped=refl_grid[r0_int:r1_int,c0_int:c1_int]
+        print(len(refl_grid[0]),len(refl_grid))
+
     def geo_coordinates(self, goes_netCdf,nexrad_object,storm_row,goes_object):
 
-        clipped=self.clip_goes(goes_netCdf,storm_row)
-        print(storm_row)
-        Frame(clipped,nexrad_object,goes_object)
+        clip_goes=self.clip_goes(goes_netCdf,storm_row)
+        clip_nexrad=self.clip_nexrad(nexrad_object,storm_row)
+        # print(storm_row)
+        Frame(clip_goes,nexrad_object,goes_object)
 
 
 
@@ -155,7 +203,8 @@ class Clip():
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
         print("nexrad_objects",len(nexrad_objects),"goes_objects",len(goes_objects),"------------------------")
-        nexrad_objects.apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
+        # ------REMOVE head(1)
+        nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
 
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None, storm_id=None):
