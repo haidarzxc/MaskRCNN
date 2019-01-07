@@ -130,22 +130,15 @@ class Clip():
             s_y1=s_y0
             s_y0=tmp_s_y1
 
-        # s_x=(g_x1-g_x0)/g_w
-        # s_y=(g_y1-g_y0)/g_h
-        #
-        # c0=(s_x0-g_x0)/s_x
-        # c1=(s_x1-g_x0)/s_x
-        # r0=(s_y0-g_y0)/s_y
-        # r1=(s_y1-g_y0)/s_y
-        #
-        # c0_int=abs(math.floor(c0))
-        # c1_int=abs(math.ceil(c1))
-        # r0_int=abs(math.floor(r0))
-        # r1_int=abs(math.ceil(r1))
-        #
-        # print("====================================")
-        # clipped=refl_grid[r0_int:r1_int,c0_int:c1_int]
-        # print(len(refl_grid[0]),len(refl_grid))
+        print("nexrad object refl_grid", refl_grid)
+        print("nexrad object rows", len(refl_grid))
+        print("nexrad object columns", len(refl_grid[0]))
+        clipped=refl_grid[
+            10:720,
+            10:1832]
+        # print(clipped)
+        return clipped
+
 
     def geo_coordinates(self, goes_netCdf,nexrad_object,storm_row,goes_object):
         # clip goes and nexrad
@@ -153,7 +146,7 @@ class Clip():
         clip_nexrad=self.clip_nexrad(nexrad_object,storm_row)
         # print(storm_row)
         # graph and export
-        Frame(clip_goes,nexrad_object,goes_object)
+        Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
 
 
 
@@ -226,7 +219,9 @@ class Clip():
                                 (storms['BEGIN_DATE_TIME'] < begin_end_date)]
 
         # filter by given storm ID
-        if storm_id:
+        if not storm_id is None:
+            print("ID:",storm_id)
+            print(storms.iloc[storm_id])
             self.get_intersected_objects(storms.iloc[storm_id])
             return
 

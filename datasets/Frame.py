@@ -7,18 +7,16 @@ import pyart
 '''
 Frame class
 inherits QtGui window
-input arguments:
-    1. data (goes clipped version)
-    2. nexrad_object
-    3. goes_object
+input arguments
 
 output: export .png image of nexrad and goes
 '''
 class Frame(QtGui.QMainWindow):
-    def __init__(self,data,nexrad_object,goes_object):
+    def __init__(self,clipped_goes,clipped_nexrad,nexrad_object,goes_object):
         self.qapp = QtGui.QApplication([])
         self.nexrad_object=nexrad_object
-        self.data=data
+        self.clipped_goes=clipped_goes
+        self.clipped_nexrad=clipped_nexrad
         self.goes_object=goes_object
 
 
@@ -37,13 +35,13 @@ class Frame(QtGui.QMainWindow):
 
         ax0 = self.fig.add_subplot(2, 1, 2)
         # , extent=[1000,120,32,0] changes axis
-        ax0.imshow(data)
+        ax0.imshow(self.clipped_goes)
 
         ax1 = self.fig.add_subplot(2, 1, 1)
-        radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
-        display = pyart.graph.RadarDisplay(radar)
-        display.plot('reflectivity', 0, title="title",ax=ax1,colorbar_flag=False)
-
+        # radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
+        # display = pyart.graph.RadarDisplay(radar)
+        # display.plot('reflectivity', 0, title="title",ax=ax1,colorbar_flag=False)
+        ax1.imshow(self.clipped_nexrad)
 
 
         self.canvas.draw()
