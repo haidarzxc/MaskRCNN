@@ -26,8 +26,8 @@ class GoesIntersectionTest:
         stormevents_df['BEGIN_TIME_UTC']=pd.Series()
         stormevents_df['END_TIME_UTC']=pd.Series()
 
-        track.info("Running Filter")
-        stormevents_df=stormevents_df.head(1).apply(lambda x: self.filter_stormevents_goes(x,self.session), axis=1)
+        self.track.info("Running Filter")
+        stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_goes(x,self.session), axis=1)
 
         # df goes_intersections
         header=["KEY","FOREIGN_KEY", "SIZE", "IS_TIME_INTERSECTING", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
