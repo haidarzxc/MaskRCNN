@@ -1,3 +1,14 @@
+
+'''
+left,top            .----------.    storm_end_point
+                    |          |    Right,top
+                    |          |
+                    |          |
+storm_begin_point   .----------.   Right,bottom
+left,bottom
+'''
+
+
 class Point(object):
     def __init__(self,x,y):
         self.x=x

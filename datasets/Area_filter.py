@@ -11,12 +11,21 @@ from utils.intersect import *
 
 
 '''
-    top,Left            .----------.    storm_end_point
-                        |          |    top,Right
+    left,top            .----------.    storm_end_point
+                        |          |    Right,top
                         |          |
                         |          |
-    storm_begin_point   .----------.   bottom,Right
-    bottom,left
+    storm_begin_point   .----------.   Right,bottom
+    left,bottom
+
+      example case
+      (-5,15).----------------.(10,15)
+            |                 |
+            |                 |
+            |                 |
+            |                 |
+            |                 |
+      (-5,0)|-----------------.(10,0)
 '''
 
 class AreaFilter():
