@@ -7,8 +7,9 @@ parent_directory = os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
 
-from datasets.boto import filter_stormevents,boxes,to_UTC_time,date_range_intersection_test
+from datasets.boto import to_UTC_time,date_range_intersection_test,calculate_area
 from datasets.intersect import *
+import math
 
 
 # # testing intersect module
@@ -287,6 +288,20 @@ def test_date_range_intersection_test():
         print(case,case_test)
 
 
-test_date_range_intersection_test()
+def test_Area():
+    test_df=pd.DataFrame()
+    test_df['BEGIN_LON']=pd.Series([-118.4535,-2,-12])
+    test_df['BEGIN_LAT']=pd.Series([46.0757,0,0])
+    test_df['END_LON']=pd.Series([-118.9053,2,0])
+    test_df['END_LAT']=pd.Series([46.078,4,20])
+    test_df['AREA']=pd.Series([])
+
+    test_df=test_df.apply(lambda x: calculate_area(x), axis=1)
+    test_df=test_df.sort_values(by=['AREA'],ascending=False)
+    print(test_df)
+
+
+test_Area()
+# test_date_range_intersection_test()
 # test_To_UTC_time("NCDC_stormevents\\test_To_UTC_time.csv")
 # export_boxes_to_csv("frontend\\src\\static\\boxes.csv")
