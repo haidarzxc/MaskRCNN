@@ -14,6 +14,12 @@ STORM_END_TIME_MIN_SHIFT=1
 # AMAZON S3 end time wether meta_data shift 310 seconds
 META_DATA_END_TIME_SEC_SHIFT=310
 
+# goes object margins
+goes_margin_left=-50
+goes_margin_right=50
+goes_margin_top=-50
+goes_margin_bottom=50
+
 # radar 88D_locations URL
 WSR_88D_LOCATIONS='http://apollo.lsc.vsc.edu/classes/remote/lecture_notes/radar/88d/88D_locations.html'
 
