@@ -1,5 +1,4 @@
 # python libraries
-# NOTE: switch python PATH to look at parent_directory
 import unittest
 
 

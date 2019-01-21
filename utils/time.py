@@ -1,6 +1,12 @@
 import pandas as pd
+from datetime import timedelta
+
 import settings.local as local
+import utils.track as tr
+Track=tr.Track()
 # http://strftime.org/
+# https://www.timeanddate.com/worldclock/converter.html?iso=20190121T070400&p1=1440&p2=tz_sst
+
 def date_range_intersection_test(bucket_begin_time,
                                     bucket_end_time,
                                     BEGIN_TIME_UTC,
@@ -12,8 +18,8 @@ def date_range_intersection_test(bucket_begin_time,
     return False
 
 def convert_time(time,zone,format='%Y-%m-%d %X'):
-    time_str=time.tz_localize(zone).tz_convert('UTC').strftime(format)
-    return pd.to_datetime(time_str)
+    time_str=time.strftime(format)
+    return pd.to_datetime(time_str)+timedelta(hours=zone)
 
 
 def to_UTC_time(row):
@@ -26,44 +32,50 @@ def to_UTC_time(row):
     storm_end_datetime=pd.to_datetime(row['END_DATE_TIME'], format=format)
 
     # add shift values
-    row['BEGIN_DATE_TIME']=storm_begin_datetime-pd.Timedelta(minutes=local.STORM_BEGIN_TIME_MIN_SHIFT)
-    row['END_DATE_TIME']=storm_end_datetime+pd.Timedelta(minutes=local.STORM_END_TIME_MIN_SHIFT)
+    shift_begin_date_time=storm_begin_datetime-pd.Timedelta(minutes=local.STORM_BEGIN_TIME_MIN_SHIFT)
+    shift_end_date_time=storm_end_datetime+pd.Timedelta(minutes=local.STORM_END_TIME_MIN_SHIFT)
 
     try:
         if(row['CZ_TIMEZONE']=='EST-5'):
-            convert_time(row['BEGIN_DATE_TIME'],'US/Eastern')
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Eastern')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Eastern')
+            # EST + 5 to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,5)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,5)
         elif(row['CZ_TIMEZONE']=='CST-6'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Central')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Central')
+            # CST + 6hours to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,6)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,6)
         elif(row['CZ_TIMEZONE']=='MST-7'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Mountain')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Mountain')
+            # mst + 7hours to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,7)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,7)
         elif(row['CZ_TIMEZONE']=='PST-8'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Pacific')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Pacific')
+            # PST + 8hours to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,8)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,8)
         elif(row['CZ_TIMEZONE']=='AST-4'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'Canada/Atlantic')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'Canada/Atlantic')
+            # AST + 4hours to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,4)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,4)
         elif(row['CZ_TIMEZONE']=='AKST-9'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Alaska')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Alaska')
+            # akst + 9hours to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,9)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,9)
         elif(row['CZ_TIMEZONE']=='HST-10'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Hawaii')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Hawaii')
-            # varify time zone GST10
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,10)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,10)
         elif(row['CZ_TIMEZONE']=='GST10'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'Pacific/Guam')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'Pacific/Guam')
+            # Guam - 10 hours to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,-10)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,-10)
         elif(row['CZ_TIMEZONE']=='SST-11'):
-            row['BEGIN_TIME_UTC']=convert_time(row['BEGIN_DATE_TIME'],'US/Samoa')
-            row['END_TIME_UTC']=convert_time(row['END_DATE_TIME'],'US/Samoa')
+            # SST + 11 hours to utc
+            row['BEGIN_TIME_UTC']=convert_time(shift_begin_date_time,11)
+            row['END_TIME_UTC']=convert_time(shift_end_date_time,11)
         else:
             Track.warn("Exception: time_zone not tracked "+row['CZ_TIMEZONE'])
+            return None
+
     except:
+        Track.warn("Exception: Error")
         pass
-
-
-
     return row

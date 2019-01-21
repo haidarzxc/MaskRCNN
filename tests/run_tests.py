@@ -8,6 +8,7 @@ sys.path.insert(0,parent_directory)
 import unittest
 
 from tests.test_intersect import TestIntersect
+from tests.test_time import TestTime
 
 if __name__ == '__main__':
     unittest.main()
