@@ -77,6 +77,17 @@ def parse_args():
         sys.exit(1)
     return parser.parse_args()
 
+'''
+Terminal Commands
+python datasets\main.py --intersectionTest GOES --storms area_filtered_stormevents.csv --locations 88D_locations.csv
+
+python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormevents.csv --locations 88D_locations.csv
+
+python datasets\main.py --areaFilter StormEvents_details-ftp_v1.0_d2017_c20180918.csv --output_dir area_filtered_stormevents.csv
+
+'''
+
+
 def main(args):
 
     if args.areaFilter is not None:
