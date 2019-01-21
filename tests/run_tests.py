@@ -9,6 +9,7 @@ import unittest
 
 from tests.test_intersect import TestIntersect
 from tests.test_time import TestTime
+from tests.test_area_filter import TestAreaFilter
 
 if __name__ == '__main__':
     unittest.main()
