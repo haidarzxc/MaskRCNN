@@ -29,16 +29,19 @@ from utils.intersect import *
 '''
 
 class AreaFilter():
-    def __init__(self,track,storms,output_dir,local, **kwargs):
+    def __init__(self,track=None,storms=None,output_dir=None,local=None, **kwargs):
         self.track=track
         self.storms=storms
         self.output_dir=output_dir
         self.local=local
 
-        self.bounding_box_area_filter()
+        if track is None or \
+            storms is None or \
+            output_dir is None or \
+            local is None:
+            return
 
-    def __init__(self):
-        pass
+        self.bounding_box_area_filter()
 
 
 

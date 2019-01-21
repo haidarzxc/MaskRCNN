@@ -13,54 +13,72 @@ from utils.time import to_UTC_time
 
 class NexradIntersectionTest():
     def __init__(self,session,track,storms,locations,local, **kwargs):
+
+        if  session is None or \
+            track is None or \
+            storms is None or \
+            locations is None or \
+            local is None:
+            return
+
+
+
         self.session=session
         self.track=track
+
+        # create Log File
+        self.track.createLogFile("./logs/nexrad_intersections_test.txt")
+
         self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
         self.local=local
         self.output_dir="NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv"
         self.locations=load_CSV_file("./NCDC_stormevents/"+locations)
 
+
+
         locations_df=self.locations[['STATIONID','LATN/LONGW(deg,min,sec)']]
-        locations_df['BEGIN_LAT']=pd.Series()
-        locations_df['BEGIN_LON']=pd.Series()
-        locations_df['END_LAT']=pd.Series()
-        locations_df['END_LON']=pd.Series()
+        locations_df = locations_df.assign(BEGIN_LAT=pd.Series())
+        locations_df = locations_df.assign(BEGIN_LON=pd.Series())
+        locations_df = locations_df.assign(END_LAT=pd.Series())
+        locations_df = locations_df.assign(END_LON=pd.Series())
         locations_df=locations_df.apply(self.locations_lon_lat, axis=1)
+        print(locations_df)
 
-        stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
-        # stormevents_df dropping NaN rows
-        stormevents_df=stormevents_df.dropna(thresh=2)
-        stormevents_df['IS_INTERSECTING']=pd.Series()
-        stormevents_df['STATIONID']=pd.Series()
-        stormevents_df['BEGIN_TIME_UTC']=pd.Series()
-        stormevents_df['END_TIME_UTC']=pd.Series()
+        # stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
+        # # stormevents_df dropping NaN rows
+        # stormevents_df=stormevents_df.dropna(thresh=2)
+        # stormevents_df['IS_INTERSECTING']=pd.Series()
+        # stormevents_df['STATIONID']=pd.Series()
+        # stormevents_df['BEGIN_TIME_UTC']=pd.Series()
+        # stormevents_df['END_TIME_UTC']=pd.Series()
+        #
+        # self.track.info("Running Filter")
+        # stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_nexrad(x,locations_df,session), axis=1)
+        #
+        #
+        # # df nexrad_intersections
+        # header=["KEY","FOREIGN_KEY", "SIZE", "IS_INTERSECTING", "IS_TIME_INTERSECTING","BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON", "STATIONID", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
+        # nexrad_intersections=load_CSV_file(self.output_dir,header)
+        # nexrad_intersections=nexrad_intersections.drop_duplicates(['KEY'])
+        # nexrad_intersections.to_csv(self.output_dir)
+        #
+        #
+        # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+        # stormevents_filtered_df.to_csv(output_dir_stormevents)
 
-        self.track.info("Running Filter")
-        stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_nexrad(x,locations_df,session), axis=1)
-
-
-        # df nexrad_intersections
-        header=["KEY","FOREIGN_KEY", "SIZE", "IS_INTERSECTING", "IS_TIME_INTERSECTING","BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON", "STATIONID", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
-        nexrad_intersections=load_CSV_file(self.output_dir,header)
-        nexrad_intersections=nexrad_intersections.drop_duplicates(['KEY'])
-        nexrad_intersections.to_csv(self.output_dir)
-
-
-        stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
-        stormevents_filtered_df.to_csv(output_dir_stormevents)
-
-    def __init__(self):
-        pass
 
     def locations_lon_lat(self,row):
         # Decimal Degrees = degrees + (minutes/60) + (seconds/3600)
         # DD = d + (min/60) + (sec/3600)
+
         deg=row['LATN/LONGW(deg,min,sec)'].split('/')
 
         lon=deg[1].strip()
         lat=deg[0].strip()
         lon=re.sub('[^0-9]','', lon)
         lat=re.sub('[^0-9]','', lat)
+
+
         # sec [-2:] | min [-4:-2] | deg [:-4]
         try:
 
@@ -68,13 +86,13 @@ class NexradIntersectionTest():
             lon_float=(float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600))*-1
             lat_float=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
 
-            row['BEGIN_LON']=lon_float-local.HORIZONTAL_SHIFT
-            row['BEGIN_LAT']=lat_float-local.VERTICAL_SHIFT
-            row['END_LON']=lon_float+local.HORIZONTAL_SHIFT
-            row['END_LAT']=lat_float+local.VERTICAL_SHIFT
+            row['BEGIN_LON']=lon_float-self.local.HORIZONTAL_SHIFT
+            row['BEGIN_LAT']=lat_float-self.local.VERTICAL_SHIFT
+            row['END_LON']=lon_float+self.local.HORIZONTAL_SHIFT
+            row['END_LAT']=lat_float+self.local.VERTICAL_SHIFT
+
         except:
             self.track.warn("Exception: Float Parsing ")
-
 
         return row
 
