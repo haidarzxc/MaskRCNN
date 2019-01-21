@@ -5,9 +5,6 @@ import pandas as pd
 
 # project modules
 from datasets.area_filter import AreaFilter
-# import utils.track as tr
-# import settings.local as local
-# Track=tr.Track()
 
 class TestAreaFilter(unittest.TestCase):
 

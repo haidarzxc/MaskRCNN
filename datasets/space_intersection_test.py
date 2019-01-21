@@ -49,7 +49,8 @@ class NexradIntersectionTest():
         stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
         stormevents_filtered_df.to_csv(output_dir_stormevents)
 
-
+    def __init__(self):
+        pass
 
     def locations_lon_lat(self,row):
         # Decimal Degrees = degrees + (minutes/60) + (seconds/3600)
