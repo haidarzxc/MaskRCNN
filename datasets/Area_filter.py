@@ -37,6 +37,9 @@ class AreaFilter():
 
         self.bounding_box_area_filter()
 
+    def __init__(self):
+        pass
+
 
 
     def calculate_distance(self,x1,x2,y1,y2):
