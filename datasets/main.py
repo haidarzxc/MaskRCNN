@@ -79,7 +79,7 @@ def parse_args():
 
 '''
 Terminal Commands
-python datasets\main.py --intersectionTest GOES --storms area_filtered_stormevents.csv --locations 88D_locations.csv
+python datasets\main.py --intersectionTest GOES --storms area_filtered_stormevents.csv
 
 python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormevents.csv --locations 88D_locations.csv
 
@@ -108,7 +108,7 @@ def main(args):
             GoesIntersectionTest(session,Track,args.stormsFile,local)
 
         elif args.intersectionTest=="NEXRAD":
-            if args.stormsFile is None:
+            if args.locationsFile is None:
                 Track.warn("Exception: Pass a Locations file")
                 return
             Track.info("Starting NEXRAD intersection Test")
