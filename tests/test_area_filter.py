@@ -31,7 +31,7 @@ class TestAreaFilter(unittest.TestCase):
         test_df['END_LON']=pd.Series([10,20])
         test_df['END_LAT']=pd.Series([15,25])
         test_df['AREA']=pd.Series([])
-        test_df['CORRECT_AREA']=pd.Series([225,400])
+        test_df['CORRECT_AREA']=pd.Series([75,400])
 
         test_df=test_df.apply(lambda x: instance1.calculate_area(x), axis=1)
         test_df.apply(self.iterate_calculateArea,axis=1)

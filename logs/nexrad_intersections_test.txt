@@ -1,0 +1,2 @@
+WARNING:root:./NCDC_stormevents/area_filtered_stormevents.csv: unable to open CSV
+INFO:root:./NCDC_stormevents/88D_locations.csv: csv file read

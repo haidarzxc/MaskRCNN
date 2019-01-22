@@ -7,6 +7,7 @@ import math
 # project modules
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 from utils.intersect import *
+from utils.general import verify_lon_lat
 
 
 
@@ -49,8 +50,16 @@ class AreaFilter():
         return math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
     def calculate_area(self,row):
-        storm_begin_point=Point(row['BEGIN_LON'], row['BEGIN_LAT'])
-        storm_end_point=Point(row['END_LON'],row['END_LAT'])
+        temp_row=row
+        result=verify_lon_lat(
+            temp_row['BEGIN_LON'],
+            temp_row['END_LON'],
+            temp_row['BEGIN_LAT'],
+            temp_row['END_LAT'],
+            self.track
+        )
+        storm_begin_point=Point(result['BEGIN_LON'], result['BEGIN_LAT'])
+        storm_end_point=Point(result['END_LON'],result['END_LAT'])
         # print((row['END_LON']-row['END_LAT'])*(row['BEGIN_LON']-row['BEGIN_LAT']))
         storm_box=Box(storm_begin_point, storm_end_point)
         width=self.calculate_distance(storm_box.bottom,
@@ -65,9 +74,9 @@ class AreaFilter():
 
         area=width*height
         # print(width,height,area)
-        row['AREA']=area
+        temp_row['AREA']=area
 
-        return row
+        return temp_row
 
     def bounding_box_area_filter(self):
         stormevents_csv_file=load_CSV_file("NCDC_stormevents/"+self.storms)
