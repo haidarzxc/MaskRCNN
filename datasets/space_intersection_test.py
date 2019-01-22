@@ -11,6 +11,8 @@ from datasets.NCDC_stormevents_data_loader import load_CSV_file
 from utils.intersect import *
 from utils.time import to_UTC_time
 
+from utils.general import verify_lon_lat
+
 class NexradIntersectionTest():
     def __init__(self,session,track,storms,locations,local, **kwargs):
 
@@ -86,10 +88,20 @@ class NexradIntersectionTest():
             lon_float=(float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600))*-1
             lat_float=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
 
-            row['BEGIN_LON']=lon_float-self.local.HORIZONTAL_SHIFT
-            row['BEGIN_LAT']=lat_float-self.local.VERTICAL_SHIFT
-            row['END_LON']=lon_float+self.local.HORIZONTAL_SHIFT
-            row['END_LAT']=lat_float+self.local.VERTICAL_SHIFT
+            # verify lons and lats
+            # method signiture BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None
+            result=verify_lon_lat(
+                lon_float-self.local.HORIZONTAL_SHIFT,
+                lon_float+self.local.HORIZONTAL_SHIFT,
+                lat_float-self.local.VERTICAL_SHIFT,
+                lat_float+self.local.VERTICAL_SHIFT,
+                self.track
+            )
+
+            row['BEGIN_LON']=result['BEGIN_LON']
+            row['BEGIN_LAT']=result['BEGIN_LAT']
+            row['END_LON']=result['END_LON']
+            row['END_LAT']=result['END_LAT']
 
         except:
             self.track.warn("Exception: Float Parsing ")
