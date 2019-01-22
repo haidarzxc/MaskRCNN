@@ -5,6 +5,7 @@ import pandas as pd
 import botocore
 import re
 import datetime
+import os
 
 
 # project modules
@@ -36,6 +37,7 @@ class NexradIntersectionTest():
         self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
         self.local=local
         self.output_dir="NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv"
+        self.output_dir_txt="NCDC_stormevents/TXT_NEXRAD_bounding_box_datetime_filtered_intersections.csv"
         self.locations=load_CSV_file("./NCDC_stormevents/"+locations)
 
 
@@ -66,13 +68,13 @@ class NexradIntersectionTest():
 
         # df nexrad_intersections
         header=["KEY","FOREIGN_KEY", "SIZE", "IS_INTERSECTING", "IS_TIME_INTERSECTING","BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON", "STATIONID", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
-        nexrad_intersections=load_CSV_file(self.output_dir,header)
+        nexrad_intersections=load_CSV_file(self.output_dir_txt,header)
         nexrad_intersections=nexrad_intersections.drop_duplicates(['KEY'])
         nexrad_intersections.to_csv(self.output_dir)
 
-
-        stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
-        stormevents_filtered_df.to_csv(self.output_dir)
+        os.remove(self.output_dir_txt)
+        # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+        # stormevents_filtered_df.to_csv(self.output_dir)
 
     def iterate_lons_lats(self,row):
         temp_row=row
@@ -228,7 +230,7 @@ class NexradIntersectionTest():
 
                 # adding row to nexrad_intersections
                 if time_intersection:
-                    with open(self.output_dir, "a") as myfile:
+                    with open(self.output_dir_txt, "a") as myfile:
                         rec=str(object.key)+ \
                         ","+str(row.name)+ \
                         ","+str(object.size*0.000001)+ \
