@@ -247,7 +247,7 @@ class NexradIntersectionTest():
                         myfile.write(rec)
 
                 print(object.key,object.size,time_intersection,x,row.name)
-                
+
                 x+=1
 
         except botocore.exceptions.ClientError as e:
