@@ -4,14 +4,16 @@
 import pandas as pd
 import botocore
 import re
+import datetime
 
 
 # project modules
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 from utils.intersect import *
 from utils.time import to_UTC_time
-
 from utils.general import verify_lon_lat
+import settings.local as local
+from utils.time import date_range_intersection_test
 
 class NexradIntersectionTest():
     def __init__(self,session,track,storms,locations,local, **kwargs):
@@ -44,29 +46,52 @@ class NexradIntersectionTest():
         locations_df = locations_df.assign(END_LAT=pd.Series())
         locations_df = locations_df.assign(END_LON=pd.Series())
         locations_df=locations_df.apply(self.locations_lon_lat, axis=1)
-        print(locations_df)
 
-        # stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
-        # # stormevents_df dropping NaN rows
-        # stormevents_df=stormevents_df.dropna(thresh=2)
-        # stormevents_df['IS_INTERSECTING']=pd.Series()
-        # stormevents_df['STATIONID']=pd.Series()
-        # stormevents_df['BEGIN_TIME_UTC']=pd.Series()
-        # stormevents_df['END_TIME_UTC']=pd.Series()
-        #
-        # self.track.info("Running Filter")
-        # stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_nexrad(x,locations_df,session), axis=1)
-        #
-        #
-        # # df nexrad_intersections
-        # header=["KEY","FOREIGN_KEY", "SIZE", "IS_INTERSECTING", "IS_TIME_INTERSECTING","BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON", "STATIONID", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
-        # nexrad_intersections=load_CSV_file(self.output_dir,header)
-        # nexrad_intersections=nexrad_intersections.drop_duplicates(['KEY'])
-        # nexrad_intersections.to_csv(self.output_dir)
-        #
-        #
-        # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
-        # stormevents_filtered_df.to_csv(output_dir_stormevents)
+        stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
+        # stormevents_df dropping NaN rows
+        stormevents_df=stormevents_df.dropna(thresh=2)
+
+        stormevents_df = stormevents_df.assign(IS_INTERSECTING=pd.Series())
+        stormevents_df = stormevents_df.assign(STATIONID=pd.Series())
+        stormevents_df = stormevents_df.assign(BEGIN_TIME_UTC=pd.Series())
+        stormevents_df = stormevents_df.assign(END_TIME_UTC=pd.Series())
+
+        self.track.info("verify lons lats")
+        stormevents_df=stormevents_df.apply(self.iterate_lons_lats, axis=1)
+
+
+        self.track.info("Running Filter")
+        stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_nexrad(x,locations_df,session), axis=1)
+
+
+        # df nexrad_intersections
+        header=["KEY","FOREIGN_KEY", "SIZE", "IS_INTERSECTING", "IS_TIME_INTERSECTING","BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON", "STATIONID", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
+        nexrad_intersections=load_CSV_file(self.output_dir,header)
+        nexrad_intersections=nexrad_intersections.drop_duplicates(['KEY'])
+        nexrad_intersections.to_csv(self.output_dir)
+
+
+        stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
+        stormevents_filtered_df.to_csv(self.output_dir)
+
+    def iterate_lons_lats(self,row):
+        temp_row=row
+        # verify lons and lats
+        # method signiture BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None
+        result=verify_lon_lat(
+            temp_row['BEGIN_LON'],
+            temp_row['END_LON'],
+            temp_row['BEGIN_LAT'],
+            temp_row['END_LAT'],
+            self.track
+        )
+
+        temp_row['BEGIN_LON']=result['BEGIN_LON']
+        temp_row['BEGIN_LAT']=result['BEGIN_LAT']
+        temp_row['END_LON']=result['END_LON']
+        temp_row['END_LAT']=result['END_LAT']
+
+        return temp_row
 
 
     def locations_lon_lat(self,row):
@@ -111,6 +136,7 @@ class NexradIntersectionTest():
 
 
     def filter_stormevents_nexrad(self,row,locations,session):
+
         # space interestion test
         st=locations.apply(lambda x: self.intersction_test(x,row),axis=1)
 
@@ -221,6 +247,7 @@ class NexradIntersectionTest():
                         myfile.write(rec)
 
                 print(object.key,object.size,time_intersection,x,row.name)
+                
                 x+=1
 
         except botocore.exceptions.ClientError as e:

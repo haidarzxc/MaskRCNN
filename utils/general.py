@@ -4,16 +4,16 @@ def verify_lon_lat(BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None):
                 BEGIN_LAT=BEGIN_LAT,
                 END_LAT=END_LAT
                 )
-                
+
     # All longtudes are negative
-    if (BEGIN_LON is not None and BEGIN_LON > 0):
+    if (values['BEGIN_LON'] is not None and values['BEGIN_LON'] > 0):
         if track is not None:
-            track.warning("Exception: BEGIN_LON greator than zero!")
+            track.warn("Exception: BEGIN_LON greator than zero!")
         values['BEGIN_LON']=values['BEGIN_LON']*-1
 
-    if (END_LON is not None and END_LON > 0):
+    if (values['END_LON'] is not None and values['END_LON'] > 0):
         if track is not None:
-            track.warning("Exception: END_LON greator than zero!")
+            track.warn("Exception: END_LON greator than zero!")
         values['END_LON']=values['END_LON']*-1
 
 
@@ -23,7 +23,7 @@ def verify_lon_lat(BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None):
         values['END_LAT'] is not None and \
         values['BEGIN_LAT'] > values['END_LAT']:
         if track is not None:
-            track.warning("Exception: BEGIN_LAT > END_LAT")
+            track.warn("Exception: BEGIN_LAT > END_LAT, "+ str(values['BEGIN_LAT'])+" > "+str(values['END_LAT']))
 
         temp=values['BEGIN_LAT']
         values['BEGIN_LAT']=values['END_LAT']
@@ -36,7 +36,7 @@ def verify_lon_lat(BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None):
         values['END_LON'] is not None and \
         values['BEGIN_LON'] > values['END_LON']:
         if track is not None:
-            track.warning("Exception: BEGIN_LON > END_LON")
+            track.warn("Exception: BEGIN_LON > END_LON , "+str(values['BEGIN_LON'])+" > "+str(values['END_LON']))
 
         temp=values['BEGIN_LON']
         values['BEGIN_LON']=values['END_LON']
