@@ -3,6 +3,7 @@
 import pandas as pd
 import botocore
 import datetime
+import os
 
 # project modules
 from NCDC_stormevents_data_loader import load_CSV_file
@@ -15,7 +16,7 @@ class GoesIntersectionTest:
         self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
         self.local=local
         self.output_dir="NCDC_stormevents/GOES_datetime_filtered_intersections.csv"
-
+        self.output_dir_txt="NCDC_stormevents/TXT_GOES_datetime_filtered_intersections.csv"
         # create Log File
         self.track.createLogFile("./logs/goes_intersections_test.txt")
 
@@ -31,9 +32,11 @@ class GoesIntersectionTest:
 
         # df goes_intersections
         header=["KEY","FOREIGN_KEY", "SIZE", "IS_TIME_INTERSECTING", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
-        goes_intersections=load_CSV_file(self.output_dir,header)
+        goes_intersections=load_CSV_file(self.output_dir_txt,header)
         goes_intersections=goes_intersections.drop_duplicates(['KEY'])
         goes_intersections.to_csv(self.output_dir)
+
+        os.remove(self.output_dir_txt)
 
 
     def filter_stormevents_goes(self,row,session):
@@ -107,7 +110,7 @@ class GoesIntersectionTest:
                                             )
                 if time_intersection:
 
-                    with open(self.output_dir, "a") as myfile:
+                    with open(self.output_dir_txt, "a") as myfile:
                         rec=str(object.key)+ \
                             ","+str(row.name)+ \
                             ","+str(object.size*0.000001)+ \
