@@ -12,7 +12,7 @@ import os
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 from utils.intersect import *
 from utils.time import to_UTC_time
-from utils.general import verify_lon_lat
+# from utils.general import verify_lon_lat
 import settings.local as local
 from utils.time import date_range_intersection_test
 
@@ -58,8 +58,8 @@ class NexradIntersectionTest():
         stormevents_df = stormevents_df.assign(BEGIN_TIME_UTC=pd.Series())
         stormevents_df = stormevents_df.assign(END_TIME_UTC=pd.Series())
 
-        self.track.info("verify lons lats")
-        stormevents_df=stormevents_df.apply(self.iterate_lons_lats, axis=1)
+        # self.track.info("verify lons lats")
+        # stormevents_df=stormevents_df.apply(self.iterate_lons_lats, axis=1)
 
 
         self.track.info("Running Filter")
@@ -76,24 +76,24 @@ class NexradIntersectionTest():
         # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
         # stormevents_filtered_df.to_csv(self.output_dir)
 
-    def iterate_lons_lats(self,row):
-        temp_row=row
-        # verify lons and lats
-        # method signiture BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None
-        result=verify_lon_lat(
-            temp_row['BEGIN_LON'],
-            temp_row['END_LON'],
-            temp_row['BEGIN_LAT'],
-            temp_row['END_LAT'],
-            self.track
-        )
-
-        temp_row['BEGIN_LON']=result['BEGIN_LON']
-        temp_row['BEGIN_LAT']=result['BEGIN_LAT']
-        temp_row['END_LON']=result['END_LON']
-        temp_row['END_LAT']=result['END_LAT']
-
-        return temp_row
+    # def iterate_lons_lats(self,row):
+    #     temp_row=row
+    #     # verify lons and lats
+    #     # method signiture BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None
+    #     result=verify_lon_lat(
+    #         temp_row['BEGIN_LON'],
+    #         temp_row['END_LON'],
+    #         temp_row['BEGIN_LAT'],
+    #         temp_row['END_LAT'],
+    #         self.track
+    #     )
+    #
+    #     temp_row['BEGIN_LON']=result['BEGIN_LON']
+    #     temp_row['BEGIN_LAT']=result['BEGIN_LAT']
+    #     temp_row['END_LON']=result['END_LON']
+    #     temp_row['END_LAT']=result['END_LAT']
+    #
+    #     return temp_row
 
 
     def locations_lon_lat(self,row):

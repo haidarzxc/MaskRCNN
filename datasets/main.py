@@ -15,6 +15,7 @@ from datasets.time_intersection_test import GoesIntersectionTest
 from datasets.space_intersection_test import NexradIntersectionTest
 from datasets.area_filter import AreaFilter
 from utils.boto import create_session
+from datasets.verifyLonsLats import VerifyLonsLats
 
 Track=tr.Track()
 
@@ -72,6 +73,14 @@ def parse_args():
         type=str
     )
 
+    parser.add_argument(
+        '--verifyLonLat',
+        dest='verifyLonLat',
+        help='verify longtudes and latitudes values',
+        default=None,
+        type=str
+    )
+
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
@@ -85,10 +94,17 @@ python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormev
 
 python datasets\main.py --areaFilter StormEvents_details-ftp_v1.0_d2017_c20180918.csv --output_dir area_filtered_stormevents.csv
 
+python datasets\main.py --verifyLonLat StormEvents_details-ftp_v1.0_d2017_c20180918.csv --output_dir verified_storms.csv
+
 '''
 
 
 def main(args):
+
+    if args.verifyLonLat is not None \
+            and args.output is not None:
+        Track.warn("verifyLonLat")
+        VerifyLonsLats(args.verifyLonLat,Track,args.output)
 
     if args.areaFilter is not None:
         if args.output is None:
