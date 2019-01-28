@@ -6,7 +6,7 @@ import pandas as pd
 # project modules
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 
-class VerifyLonsLats:
+class VerifyStorms:
     def __init__(self,storms,track,output_dir,**kwargs):
         self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
         self.output_dir="./NCDC_stormevents/"+output_dir
