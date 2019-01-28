@@ -28,14 +28,14 @@ class VerifyStorms:
 
         stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
         stormevents_df=stormevents_df[(
-                                        stormevents_df['BEGIN_LAT'].notnull() &
-                                        stormevents_df['BEGIN_LON'].notnull() &
-                                        stormevents_df['END_LAT'].notnull() &
-                                        stormevents_df['END_LON'].notnull() &
-                                        stormevents_df['BEGIN_DATE_TIME'].notnull() &
-                                        stormevents_df['CZ_TIMEZONE'].notnull() &
-                                        stormevents_df['END_DATE_TIME'].notnull()
-                                        )]
+                        stormevents_df['BEGIN_LAT'].notnull() &
+                        stormevents_df['BEGIN_LON'].notnull() &
+                        stormevents_df['END_LAT'].notnull() &
+                        stormevents_df['END_LON'].notnull() &
+                        stormevents_df['BEGIN_DATE_TIME'].notnull() &
+                        stormevents_df['CZ_TIMEZONE'].notnull() &
+                        stormevents_df['END_DATE_TIME'].notnull()
+                        )]
 
         self.track.info("verify lons lats")
         self.output=stormevents_df.apply(self.iterate_lons_lats, axis=1)
@@ -43,6 +43,7 @@ class VerifyStorms:
         self.output.to_csv(self.output_dir)
         self.track.info("verification Done")
 
+        # re-test
         self.track.info("running again")
         self.storms=load_CSV_file(self.output_dir)
         self.track.info("re-verify lons lats")
@@ -62,7 +63,7 @@ class VerifyStorms:
             rowCopy
         )
 
-        # print(result)
+        
 
         # after varification
         rowCopy['BEGIN_LON']=result['BEGIN_LON']

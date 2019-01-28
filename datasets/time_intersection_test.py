@@ -20,10 +20,8 @@ class GoesIntersectionTest:
         # create Log File
         self.track.createLogFile("./logs/goes_intersections_test.txt")
 
-        stormevents_df=self.storms[['BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
 
-        # stormevents_df dropping NaN rows
-        stormevents_df=stormevents_df.dropna(thresh=2)
+
         stormevents_df['BEGIN_TIME_UTC']=pd.Series()
         stormevents_df['END_TIME_UTC']=pd.Series()
 
@@ -41,7 +39,7 @@ class GoesIntersectionTest:
 
     def filter_stormevents_goes(self,row,session):
         # time conversion to UTC
-        to_UTC_time(row)
+        # to_UTC_time(row)
 
         self.bucket_goes(row,session)
         self.track.info("filter_stormevents_goes Testing Intersection "+str(row.name))

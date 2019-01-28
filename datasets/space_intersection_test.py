@@ -41,7 +41,7 @@ class NexradIntersectionTest():
         self.locations=load_CSV_file("./NCDC_stormevents/"+locations)
 
 
-
+        # add columns to locations DataFrame
         locations_df=self.locations[['STATIONID','LATN/LONGW(deg,min,sec)']]
         locations_df = locations_df.assign(BEGIN_LAT=pd.Series())
         locations_df = locations_df.assign(BEGIN_LON=pd.Series())
@@ -49,24 +49,20 @@ class NexradIntersectionTest():
         locations_df = locations_df.assign(END_LON=pd.Series())
         locations_df=locations_df.apply(self.locations_lon_lat, axis=1)
 
-        stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
-        # stormevents_df dropping NaN rows
-        stormevents_df=stormevents_df.dropna(thresh=2)
 
+        # add columns to stormevents DataFrame
         stormevents_df = stormevents_df.assign(IS_INTERSECTING=pd.Series())
         stormevents_df = stormevents_df.assign(STATIONID=pd.Series())
         stormevents_df = stormevents_df.assign(BEGIN_TIME_UTC=pd.Series())
         stormevents_df = stormevents_df.assign(END_TIME_UTC=pd.Series())
 
-        # self.track.info("verify lons lats")
-        # stormevents_df=stormevents_df.apply(self.iterate_lons_lats, axis=1)
 
-
+        # run space and datetime test
         self.track.info("Running Filter")
         stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_nexrad(x,locations_df,session), axis=1)
 
 
-        # df nexrad_intersections
+        # read df nexrad_intersections -re format csv file
         header=["KEY","FOREIGN_KEY", "SIZE", "IS_INTERSECTING", "IS_TIME_INTERSECTING","BEGIN_LAT", "BEGIN_LON", "END_LAT", "END_LON", "STATIONID", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]
         nexrad_intersections=load_CSV_file(self.output_dir_txt,header)
         nexrad_intersections=nexrad_intersections.drop_duplicates(['KEY'])
@@ -75,25 +71,6 @@ class NexradIntersectionTest():
         os.remove(self.output_dir_txt)
         # stormevents_filtered_df=stormevents_df.loc[stormevents_df['IS_INTERSECTING'] == True]
         # stormevents_filtered_df.to_csv(self.output_dir)
-
-    # def iterate_lons_lats(self,row):
-    #     temp_row=row
-    #     # verify lons and lats
-    #     # method signiture BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None
-    #     result=verify_lon_lat(
-    #         temp_row['BEGIN_LON'],
-    #         temp_row['END_LON'],
-    #         temp_row['BEGIN_LAT'],
-    #         temp_row['END_LAT'],
-    #         self.track
-    #     )
-    #
-    #     temp_row['BEGIN_LON']=result['BEGIN_LON']
-    #     temp_row['BEGIN_LAT']=result['BEGIN_LAT']
-    #     temp_row['END_LON']=result['END_LON']
-    #     temp_row['END_LAT']=result['END_LAT']
-    #
-    #     return temp_row
 
 
     def locations_lon_lat(self,row):
