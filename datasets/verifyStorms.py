@@ -7,14 +7,9 @@ import pandas as pd
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 
 class VerifyStorms:
-    def __init__(self,storms,track,output_dir,**kwargs):
-        self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
-        self.output_dir="./NCDC_stormevents/"+output_dir
+    def __init__(self,storms,output_dir=None,track=None,**kwargs):
+        self.storms=None
         self.track=track
-
-        # create Log File
-        self.track.createLogFile("./logs/verify_lon_lat.txt")
-
         self.output=pd.DataFrame()
         self.output = self.output.assign(BEGIN_LAT=pd.Series())
         self.output = self.output.assign(BEGIN_LON=pd.Series())
@@ -23,8 +18,29 @@ class VerifyStorms:
         self.output = self.output.assign(BEGIN_DATE_TIME=pd.Series())
         self.output = self.output.assign(CZ_TIMEZONE=pd.Series())
         self.output = self.output.assign(END_DATE_TIME=pd.Series())
-        self.track.info("created New file "+self.output_dir)
 
+        # testing
+        if track==None and output_dir==None:
+            self.storms=storms
+            stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
+            stormevents_df=stormevents_df[(
+                            stormevents_df['BEGIN_LAT'].notnull() &
+                            stormevents_df['BEGIN_LON'].notnull() &
+                            stormevents_df['END_LAT'].notnull() &
+                            stormevents_df['END_LON'].notnull() &
+                            stormevents_df['BEGIN_DATE_TIME'].notnull() &
+                            stormevents_df['CZ_TIMEZONE'].notnull() &
+                            stormevents_df['END_DATE_TIME'].notnull()
+                            )]
+            self.output=stormevents_df.apply(self.iterate_lons_lats, axis=1)
+            return
+
+        self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
+        self.output_dir="./NCDC_stormevents/"+output_dir
+
+
+        # create Log File
+        self.track.createLogFile("./logs/verify_lon_lat.txt")
 
         stormevents_df=self.storms[['BEGIN_LAT','BEGIN_LON','END_LAT','END_LON','BEGIN_DATE_TIME','CZ_TIMEZONE','END_DATE_TIME']]
         stormevents_df=stormevents_df[(
@@ -59,11 +75,10 @@ class VerifyStorms:
             rowCopy['END_LON'],
             rowCopy['BEGIN_LAT'],
             rowCopy['END_LAT'],
-            self.track,
             rowCopy
         )
 
-        
+
 
         # after varification
         rowCopy['BEGIN_LON']=result['BEGIN_LON']
@@ -78,7 +93,7 @@ class VerifyStorms:
         return rowCopy
 
 
-    def verify_lon_lat(self,BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None,row=None):
+    def verify_lon_lat(self,BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,row=None):
         values=dict(BEGIN_LON=BEGIN_LON,
                     END_LON=END_LON,
                     BEGIN_LAT=BEGIN_LAT,
@@ -87,13 +102,13 @@ class VerifyStorms:
 
         # All longtudes are negative
         if (values['BEGIN_LON'] is not None and values['BEGIN_LON'] > 0):
-            if track is not None and row is not None:
-                track.warn("Exception: BEGIN_LON greator than zero! "+str(row.name))
+            if self.track is not None and row is not None:
+                self.track.warn("Exception: BEGIN_LON greator than zero! "+str(row.name))
             values['BEGIN_LON']=values['BEGIN_LON']*-1
 
         if (values['END_LON'] is not None and values['END_LON'] > 0):
-            if track is not None and row is not None:
-                track.warn("Exception: END_LON greator than zero! "+str(row.name))
+            if self.track is not None and row is not None:
+                self.track.warn("Exception: END_LON greator than zero! "+str(row.name))
             values['END_LON']=values['END_LON']*-1
 
 
@@ -102,8 +117,8 @@ class VerifyStorms:
         if values['BEGIN_LAT'] is not None and \
             values['END_LAT'] is not None and \
             values['BEGIN_LAT'] > values['END_LAT']:
-            if track is not None and row is not None:
-                track.warn("Exception: BEGIN_LAT > END_LAT, "+ str(values['BEGIN_LAT'])+" > "+str(values['END_LAT'])+", index"+str(row.name))
+            if self.track is not None and row is not None:
+                self.track.warn("Exception: BEGIN_LAT > END_LAT, "+ str(values['BEGIN_LAT'])+" > "+str(values['END_LAT'])+", index"+str(row.name))
 
             temp=values['BEGIN_LAT']
             values['BEGIN_LAT']=values['END_LAT']
@@ -115,8 +130,8 @@ class VerifyStorms:
         if values['BEGIN_LON'] is not None and \
             values['END_LON'] is not None and \
             values['BEGIN_LON'] > values['END_LON']:
-            if track is not None and row is not None:
-                track.warn("Exception: BEGIN_LON > END_LON , "+str(values['BEGIN_LON'])+" > "+str(values['END_LON'])+", index"+str(row.name))
+            if self.track is not None and row is not None:
+                self.track.warn("Exception: BEGIN_LON > END_LON , "+str(values['BEGIN_LON'])+" > "+str(values['END_LON'])+", index"+str(row.name))
 
             temp=values['BEGIN_LON']
             values['BEGIN_LON']=values['END_LON']

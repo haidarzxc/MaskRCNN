@@ -104,7 +104,7 @@ def main(args):
     if args.verifyStorms is not None \
             and args.output is not None:
         Track.warn("Verify Storms")
-        VerifyStorms(args.verifyStorms,Track,args.output)
+        VerifyStorms(args.verifyStorms,args.output,Track)
 
     if args.areaFilter is not None:
         if args.output is None:
