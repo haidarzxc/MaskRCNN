@@ -21,12 +21,11 @@ class GoesIntersectionTest:
         self.track.createLogFile("./logs/goes_intersections_test.txt")
 
 
-
-        stormevents_df['BEGIN_TIME_UTC']=pd.Series()
-        stormevents_df['END_TIME_UTC']=pd.Series()
+        self.storms = self.storms.assign(BEGIN_TIME_UTC=pd.Series())
+        self.storms = self.storms.assign(END_TIME_UTC=pd.Series())
 
         self.track.info("Running Filter")
-        stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_goes(x,self.session), axis=1)
+        self.storms=self.storms.apply(lambda x: self.filter_stormevents_goes(x,self.session), axis=1)
 
         # df goes_intersections
         header=["KEY","FOREIGN_KEY", "SIZE", "IS_TIME_INTERSECTING", "BEGIN_TIME_UTC", "END_TIME_UTC", "bucket_begin_time", "bucket_end_time"]

@@ -1,0 +1,8 @@
+INFO:root:removing Nulls (158, 7)
+INFO:root:verify lons lats
+INFO:root:reseting index
+INFO:root:verification Done
+INFO:root:running again
+INFO:root:./NCDC_stormevents/temp1.csv: csv file read
+INFO:root:re-verify lons lats
+INFO:root:testing ./NCDC_stormevents/temp1.csv Done.
