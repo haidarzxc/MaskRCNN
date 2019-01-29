@@ -41,6 +41,9 @@ class AreaFilter():
             local is None:
             return
 
+        # create Log File
+        self.track.createLogFile("./logs/area_filter.txt")
+
         self.bounding_box_area_filter()
 
 
@@ -81,8 +84,14 @@ class AreaFilter():
         stormevents_df=stormevents_df.apply(lambda x: self.calculate_area(x), axis=1)
 
 
-        stormevents_df_sorted=stormevents_df.sort_values(by=['AREA'])
+        stormevents_df_sorted=stormevents_df.sort_values(by=['AREA'],ascending=False,axis=0)
+        self.track.info("sorting by area DEC, ascending=False")
         stormevents_df_threshold=stormevents_df_sorted.loc[stormevents_df['AREA'] >= self.local.bounding_box_area_threshold]
-        print(stormevents_df_threshold)
+        self.track.info("shape "+str(stormevents_df_threshold.shape))
+
+        stormevents_df_threshold=stormevents_df_threshold.reset_index(drop=True)
+        self.track.info("reseting index")
 
         stormevents_df_threshold.to_csv("NCDC_stormevents/"+self.output_dir)
+
+

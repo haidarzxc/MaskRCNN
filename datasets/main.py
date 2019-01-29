@@ -92,7 +92,7 @@ python datasets\main.py --intersectionTest GOES --storms area_filtered_stormeven
 
 python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormevents.csv --locations 88D_locations.csv
 
-python datasets\main.py --areaFilter StormEvents_details-ftp_v1.0_d2017_c20180918.csv --output_dir area_filtered_stormevents.csv
+python datasets\main.py --areaFilter verified_storms.csv --output_dir area_filtered_stormevents.csv
 
 python datasets\main.py --verifyStorms StormEvents_details-ftp_v1.0_d2017_c20180918.csv --output_dir verified_storms.csv
 
