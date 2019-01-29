@@ -1,3 +1,4 @@
+INFO:root:removing Nulls (39361, 7)
 INFO:root:verify lons lats
 WARNING:root:Exception: BEGIN_LAT > END_LAT, 39.1065 > 39.1061, index3
 WARNING:root:Exception: BEGIN_LAT > END_LAT, 38.75 > 38.7465, index5
@@ -7928,6 +7929,7 @@ WARNING:root:Exception: BEGIN_LAT > END_LAT, 41.6781 > 41.6473, index56984
 WARNING:root:Exception: BEGIN_LON > END_LON , -91.5614 > -91.5621, index56984
 WARNING:root:Exception: BEGIN_LAT > END_LAT, 39.8417 > 39.841, index56987
 WARNING:root:Exception: BEGIN_LON > END_LON , -79.6108 > -79.6126, index56987
+INFO:root:reseting index
 INFO:root:verification Done
 INFO:root:running again
 INFO:root:./NCDC_stormevents/verified_storms.csv: csv file read

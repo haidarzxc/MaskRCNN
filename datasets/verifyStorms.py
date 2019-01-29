@@ -53,8 +53,13 @@ class VerifyStorms:
                         stormevents_df['END_DATE_TIME'].notnull()
                         )]
 
+        self.track.info("removing Nulls "+str(stormevents_df.shape))
+
         self.track.info("verify lons lats")
         self.output=stormevents_df.apply(self.iterate_lons_lats, axis=1)
+
+        self.output=self.output.reset_index(drop=True)
+        self.track.info("reseting index")
 
         self.output.to_csv(self.output_dir)
         self.track.info("verification Done")
