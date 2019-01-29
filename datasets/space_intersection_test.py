@@ -12,9 +12,9 @@ import os
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 from utils.intersect import *
 from utils.time import to_UTC_time
-# from utils.general import verify_lon_lat
 import settings.local as local
 from utils.time import date_range_intersection_test
+from datasets.verifyStorms import VerifyStorms
 
 class NexradIntersectionTest():
     def __init__(self,session,track,storms,locations,local, **kwargs):
@@ -31,8 +31,6 @@ class NexradIntersectionTest():
         self.session=session
         self.track=track
 
-        # create Log File
-        self.track.createLogFile("./logs/nexrad_intersections_test.txt")
 
         self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
         self.local=local
@@ -50,16 +48,30 @@ class NexradIntersectionTest():
         locations_df=locations_df.apply(self.locations_lon_lat, axis=1)
 
 
+
+        # verify locations lons/lats
+        locations_df = locations_df.assign(BEGIN_DATE_TIME=pd.Series([0]*len(locations_df)))
+        locations_df = locations_df.assign(CZ_TIMEZONE=pd.Series([0]*len(locations_df)))
+        locations_df = locations_df.assign(END_DATE_TIME=pd.Series([0]*len(locations_df)))
+        locations_df.to_csv("./NCDC_stormevents/temp.csv")
+        VerifyStorms("temp.csv","temp1.csv",self.track)
+        os.remove("./NCDC_stormevents/temp.csv")
+        os.remove("./NCDC_stormevents/temp1.csv")
+
+
+        # create Log File
+        self.track.createLogFile("./logs/nexrad_intersections_test.txt")
+
         # add columns to stormevents DataFrame
-        stormevents_df = stormevents_df.assign(IS_INTERSECTING=pd.Series())
-        stormevents_df = stormevents_df.assign(STATIONID=pd.Series())
-        stormevents_df = stormevents_df.assign(BEGIN_TIME_UTC=pd.Series())
-        stormevents_df = stormevents_df.assign(END_TIME_UTC=pd.Series())
+        self.storms = self.storms.assign(IS_INTERSECTING=pd.Series())
+        self.storms = self.storms.assign(STATIONID=pd.Series())
+        self.storms = self.storms.assign(BEGIN_TIME_UTC=pd.Series())
+        self.storms = self.storms.assign(END_TIME_UTC=pd.Series())
 
 
         # run space and datetime test
         self.track.info("Running Filter")
-        stormevents_df=stormevents_df.apply(lambda x: self.filter_stormevents_nexrad(x,locations_df,session), axis=1)
+        self.storms=self.storms.apply(lambda x: self.filter_stormevents_nexrad(x,locations_df,session), axis=1)
 
 
         # read df nexrad_intersections -re format csv file
@@ -92,23 +104,14 @@ class NexradIntersectionTest():
             lon_float=(float(lon[:-4]) + (float(lon[-4:-2])/60) + (float(lon[-2:])/3600))*-1
             lat_float=float(lat[:-4]) + (float(lat[-4:-2])/60) + (float(lat[-2:])/3600)
 
-            # verify lons and lats
-            # method signiture BEGIN_LON,END_LON, BEGIN_LAT,END_LAT,track=None
-            result=verify_lon_lat(
-                lon_float-self.local.HORIZONTAL_SHIFT,
-                lon_float+self.local.HORIZONTAL_SHIFT,
-                lat_float-self.local.VERTICAL_SHIFT,
-                lat_float+self.local.VERTICAL_SHIFT,
-                self.track
-            )
 
-            row['BEGIN_LON']=result['BEGIN_LON']
-            row['BEGIN_LAT']=result['BEGIN_LAT']
-            row['END_LON']=result['END_LON']
-            row['END_LAT']=result['END_LAT']
+            row['BEGIN_LON']=lon_float-self.local.HORIZONTAL_SHIFT
+            row['END_LON']=lon_float+self.local.HORIZONTAL_SHIFT
+            row['BEGIN_LAT']=lat_float-self.local.VERTICAL_SHIFT
+            row['END_LAT']=lat_float+self.local.VERTICAL_SHIFT
 
         except:
-            self.track.warn("Exception: Float Parsing ")
+            self.track.warn("Exception: Float Parsing "+"lon_float "+str(lon_float)+",lon_float "+str(lat_float))
 
         return row
 
