@@ -38,7 +38,7 @@ class GoesIntersectionTest:
 
     def filter_stormevents_goes(self,row,session):
         # time conversion to UTC
-        # to_UTC_time(row)
+        to_UTC_time(row)
 
         self.bucket_goes(row,session)
         self.track.info("filter_stormevents_goes Testing Intersection "+str(row.name))
