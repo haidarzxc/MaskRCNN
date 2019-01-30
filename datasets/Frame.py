@@ -38,10 +38,10 @@ class Frame(QtGui.QMainWindow):
         ax0.imshow(self.clipped_goes)
 
         ax1 = self.fig.add_subplot(2, 1, 1)
-        # radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
-        # display = pyart.graph.RadarDisplay(radar)
-        # display.plot('reflectivity', 0, title="title",ax=ax1,colorbar_flag=False)
-        ax1.imshow(self.clipped_nexrad)
+        radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
+        display = pyart.graph.RadarDisplay(radar)
+        display.plot('reflectivity', 0, title="title",ax=ax1,colorbar_flag=False)
+        # ax1.imshow(self.clipped_nexrad)
 
 
         self.canvas.draw()

@@ -101,9 +101,10 @@ class Clip():
         radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
         refl_grid = radar.get_field(0, 'reflectivity')
 
-        read_grid=pyart.io.read('nexrad_intersections/'+nexrad_object['KEY'])
+        # read_grid=pyart.io.read('nexrad_intersections/'+nexrad_object['KEY'])
         # nexrad_netCdf= Dataset('nexrad_intersections/'+nexrad_object['KEY'],"r")
-        print("read_grid ",read_grid)
+        # read_grid=radar.get_field(1, 'metadata')
+        # print("read_grid ",read_grid)
 
         s_x0=storm_row['BEGIN_LON']
         s_y0=storm_row['BEGIN_LAT']
@@ -111,12 +112,12 @@ class Clip():
         s_y1=storm_row['END_LAT']
 
 
-        # print("nexrad object refl_grid", refl_grid)
-        # print("nexrad object rows", len(refl_grid))
-        # print("nexrad object columns", len(refl_grid[0]))
+        print("nexrad object refl_grid", refl_grid)
+        print("nexrad object rows", len(refl_grid))
+        print("nexrad object columns", len(refl_grid[0]))
         clipped=refl_grid[
-            10:720,
-            10:1832]
+            :720,
+            :1832]
         # print(clipped)
         return clipped
 
