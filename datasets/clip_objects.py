@@ -7,11 +7,11 @@ parent_directory = os.path.dirname(\
 sys.path.insert(0,parent_directory)
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
 
-from datasets.boto import create_session, \
-                            iterate_nexrad_intersections, \
-                            iterate_goes_intersections
+from utils.boto import create_session
+from datasets.download_intersections import iterate_nexrad_intersections, \
+                                            iterate_goes_intersections
 from datasets.Frame import Frame
-import settings.base as settings
+import settings.local as local
 from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
@@ -57,22 +57,10 @@ class Clip():
         g_x1=-52.946879
         g_y1=56.761450
 
-        s_x0=storm_row['END_LON']
+        s_x0=storm_row['BEGIN_LON']
         s_y0=storm_row['BEGIN_LAT']
-        s_x1=storm_row['BEGIN_LON']
+        s_x1=storm_row['END_LON']
         s_y1=storm_row['END_LAT']
-
-        # s_x0 must be less than s_x1
-        if s_x0 > s_x1:
-            tmp_s_x1=s_x1
-            s_x1=s_x0
-            s_x0=tmp_s_x1
-
-        # s_y0 must be less than s_y1
-        if s_y0 > s_y1:
-            tmp_s_y1=s_y1
-            s_y1=s_y0
-            s_y0=tmp_s_y1
 
         '''
                         2500
@@ -104,8 +92,8 @@ class Clip():
         #       "c1_int",c1_int)
         # [r0..r1,c0..c1]
         clipped=data[
-        r0_int+settings.goes_margin_left:r1_int+settings.goes_margin_right,
-        c0_int+settings.goes_margin_top:c1_int+settings.goes_margin_bottom]
+        r0_int+local.goes_margin_left:r1_int+local.goes_margin_right,
+        c0_int+local.goes_margin_top:c1_int+local.goes_margin_bottom]
         # print(clipped)
         return clipped
 
@@ -113,26 +101,19 @@ class Clip():
         radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
         refl_grid = radar.get_field(0, 'reflectivity')
 
-        s_x0=storm_row['END_LON']
+        read_grid=pyart.io.read('nexrad_intersections/'+nexrad_object['KEY'])
+        # nexrad_netCdf= Dataset('nexrad_intersections/'+nexrad_object['KEY'],"r")
+        print("read_grid ",read_grid)
+
+        s_x0=storm_row['BEGIN_LON']
         s_y0=storm_row['BEGIN_LAT']
-        s_x1=storm_row['BEGIN_LON']
+        s_x1=storm_row['END_LON']
         s_y1=storm_row['END_LAT']
 
-        # s_x0 must be less than s_x1
-        if s_x0 > s_x1:
-            tmp_s_x1=s_x1
-            s_x1=s_x0
-            s_x0=tmp_s_x1
 
-        # s_y0 must be less than s_y1
-        if s_y0 > s_y1:
-            tmp_s_y1=s_y1
-            s_y1=s_y0
-            s_y0=tmp_s_y1
-
-        print("nexrad object refl_grid", refl_grid)
-        print("nexrad object rows", len(refl_grid))
-        print("nexrad object columns", len(refl_grid[0]))
+        # print("nexrad object refl_grid", refl_grid)
+        # print("nexrad object rows", len(refl_grid))
+        # print("nexrad object columns", len(refl_grid[0]))
         clipped=refl_grid[
             10:720,
             10:1832]
@@ -140,17 +121,7 @@ class Clip():
         return clipped
 
 
-    def geo_coordinates(self, goes_netCdf,nexrad_object,storm_row,goes_object):
-        # clip goes and nexrad
-        clip_goes=self.clip_goes(goes_netCdf,storm_row)
-        clip_nexrad=self.clip_nexrad(nexrad_object,storm_row)
-        # print(storm_row)
-        # graph and export
-        Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
-
-
-
-    def clip_Goes_object(self,goes_object,nexrad_object,storm_row):
+    def clip_object(self,goes_object,nexrad_object,storm_row):
         # download nexrad or goes objects of not found on disk
         goes_dir='goes_intersections/2017-12-01_2017-12-31/'
         if not Path(goes_dir+goes_object['KEY'].replace('/',"_")).is_file():
@@ -164,8 +135,14 @@ class Clip():
         goes_netCdf= Dataset(goes_dir+goes_object['KEY'].replace('/',"_"),"r")
 
         # print(goes_netCdf.variables)
-        # wrapper function
-        self.geo_coordinates(goes_netCdf,nexrad_object,storm_row,goes_object)
+
+        # clip goes and nexrad
+        clip_goes=self.clip_goes(goes_netCdf,storm_row)
+        clip_nexrad=self.clip_nexrad(nexrad_object,storm_row)
+        # print(storm_row)
+        # graph and export
+        Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
+
         # goes_netCdf.close()
 
 
@@ -189,7 +166,7 @@ class Clip():
                 key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
 
             # clip nearest goes object
-            self.clip_Goes_object(goes_objects.iloc[nearest_object_index],nexrad_row,storm_row)
+            self.clip_object(goes_objects.iloc[nearest_object_index],nexrad_row,storm_row)
             # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
         else:
@@ -206,28 +183,28 @@ class Clip():
 
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None, storm_id=None):
-        # sort storms by Area
-        storms=self.storms.sort_values(by='AREA',ascending=False,axis=0)
+
         # change storm BEGIN_DATE_TIME to Timestamp type
-        storms['BEGIN_DATE_TIME']=storms['BEGIN_DATE_TIME'].apply(lambda x: pd.Timestamp(x))
+        self.storms['BEGIN_DATE_TIME']=self.storms['BEGIN_DATE_TIME'].apply(lambda x: pd.Timestamp(x))
 
         # filter by given BEGIN start_date and end_date
         if begin_start_date and begin_end_date:
             begin_start_date=pd.Timestamp(begin_start_date)
             begin_end_date=pd.Timestamp(begin_end_date)
-            storms=storms.loc[(storms['BEGIN_DATE_TIME'] > begin_start_date) &
-                                (storms['BEGIN_DATE_TIME'] < begin_end_date)]
+            self.storms=self.storms.loc[(self.storms['BEGIN_DATE_TIME'] > begin_start_date) &
+                                (self.storms['BEGIN_DATE_TIME'] < begin_end_date)]
 
+        self.storms=self.storms.reset_index(drop=True)
         # filter by given storm ID
         if not storm_id is None:
             print("ID:",storm_id)
-            print(storms.iloc[storm_id])
-            self.get_intersected_objects(storms.iloc[storm_id])
+            print(self.storms.iloc[storm_id])
+            self.get_intersected_objects(self.storms.iloc[storm_id])
             return
 
         # get intersections
-        storms.apply(self.get_intersected_objects,axis=1)
+        self.storms.apply(self.get_intersected_objects,axis=1)
 
 
 
-Clip(0)
+Clip(1)
