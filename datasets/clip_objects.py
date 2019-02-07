@@ -29,14 +29,15 @@ import math
 
 
 class Clip():
-    # load CSVs storms, nexrad, and goes
-    storms=load_CSV_file('NCDC_stormevents/area_filtered_stormevents.csv')
-    nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
-    goes=load_CSV_file('goes_intersections/GOES_datetime_filtered_intersections.csv')
 
     # constructor
     def __init__(self,storm_id=None, **kwargs):
         super(Clip,self).__init__(**kwargs)
+        # load CSVs storms, nexrad, and goes
+        self.storms=load_CSV_file('NCDC_stormevents/area_filtered_stormevents.csv')
+        self.nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
+        self.goes=load_CSV_file('goes_intersections/GOES_datetime_filtered_intersections.csv')
+
         self.nexrad=self.nexrad.sort_values(by=['bucket_begin_time'])
         self.goes=self.goes.sort_values(by=['bucket_begin_time'])
 
@@ -101,7 +102,7 @@ class Clip():
         radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
         # refl_grid = radar.get_field(0, 'reflectivity')
 
-        
+
         # gatefilter = pyart.filters.GateFilter(radar)
         # gatefilter.exclude_transition()
         # gatefilter.exclude_masked('reflectivity')
