@@ -1,3 +1,4 @@
+# python libraries
 import os, sys, inspect
 import pandas as pd
 import numpy as np
@@ -5,41 +6,45 @@ parent_directory = os.path.dirname(\
                     os.path.dirname(\
                     os.path.abspath(inspect.getfile(inspect.currentframe()))))
 sys.path.insert(0,parent_directory)
-from datasets.NCDC_stormevents_data_loader import load_CSV_file
+from datetime import datetime
+from datetime import timedelta
+from pathlib import Path
+from netCDF4 import Dataset
+import pyart
+# from mpl_toolkits.basemap import Basemap, cm
+import math
 
+# project modules
+from datasets.NCDC_stormevents_data_loader import load_CSV_file
 from utils.boto import create_session
 from datasets.download_intersections import iterate_nexrad_intersections, \
                                             iterate_goes_intersections
 from datasets.Frame import Frame
 import settings.local as local
-from datetime import datetime
-from datetime import timedelta
-from pathlib import Path
-import boto3
-import botocore
-from netCDF4 import Dataset
-import pyart
-
-
-from mpl_toolkits.basemap import Basemap, cm
-import math
-
-
-
+from datasets.trainingObject import TrainingObject
 
 
 class Clip():
 
     # constructor
-    def __init__(self,storm_id=None, **kwargs):
+    def __init__(self,storms_dir,nexrad_dir,goes_dir,
+                track,year,output_dir,storm_id=None, **kwargs):
         super(Clip,self).__init__(**kwargs)
+
+        self.track=track
+        self.year=year
+        self.output_dir=output_dir
+
         # load CSVs storms, nexrad, and goes
-        self.storms=load_CSV_file('NCDC_stormevents/area_filtered_stormevents.csv')
-        self.nexrad=load_CSV_file('NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv')
-        self.goes=load_CSV_file('goes_intersections/GOES_datetime_filtered_intersections.csv')
+        self.storms=load_CSV_file("NCDC_stormevents/"+storms_dir)
+        self.nexrad=load_CSV_file("NCDC_stormevents/"+nexrad_dir)
+        self.goes=load_CSV_file(goes_dir)
 
         self.nexrad=self.nexrad.sort_values(by=['bucket_begin_time'])
         self.goes=self.goes.sort_values(by=['bucket_begin_time'])
+
+        # create instances
+        self.instances=TrainingObject(self.track,self.year,self.output_dir)
 
         # filters storms for month december 2017
         self.iterate_storms(begin_start_date='01-DEC-17',
@@ -155,6 +160,10 @@ class Clip():
         clip_goes=self.clip_goes(goes_netCdf,storm_row)
         clip_nexrad=self.clip_nexrad(nexrad_object,storm_row)
         # print(storm_row)
+
+        # add instance
+        self.instances.create_training_instance(storm_row,goes_object,len(clip_goes),len(clip_goes[0]))
+
         # graph and export
         Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
 
@@ -222,4 +231,5 @@ class Clip():
 
 
 
-Clip(1)
+
+
