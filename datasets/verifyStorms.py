@@ -11,6 +11,9 @@ class VerifyStorms:
         self.storms=None
         self.track=track
         self.output=pd.DataFrame()
+        self.count_lons_violations=0
+        self.count_lats_violations=0
+        self.count_non_negative_lons_violations=0
         self.output = self.output.assign(BEGIN_LAT=pd.Series())
         self.output = self.output.assign(BEGIN_LON=pd.Series())
         self.output = self.output.assign(END_LAT=pd.Series())
@@ -71,6 +74,10 @@ class VerifyStorms:
         self.output=self.storms.apply(self.iterate_lons_lats, axis=1)
         self.track.info("testing "+self.output_dir+" Done.")
 
+        self.track.info("count_lons_violations "+str(self.count_lons_violations))
+        self.track.info("count_lats_violations "+str(self.count_lats_violations))
+        self.track.info("count_non_negative_lons_violations "+str(self.count_non_negative_lons_violations))
+
     def iterate_lons_lats(self,row):
         rowCopy=row
         # verify lons and lats
@@ -109,11 +116,13 @@ class VerifyStorms:
         if (values['BEGIN_LON'] is not None and values['BEGIN_LON'] > 0):
             if self.track is not None and row is not None:
                 self.track.warn("Exception: BEGIN_LON greator than zero! "+str(row.name))
+                self.count_non_negative_lons_violations+=1
             values['BEGIN_LON']=values['BEGIN_LON']*-1
 
         if (values['END_LON'] is not None and values['END_LON'] > 0):
             if self.track is not None and row is not None:
                 self.track.warn("Exception: END_LON greator than zero! "+str(row.name))
+                self.count_non_negative_lons_violations+=1
             values['END_LON']=values['END_LON']*-1
 
 
@@ -124,6 +133,7 @@ class VerifyStorms:
             values['BEGIN_LAT'] > values['END_LAT']:
             if self.track is not None and row is not None:
                 self.track.warn("Exception: BEGIN_LAT > END_LAT, "+ str(values['BEGIN_LAT'])+" > "+str(values['END_LAT'])+", index"+str(row.name))
+                self.count_lats_violations+=1
 
             temp=values['BEGIN_LAT']
             values['BEGIN_LAT']=values['END_LAT']
@@ -137,6 +147,7 @@ class VerifyStorms:
             values['BEGIN_LON'] > values['END_LON']:
             if self.track is not None and row is not None:
                 self.track.warn("Exception: BEGIN_LON > END_LON , "+str(values['BEGIN_LON'])+" > "+str(values['END_LON'])+", index"+str(row.name))
+                self.count_lons_violations+=1
 
             temp=values['BEGIN_LON']
             values['BEGIN_LON']=values['END_LON']

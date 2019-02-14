@@ -16,6 +16,8 @@ from datasets.space_intersection_test import NexradIntersectionTest
 from datasets.area_filter import AreaFilter
 from utils.boto import create_session
 from datasets.verifyStorms import VerifyStorms
+from datasets.clip_objects import Clip
+
 
 Track=tr.Track()
 
@@ -45,6 +47,22 @@ def parse_args():
         '--storms',
         dest='stormsFile',
         help='pass stormsFile',
+        default=None,
+        type=str
+    )
+
+    parser.add_argument(
+        '--goes',
+        dest='goesFile',
+        help='pass goes csv',
+        default=None,
+        type=str
+    )
+
+    parser.add_argument(
+        '--nexrad',
+        dest='nexradFile',
+        help='pass nexrad csv',
         default=None,
         type=str
     )
@@ -81,6 +99,16 @@ def parse_args():
         type=str
     )
 
+    parser.add_argument(
+        '--clip',
+        dest='clip',
+        help='clip objects and annotate',
+        default=None,
+        type=str
+    )
+
+
+
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
@@ -95,6 +123,9 @@ python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormev
 python datasets\main.py --areaFilter verified_storms.csv --output_dir area_filtered_stormevents.csv
 
 python datasets\main.py --verifyStorms StormEvents_details-ftp_v1.0_d2017_c20180918.csv --output_dir verified_storms.csv
+
+python datasets\main.py --clip 2017 --output_dir instances_train2017.json --storms area_filtered_stormevents.csv --nexrad NEXRAD_bounding_box_datetime_filtered_intersections.csv --goes goes_intersections/GOES_datetime_filtered_intersections.csv
+
 
 '''
 
@@ -130,6 +161,27 @@ def main(args):
             Track.info("Starting NEXRAD intersection Test")
             NexradIntersectionTest(session,Track,args.stormsFile,args.locationsFile,local)
 
+    if args.clip is not None:
+        if args.output is None:
+            Track.warn("Exception: Pass annotation output directory")
+            return
+        if args.goesFile is None:
+            Track.warn("Exception: Pass goes csv")
+            return
+        if args.nexradFile is None:
+            Track.warn("Exception: Pass nexrad csv")
+            return
+        if args.stormsFile is None:
+            Track.warn("Exception: Pass stroms csv")
+            return
+        Clip(
+            args.stormsFile,
+            args.nexradFile,
+            args.goesFile,
+            Track,
+            args.clip,
+            args.output,
+            0)
 
 
 if __name__ == '__main__':
