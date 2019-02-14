@@ -134,6 +134,17 @@ class TrainingObject:
     	}
         instances['images'].append(image_dict)
 
+        # # append annotation instance
+        # annoatation_dict={
+        #     "segmentation": [[224.24, 297.18, 228.29, 297.18, 234.91, 298.29, 243, 297.55, 249.25, 296.45, 252.19, 294.98, 256.61, 292.4, 254.4, 264.08, 251.83, 262.61, 241.53, 260.04, 235.27, 259.67, 230.49, 259.67, 233.44, 255.25, 237.48, 250.47, 237.85, 243.85, 237.11, 240.54, 234.17, 242.01, 228.65, 249.37, 224.24, 255.62, 220.93, 262.61, 218.36, 267.39, 217.62, 268.5, 218.72, 295.71, 225.34, 297.55]],
+        #     "area": 1481.38065, #storm data area
+        #     "iscrowd": 0,
+        #     "image_id": str(storm_row.name), #FOREGIN_KEY->images
+        #     "bbox": [217.62, 240.54, 38.99, 57.75], #nexrad image jpg bounding box
+        #     "category_id": 1, #FOREGIN_KEY->categories
+        #     "id":  #unique
+        # }
+
         # overwrite instances
         with open(self.output_dir, 'w') as out:
             json.dump(instances,out)
