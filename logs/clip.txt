@@ -709,3 +709,53 @@ INFO:root:nexrad_objects: 71,goes_objects: 944
 INFO:root:ABI-L1b-RadC/2017/071/10/OR_ABI-L1b-RadC-M3C02_G16_s20170711036437_e20170711039210_c20170711039245.nc, 2017-03-12 10:36:43, goes_intersections/2017-12-01_2017-12-31/, 37.279229
 INFO:root:2017/03/12/PHWA/PHWA20170312_103435_V06, 658, nexrad_intersections/2017/03/12/PHWA, 39.845716
 INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:NCDC_stormevents/area_filtered_stormevents.csv: csv file read
+INFO:root:NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv: csv file read
+INFO:root:goes_intersections/GOES_datetime_filtered_intersections.csv: csv file read
+INFO:root:loaded Storms, nexrad and goes csvs
+INFO:root:sorted nexrad and goes by bucket_begin_time
+INFO:root:check if training dataset directory exists
+INFO:root:initialize instances object: ./NCDC_stormevents/instances_train2017.json
+INFO:root:created instance of training object
+INFO:root:begin iteration
+INFO:root:nexrad_objects: 143,goes_objects: 3069
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Storm Id: 0--------------------------
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2017_03_13_KOTX_KOTX20170313_075536_V06__ABI-L1b-RadC201707207OR_ABI-L1b-RadC-M3C01_G16_s20170720756438_e20170720759211_c20170720759257.nc.jpg
+INFO:root:generate image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2017_03_13_KOTX_KOTX20170313_075536_V06__ABI-L1b-RadC201707207OR_ABI-L1b-RadC-M3C01_G16_s20170720756438_e20170720759211_c20170720759257.nc.jpg
+INFO:root:generate traing image
+INFO:root:load instances
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:overwrite instances
+INFO:root:create training instance
+INFO:root:nexrad_objects: 167,goes_objects: 0
+INFO:root:No Goes objects
+INFO:root:nexrad_objects: 68,goes_objects: 1296
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:NCDC_stormevents/area_filtered_stormevents.csv: csv file read
+INFO:root:NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv: csv file read
+INFO:root:goes_intersections/GOES_datetime_filtered_intersections.csv: csv file read
+INFO:root:loaded Storms, nexrad and goes csvs
+INFO:root:sorted nexrad and goes by bucket_begin_time
+INFO:root:check if training dataset directory exists
+INFO:root:initialize instances object: ./NCDC_stormevents/instances_train2017.json
+INFO:root:created instance of training object
+INFO:root:begin iteration
+INFO:root:nexrad_objects: 143,goes_objects: 3069
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Storm Id: 0--------------------------
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2017_03_13_KOTX_KOTX20170313_075536_V06__ABI-L1b-RadC201707207OR_ABI-L1b-RadC-M3C01_G16_s20170720756438_e20170720759211_c20170720759257.nc.jpg
+INFO:root:generate image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2017_03_13_KOTX_KOTX20170313_075536_V06__ABI-L1b-RadC201707207OR_ABI-L1b-RadC-M3C01_G16_s20170720756438_e20170720759211_c20170720759257.nc.jpg
+INFO:root:generate traing image
+INFO:root:load instances
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:overwrite instances
+INFO:root:create training instance
+INFO:root:nexrad_objects: 167,goes_objects: 0
+INFO:root:No Goes objects
+INFO:root:nexrad_objects: 68,goes_objects: 1296
+INFO:root:Clipping: GOES and NEXRAD objects
