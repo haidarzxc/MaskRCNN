@@ -54,4 +54,4 @@ six==1.11.0
 traitlets==4.3.2
 urllib3==1.23
 wget==3.2
-timedelta=2018.11.20
+timedelta==2018.11.20
