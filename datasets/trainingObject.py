@@ -85,7 +85,7 @@ class TrainingObject:
         self.current_image_dir=None
         self.current_segmentation=None
 
-
+        self.fig = plt.figure()
 
         # instances header
         self.instances={
@@ -177,7 +177,7 @@ class TrainingObject:
             json.dump(instances,out)
 
     def generate_training_images(self,goes_data):
-        self.fig = plt.figure()
+
         # self.canvas = FigureCanvas(self.fig)
         # ax0 = self.fig.add_subplot(1, 1, 1)
         plt.imshow(goes_data)
