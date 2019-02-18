@@ -180,8 +180,8 @@ class Clip():
         # print(storm_row)
 
         # add instance
-        self.track.info("Storm Id: "+str(storm_row.name)+"--------------------------")
-        print("Storm Id: ",storm_row.name)
+        self.track.info("Storm Id: "+str(storm_row.name)+", Nexrad key: "+str(nexrad_object['KEY'])+", Goes key: "+str(goes_object['KEY']))
+        print("Storm_Id:",storm_row.name,",Nexrad_key:",nexrad_object['KEY'],",Goes_key:",goes_object['KEY'])
         self.instances.current_image_dir=self.train_dir+"/GOES_train_"+nexrad_object['KEY'].replace("/","_")+"__"+goes_object['KEY'].replace("/","")+".jpg"
         self.track.info("set image directory: "+self.instances.current_image_dir)
         self.instances.generate_segmentation_image(nexrad_object)

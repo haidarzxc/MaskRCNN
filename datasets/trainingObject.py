@@ -149,22 +149,18 @@ class TrainingObject:
 
         # append annotation instance
 
-        # image width and height
-        im = Image.open(self.current_image_dir)
-        width, height = im.size
-
         # numpy to list of lists
         list=[]
         list.append(self.current_segmentation.tolist())
 
-        area=(width*height)
-        bbox=[217.62, 240.54, width, height]
+        bbox=self.generate_bounding_box()
+
         annoatation_dict={
             "segmentation": list,
-            "area": area, #storm data area
+            "area": bbox["area"], #storm data area
             "iscrowd": 0,
             "image_id": int(storm_row.name), #FOREGIN_KEY->images
-            "bbox": bbox, # nexrad image jpg bounding bbox[x,y,width,height]
+            "bbox": bbox["coordinates"], # nexrad image jpg bounding bbox[x,y,width,height]
             "category_id": 1, #FOREGIN_KEY->categories
             "id": int(storm_row.name) #unique
         }
@@ -195,8 +191,17 @@ class TrainingObject:
         # print(valueList)
 
 
-    def generate_bounding_box(self,row):
-        pass
+    def generate_bounding_box(self):
+        # image width and height
+        im = Image.open(self.current_image_dir)
+        width, height = im.size
+
+        area=width*height
+        return {
+            "area":area,
+            "coordinates":[217.62, 240.54, width, height]
+        }
+
 
 
 
