@@ -92,6 +92,14 @@ def parse_args():
     )
 
     parser.add_argument(
+        '--train_dir',
+        dest='train_dir',
+        help='pass output directory',
+        default=None,
+        type=str
+    )
+
+    parser.add_argument(
         '--verifyStorms',
         dest='verifyStorms',
         help='verify verifyStorms values',
@@ -124,7 +132,7 @@ python datasets\main.py --areaFilter verified_storms.csv --output_dir area_filte
 
 python datasets\main.py --verifyStorms StormEvents_details-ftp_v1.0_d2017_c20180918.csv --output_dir verified_storms.csv
 
-python datasets\main.py --clip 2017 --output_dir instances_train2017.json --storms area_filtered_stormevents.csv --nexrad NEXRAD_bounding_box_datetime_filtered_intersections.csv --goes goes_intersections/GOES_datetime_filtered_intersections.csv
+python datasets\main.py --clip 2017 --output_dir instances_train2017.json --storms area_filtered_stormevents.csv --nexrad NEXRAD_bounding_box_datetime_filtered_intersections.csv --goes goes_intersections/GOES_datetime_filtered_intersections.csv --train_dir goes_intersections/storms_train2017
 
 
 '''
@@ -174,6 +182,9 @@ def main(args):
         if args.stormsFile is None:
             Track.warn("Exception: Pass stroms csv")
             return
+        if args.train_dir is None:
+            Track.warn("Exception: Pass a training directory")
+            return
         Clip(
             args.stormsFile,
             args.nexradFile,
@@ -181,7 +192,8 @@ def main(args):
             Track,
             args.clip,
             args.output,
-            0)
+            args.train_dir
+            )
 
 
 if __name__ == '__main__':

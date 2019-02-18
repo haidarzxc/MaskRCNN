@@ -9,9 +9,6 @@ from utils.track import Track
 
 track=Track()
 
-# create Log File
-track.createLogFile("./logs/download_intersections.txt")
-
 def iterate_nexrad_intersections(row,output_dir):
     global total
     try:
