@@ -1,0 +1,5 @@
+INFO:root:NCDC_stormevents/verified_storms.csv: csv file read
+INFO:root:AREA Calculation
+INFO:root:sorting by area DEC, ascending=False
+INFO:root:shape (7229, 8)
+INFO:root:reseting index

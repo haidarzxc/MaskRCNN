@@ -13,7 +13,7 @@ class Track:
         logging.info(msg)
 
     def warn(self,msg):
-        logging.warn(msg)
+        logging.warning(msg)
 
     def start_timer(self):
         self.start_time=time.time()
