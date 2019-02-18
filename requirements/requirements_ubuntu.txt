@@ -30,8 +30,6 @@ Cython==0.29.1
 dask==0.19.1
 decorator==4.3.0
 deepdish==0.3.6
--e git+https://github.com/haidarzxc/Detectron.git@aa6b23378b43c48e72e91f181e287a75a524ebda#egg=Detectron
-Django==1.11.20
 docutils==0.14
 easydict==1.7
 enum34==1.1.6
