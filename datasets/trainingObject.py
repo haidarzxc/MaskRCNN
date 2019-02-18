@@ -5,8 +5,10 @@ from pprint import pprint
 import json
 import datetime
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+# from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from PIL import Image
 import pyart
 import numpy as np
@@ -175,11 +177,11 @@ class TrainingObject:
             json.dump(instances,out)
 
     def generate_training_images(self,goes_data):
-        self.fig = plt.Figure(figsize=(16,15))
-        self.canvas = FigureCanvas(self.fig)
-        ax0 = self.fig.add_subplot(1, 1, 1)
-        ax0.imshow(goes_data)
-
+        self.fig = plt.figure()
+        # self.canvas = FigureCanvas(self.fig)
+        # ax0 = self.fig.add_subplot(1, 1, 1)
+        plt.imshow(goes_data)
+        # plt.plot(goes_data)
         self.fig.savefig(self.current_image_dir, dpi=100)
         self.track.info("image created: "+self.current_image_dir)
 
