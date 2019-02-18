@@ -1,5 +1,6 @@
 absl-py==0.4.0
 adium-theme-ubuntu==0.3.4
+arm-pyart==1.10.0
 astor==0.7.1
 atomicwrites==1.2.1
 attrs==18.2.0
