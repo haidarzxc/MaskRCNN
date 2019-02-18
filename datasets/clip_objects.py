@@ -34,20 +34,35 @@ class Clip():
         self.track=track
         self.year=year
         self.output_dir=output_dir
-        self.train_dir=train_dir
+        self.train_dir='./'+train_dir
+
+        # create Log File
+        self.track.createLogFile("./logs/clip.txt")
+
+
 
         # load CSVs storms, nexrad, and goes
         self.storms=load_CSV_file("NCDC_stormevents/"+storms_dir)
         self.nexrad=load_CSV_file("NCDC_stormevents/"+nexrad_dir)
         self.goes=load_CSV_file(goes_dir)
+        self.track.info("loaded Storms, nexrad and goes csvs")
 
         self.nexrad=self.nexrad.sort_values(by=['bucket_begin_time'])
         self.goes=self.goes.sort_values(by=['bucket_begin_time'])
+        self.track.info("sorted nexrad and goes by bucket_begin_time")
 
+
+        # training dataset directory
+        self.track.info("check if training dataset directory exists")
+        if not os.path.exists(self.train_dir):
+            os.mkdir(self.train_dir)
+            track.info("created directory: "+str(self.train_dir))
         # create instances
-        self.instances=TrainingObject(self.track,self.year,self.output_dir,self.train_dir)
+        self.instances=TrainingObject(self.track,self.year,self.output_dir)
+        self.track.info("created instance of training object")
 
         # filters storms for month december 2017
+        self.track.info("begin iteration")
         self.iterate_storms(begin_start_date='01-DEC-17',
                             begin_end_date='31-DEC-17',
                             storm_id=storm_id)
@@ -158,17 +173,25 @@ class Clip():
         # print(goes_netCdf.variables)
 
         # clip goes and nexrad
+        self.track.info("Clipping: GOES and NEXRAD objects")
         clip_goes=self.clip_goes(goes_netCdf,storm_row)
         clip_nexrad=self.clip_nexrad(nexrad_object,storm_row)
+        goes_netCdf.close()
         # print(storm_row)
 
         # add instance
+        self.track.info("Storm Id: "+str(storm_row.name)+"--------------------------")
+        print("Storm Id: ",storm_row.name)
+        self.instances.current_image_dir=self.train_dir+"/GOES_train_"+nexrad_object['KEY'].replace("/","_")+"__"+goes_object['KEY'].replace("/","")+".jpg"
+        self.track.info("set image directory: "+self.instances.current_image_dir)
+        self.instances.generate_segmentation_image(nexrad_object)
+        self.track.info("generate image segmentation")
+        self.instances.generate_training_images(clip_goes)
+        self.track.info("generate traing image")
         self.instances.create_training_instance(storm_row,goes_object,len(clip_goes),len(clip_goes[0]))
-        self.instances.generate_training_images(clip_goes,nexrad_object["KEY"],goes_object["KEY"])
+        self.track.info("create training instance")
         # graph and export
-        Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
-
-        # goes_netCdf.close()
+        # Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
 
 
     def iterate_goes(self,nexrad_row,goes_objects,storm_row):
@@ -195,13 +218,15 @@ class Clip():
             # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
         else:
-            print("No Goes objects")
+            # print("No Goes objects")
+            self.track.info("No Goes objects")
 
     def get_intersected_objects(self,storm_row):
         # get NEXRAD AND GOES objects given storm row
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
-        print("nexrad_objects",len(nexrad_objects),"goes_objects",len(goes_objects),"------------------------")
+        # print("nexrad_objects",len(nexrad_objects),"goes_objects",len(goes_objects),"------------------------")
+        self.track.info("nexrad_objects: "+str(len(nexrad_objects))+",goes_objects: "+str(len(goes_objects)))
         # ------REMOVE head(1)
         # for each nexrad object, iterate intersected goes objects.
         nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)

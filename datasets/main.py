@@ -192,8 +192,8 @@ def main(args):
             Track,
             args.clip,
             args.output,
-            args.train_dir,
-            0)
+            args.train_dir
+            )
 
 
 if __name__ == '__main__':
