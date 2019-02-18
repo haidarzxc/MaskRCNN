@@ -41,7 +41,6 @@ Pygments==2.2.0
 pyparsing==2.2.2
 pypiwin32==223
 pyproj==1.9.5.1
-PyQt4==4.11.4
 pyshp==2.0.1
 pytest==3.10.1
 python-dateutil==2.7.3
