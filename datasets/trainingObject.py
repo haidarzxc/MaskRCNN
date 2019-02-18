@@ -5,6 +5,8 @@ from pprint import pprint
 import json
 import datetime
 import os
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 # project modules
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
@@ -71,10 +73,15 @@ goes 3 channels
 '''
 
 class TrainingObject:
-    def __init__(self,track,year,output_dir,**kwargs):
+    def __init__(self,track,year,output_dir,train_dir,**kwargs):
         self.track=track
         self.year=year
         self.output_dir='./NCDC_stormevents/'+output_dir
+        self.train_dir='./'+train_dir
+        # training dataset directory
+        if not os.path.exists(self.train_dir):
+            os.mkdir(self.train_dir)
+
 
         # instances header
         self.instances={
@@ -149,8 +156,20 @@ class TrainingObject:
         with open(self.output_dir, 'w') as out:
             json.dump(instances,out)
 
-    def generate_training_images(self,row):
+    def generate_training_images(self,row,nexrad_key,goes_key):
+        self.fig = plt.Figure(figsize=(16,15))
+        self.canvas = FigureCanvas(self.fig)
+        ax0 = self.fig.add_subplot(1, 1, 1)
+        ax0.imshow(row)
+        self.fig.savefig(self.train_dir+"/GOES_train_"+nexrad_key.replace("/","_")+"__"+goes_key.replace("/","")+".jpg", dpi=100)
+
+    def generate_segmentation_image(self,row):
         pass
+
+    def generate_bounding_box(self,row):
+        pass
+
+
 
 
 

@@ -28,12 +28,13 @@ class Clip():
 
     # constructor
     def __init__(self,storms_dir,nexrad_dir,goes_dir,
-                track,year,output_dir,storm_id=None, **kwargs):
+                track,year,output_dir,train_dir,storm_id=None, **kwargs):
         super(Clip,self).__init__(**kwargs)
 
         self.track=track
         self.year=year
         self.output_dir=output_dir
+        self.train_dir=train_dir
 
         # load CSVs storms, nexrad, and goes
         self.storms=load_CSV_file("NCDC_stormevents/"+storms_dir)
@@ -44,7 +45,7 @@ class Clip():
         self.goes=self.goes.sort_values(by=['bucket_begin_time'])
 
         # create instances
-        self.instances=TrainingObject(self.track,self.year,self.output_dir)
+        self.instances=TrainingObject(self.track,self.year,self.output_dir,self.train_dir)
 
         # filters storms for month december 2017
         self.iterate_storms(begin_start_date='01-DEC-17',
@@ -163,7 +164,7 @@ class Clip():
 
         # add instance
         self.instances.create_training_instance(storm_row,goes_object,len(clip_goes),len(clip_goes[0]))
-
+        self.instances.generate_training_images(clip_goes,nexrad_object["KEY"],goes_object["KEY"])
         # graph and export
         Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
 
