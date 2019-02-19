@@ -180,8 +180,8 @@ class Clip():
         # print(storm_row)
 
         # add instance
-        self.track.info("Storm Id: "+str(storm_row.name)+", Nexrad key: "+str(nexrad_object['KEY'])+", Goes key: "+str(goes_object['KEY']))
-        print("Storm_Id:",storm_row.name,",Nexrad_key:",nexrad_object['KEY'],",Goes_key:",goes_object['KEY'])
+        self.track.info("Storm Id: "+str(storm_row)+", Nexrad key: "+str(nexrad_object['KEY'])+", Goes key: "+str(goes_object['KEY']))
+        print("Storm_Id:",storm_row,",Nexrad_key:",nexrad_object['KEY'],",Goes_key:",goes_object['KEY'])
         self.instances.current_image_dir=self.train_dir+"/GOES_train_"+nexrad_object['KEY'].replace("/","_")+"__"+goes_object['KEY'].replace("/","")+".jpg"
         self.track.info("set image directory: "+self.instances.current_image_dir)
         self.instances.generate_segmentation_image(nexrad_object)
@@ -244,7 +244,9 @@ class Clip():
             self.storms=self.storms.loc[(self.storms['BEGIN_DATE_TIME'] > begin_start_date) &
                                 (self.storms['BEGIN_DATE_TIME'] < begin_end_date)]
 
-        self.storms=self.storms.reset_index(drop=True)
+        # NO RESET INDEX SINCE STORM ID IS USED TO FOREGIN_KEY
+        # self.storms=self.storms.reset_index(drop=True)
+        
         # filter by given storm ID
         if not storm_id is None:
             print("ID:",storm_id)
