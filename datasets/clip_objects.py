@@ -119,23 +119,23 @@ class Clip():
         # print(clipped)
         return clipped
 
-    def clip_nexrad(self, nexrad_object, storm_row):
-        radar = pyart.io.read_nexrad_archive('nexrad_intersections/'+nexrad_object['KEY'])
-        # refl_grid = radar.get_field(0, 'reflectivity')
+    def clip_nexrad(self, radar, storm_row):
+
+        refl_grid = radar.get_field(0, 'reflectivity')
 
 
         # gatefilter = pyart.filters.GateFilter(radar)
         # gatefilter.exclude_transition()
         # gatefilter.exclude_masked('reflectivity')
 
-        grid = pyart.map.grid_from_radars(
-                (radar,),
-                # gatefilters=(gatefilter, ),
-                grid_shape=(1, 241, 241),
-                grid_limits=((2000, 2000),
-                            (-123000.0, 123000.0),
-                            (-123000.0, 123000.0)),
-                fields=['reflectivity'])
+        # grid = pyart.map.grid_from_radars(
+        #         (radar,),
+        #         # gatefilters=(gatefilter, ),
+        #         grid_shape=(1, 241, 241),
+        #         grid_limits=((2000, 2000),
+        #                     (-123000.0, 123000.0),
+        #                     (-123000.0, 123000.0)),
+        #         fields=['reflectivity'])
 
         # read_grid=radar.fields['reflectivity']['data']
         # print("read_grid ",read_grid)
@@ -149,77 +149,76 @@ class Clip():
         # print("nexrad object refl_grid", refl_grid)
         # print("nexrad object rows", len(refl_grid))
         # print("nexrad object columns", len(refl_grid[0]))
-        # clipped=read_grid[
-        #     :700,
-        #     :700]
-        clipped= grid.fields['reflectivity']['data'][0]
+        clipped=refl_grid[
+            :700,
+            :700]
+        # clipped= grid.fields['reflectivity']['data'][0]
         # print(clipped)
         return clipped
 
 
     def clip_object(self,goes_object,nexrad_object,storm_row):
         # download nexrad or goes objects of not found on disk
-        goes_dir='goes_intersections/2017-12-01_2017-12-31/'
-        if not Path(goes_dir+goes_object['KEY'].replace('/',"_")).is_file():
-            iterate_goes_intersections(goes_object,goes_dir)
-        if not Path('nexrad_intersections/'+nexrad_object['KEY']).is_file():
+        if not Path(local.GOES_DIR+goes_object['KEY'].replace('/',"_")).is_file():
+            iterate_goes_intersections(goes_object,local.GOES_DIR)
+        if not Path(local.NEXRAD_DIR+nexrad_object['KEY']).is_file():
             current_working_dir=os.getcwd()
-            iterate_nexrad_intersections(nexrad_object,'nexrad_intersections')
+            iterate_nexrad_intersections(nexrad_object,local.NEXRAD_DIR)
             os.chdir(current_working_dir)
 
-        # read goes object
-        goes_netCdf= Dataset(goes_dir+goes_object['KEY'].replace('/',"_"),"r")
-
-        # print(goes_netCdf.variables)
+        # read goes object ; goes_netCdf.variables
+        goes_netCdf= Dataset(local.GOES_DIR+goes_object['KEY'].replace('/',"_"),"r")
+        # read nexrad object
+        radar = pyart.io.read_nexrad_archive(local.NEXRAD_DIR+nexrad_object['KEY'])
+        self.track.info("Loaded GOES and NEXRAD OBJECT")
 
         # clip goes and nexrad
         self.track.info("Clipping: GOES and NEXRAD objects")
         clip_goes=self.clip_goes(goes_netCdf,storm_row)
-        clip_nexrad=self.clip_nexrad(nexrad_object,storm_row)
+        clip_nexrad=self.clip_nexrad(radar,storm_row)
+
         goes_netCdf.close()
-        # print(storm_row)
 
         # add instance
-        self.track.info("Storm Id: "+str(storm_row)+", Nexrad key: "+str(nexrad_object['KEY'])+", Goes key: "+str(goes_object['KEY']))
-        print("Storm_Id:",storm_row,",Nexrad_key:",nexrad_object['KEY'],",Goes_key:",goes_object['KEY'])
-        self.instances.current_image_dir=self.train_dir+"/GOES_train_"+nexrad_object['KEY'].replace("/","_")+"__"+goes_object['KEY'].replace("/","")+".jpg"
+        self.track.info(str(storm_row)+", Nexrad_id: "+str(nexrad_object.name)+", Goes_id: "+str(goes_object.name))
+        print("storm_id",storm_row.name,",Nexrad_id:",nexrad_object.name,",Goes_id:",goes_object.name)
+
+        self.instances.current_image_dir=self.train_dir+"/GOES_train_"+str(storm_row.name)+"_"+str(nexrad_object.name)+"_"+str(goes_object.name)+".jpg"
         self.track.info("set image directory: "+self.instances.current_image_dir)
-        self.instances.generate_segmentation_image(nexrad_object)
-        self.track.info("generate image segmentation")
+        self.instances.generate_segmentation_image(radar)
+        self.track.info("generated image segmentation")
         self.instances.generate_training_images(clip_goes)
-        self.track.info("generate traing image")
+        self.track.info("generated training image")
         self.instances.create_training_instance(storm_row,goes_object,len(clip_goes),len(clip_goes[0]))
-        self.track.info("create training instance")
+        self.track.info("created training instance")
+
         # graph and export
         # Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
 
 
     def iterate_goes(self,nexrad_row,goes_objects,storm_row):
+
         # format nexrad object bucket_begin_time
         nexrad_datetime=datetime.strptime(nexrad_row['bucket_begin_time'],'%Y-%m-%d %X')
 
-        # check if goes objects exists
-        if len(goes_objects)>0:
-            # set goes dataframe index to bucket_begin_time instead of integers
-            goes_objects.index = pd.to_datetime(goes_objects['bucket_begin_time'])
+        # set goes dataframe index to bucket_begin_time instead of integers
+        goes_objects.index = pd.to_datetime(goes_objects['bucket_begin_time'])
 
-            # find goes objects between nexrad bucket_begin_time and next 30 minutes
-            goes_30min_window=goes_objects['bucket_begin_time'].between_time(
-                    str(nexrad_datetime.time()),
-                    str((nexrad_datetime + timedelta(minutes=30)).time()))
+        # find goes objects between nexrad bucket_begin_time and next 30 minutes
+        goes_30min_window=goes_objects['bucket_begin_time'].between_time(
+                str(nexrad_datetime.time()),
+                str((nexrad_datetime + timedelta(minutes=30)).time()))
 
+        # reset index back to integers
+        goes_objects=goes_objects.reset_index(drop=True)
 
-            # find nearest goes object index
-            nearest_object_index=goes_objects['bucket_begin_time'].tolist().index(min(goes_objects['bucket_begin_time'],
-                key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
+        # find nearest goes object index
+        nearest_object_index=goes_objects['bucket_begin_time'].tolist().index(min(goes_objects['bucket_begin_time'],
+            key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
 
-            # clip nearest goes object
-            self.clip_object(goes_objects.iloc[nearest_object_index],nexrad_row,storm_row)
-            # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
-
-        else:
-            # print("No Goes objects")
-            self.track.info("No Goes objects")
+        # clip nearest goes object
+        self.clip_object(goes_objects.iloc[nearest_object_index],nexrad_row,storm_row)
+        # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
     def get_intersected_objects(self,storm_row):
         # get NEXRAD AND GOES objects given storm row
@@ -227,9 +226,17 @@ class Clip():
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
         # print("nexrad_objects",len(nexrad_objects),"goes_objects",len(goes_objects),"------------------------")
         self.track.info("nexrad_objects: "+str(len(nexrad_objects))+",goes_objects: "+str(len(goes_objects)))
+
+        if len(nexrad_objects)==0:
+            self.track.info("No NEXRAD objects")
+            return
+        if len(goes_objects)==0:
+            self.track.info("No GOES objects")
+            return
+
         # ------REMOVE head(1)
         # for each nexrad object, iterate intersected goes objects.
-        nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
+        nexrad_objects.apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
 
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None, storm_id=None):
@@ -246,7 +253,7 @@ class Clip():
 
         # NO RESET INDEX SINCE STORM ID IS USED TO FOREGIN_KEY
         # self.storms=self.storms.reset_index(drop=True)
-        
+
         # filter by given storm ID
         if not storm_id is None:
             print("ID:",storm_id)

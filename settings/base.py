@@ -37,3 +37,8 @@ WSR_88D_LOCATIONS='http://apollo.lsc.vsc.edu/classes/remote/lecture_notes/radar/
 
 # ncdc stormevents URL
 NCDC_STORMEVENTS='ftp://ftp.ncdc.noaa.gov/pub/data/swdi/stormevents/csvfiles/'
+
+
+# download directories
+GOES_DIR='goes_intersections/objects/'
+NEXRAD_DIR='nexrad_intersections/'

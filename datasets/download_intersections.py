@@ -20,7 +20,7 @@ def iterate_nexrad_intersections(row,output_dir):
         obj=bucket.Object(row['KEY'])
 
         rep=row['KEY'].rpartition("/")
-        path=output_dir+"/"+rep[0]
+        path=output_dir+rep[0]
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -44,7 +44,7 @@ def iterate_goes_intersections(row,output_dir):
         session=create_session(local)
         bucket=session.Bucket("noaa-goes16")
         obj=bucket.Object(row['KEY'])
-        bucket.download_file(obj.key,output_dir+"/"+obj.key.replace('/',"_"))
+        bucket.download_file(obj.key,output_dir+obj.key.replace('/',"_"))
         total+=(obj.get()['ContentLength']*0.000001)
         track.info(str(obj.key)+", "+str(row.name)+", "+output_dir+", "+str(total))
         print(obj.key,row.name,output_dir,total)

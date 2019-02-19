@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import pyart
 import numpy as np
+# import warnings
+from pathlib import Path
 
 # project modules
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
@@ -79,6 +81,7 @@ goes 3 channels
 
 class TrainingObject:
     def __init__(self,track,year,output_dir,**kwargs):
+        # warnings.simplefilter('error', UserWarning)
         self.track=track
         self.year=year
         self.output_dir='./NCDC_stormevents/'+output_dir
@@ -176,13 +179,17 @@ class TrainingObject:
 
         # self.canvas = FigureCanvas(self.fig)
         # ax0 = self.fig.add_subplot(1, 1, 1)
+
         plt.imshow(goes_data)
-        # plt.plot(goes_data)
+
+        if Path(self.current_image_dir).is_file():
+            print(self.current_image_dir)
+            raise Exception('Duplicate image')
+
         self.fig.savefig(self.current_image_dir, dpi=100)
         self.track.info("image created: "+self.current_image_dir)
 
-    def generate_segmentation_image(self,nexrad_object):
-        radar = pyart.io.read('nexrad_intersections/'+nexrad_object['KEY'])
+    def generate_segmentation_image(self,radar):
         value = 35
         refl_grid = radar.get_field(0, 'reflectivity')
         valueList = []
