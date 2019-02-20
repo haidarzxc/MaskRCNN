@@ -128,11 +128,6 @@ class TrainingObject:
 
     def create_training_instance(self,storm_row,goes_object,rows,cols):
 
-        # # load instances
-        # self.track.info("load instances")
-        # with open(self.output_dir) as out:
-        #     instances=json.load(out)
-
         # modify instances
         # append image instance
         image_dict={
