@@ -38,7 +38,8 @@ class Clip():
 
         # create Log File
         self.track.createLogFile("./logs/clip.txt")
-
+        self.track.start_timer()
+        self.track.info(str(self.track.get_start_time()))
 
 
         # load CSVs storms, nexrad, and goes
@@ -66,6 +67,11 @@ class Clip():
         self.iterate_storms(begin_start_date='01-DEC-17',
                             begin_end_date='31-DEC-17',
                             storm_id=storm_id)
+
+        self.instances.dump_instances()
+        
+        self.track.stop_timer()
+        self.track.info(str(self.track.get_end_time()))
 
 
     def clip_goes(self,goes_netCdf,storm_row):

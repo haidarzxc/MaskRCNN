@@ -121,20 +121,17 @@ class TrainingObject:
             	}
             ]
         }
-        self.track.info("initialize instances object: "+self.output_dir)
-        with open(self.output_dir, 'w') as out:
-            json.dump(self.instances,out)
+        self.track.info("initialized instances object")
+
 
 
 
     def create_training_instance(self,storm_row,goes_object,rows,cols):
-        # initialize instances
-        instances=None
 
-        # load instances
-        self.track.info("load instances")
-        with open(self.output_dir) as out:
-            instances=json.load(out)
+        # # load instances
+        # self.track.info("load instances")
+        # with open(self.output_dir) as out:
+        #     instances=json.load(out)
 
         # modify instances
         # append image instance
@@ -148,7 +145,7 @@ class TrainingObject:
     		"id": int(storm_row.name) #unique
     	}
         self.track.info("append image")
-        instances['images'].append(image_dict)
+        self.instances['images'].append(image_dict)
 
         # append annotation instance
 
@@ -168,12 +165,13 @@ class TrainingObject:
             "id": int(storm_row.name) #unique
         }
         self.track.info("append annotations")
-        instances['annotations'].append(annoatation_dict)
+        self.instances['annotations'].append(annoatation_dict)
 
-        # overwrite instances
-        self.track.info("overwrite instances")
+    def dump_instances(self):
+        # dump instances
+        self.track.info("Dump instances, Directory: "+self.output_dir)
         with open(self.output_dir, 'w') as out:
-            json.dump(instances,out)
+            json.dump(self.instances,out)
 
     def generate_training_images(self,goes_data):
 
