@@ -151,7 +151,7 @@ class TrainingObject:
 
         annoatation_dict={
             "segmentation": list,
-            "area": bbox["area"], #storm data area
+            "area": float(bbox["area"]), #storm data area
             "iscrowd": 0,
             "image_id": int(storm_row.name), #FOREGIN_KEY->images
             "bbox": bbox["coordinates"], # nexrad image jpg bounding bbox[x,y,width,height]
@@ -194,11 +194,11 @@ class TrainingObject:
         # image width and height
         im = Image.open(self.current_image_dir)
         width, height = im.size
-
+        
         area=width*height
         return {
             "area":area,
-            "coordinates":[217.62, 240.54, width, height]
+            "coordinates":[217.62, 240.54, float(width), float(height)]
         }
 
 
