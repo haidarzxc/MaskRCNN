@@ -194,11 +194,12 @@ class TrainingObject:
         # image width and height
         im = Image.open(self.current_image_dir)
         width, height = im.size
-        
+
         area=width*height
         return {
             "area":area,
-            "coordinates":[217.62, 240.54, float(width), float(height)]
+            # "coordinates":[217.62, 240.54, float(width), float(height)]
+            "coordinates":[217.62, 240.54, 38.99, 57.75]
         }
 
 

@@ -1,0 +1,738 @@
+INFO:root:1550972583.5994303
+INFO:root:NCDC_stormevents/area_filtered_stormevents.csv: csv file read
+INFO:root:NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv: csv file read
+INFO:root:goes_intersections/GOES_datetime_filtered_intersections.csv: csv file read
+INFO:root:loaded Storms, nexrad and goes csvs
+INFO:root:sorted nexrad and goes by bucket_begin_time
+INFO:root:check if training dataset directory exists
+INFO:root:initialized instances object
+INFO:root:created instance of training object
+INFO:root:begin iteration
+INFO:root:nexrad_objects: 167,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 35,goes_objects: 496
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                         215
+BEGIN_LAT                      20.8333
+BEGIN_LON                     -156.653
+END_LAT                        20.9859
+END_LON                       -156.327
+BEGIN_DATE_TIME    2017-12-20 21:15:00
+CZ_TIMEZONE                     HST-10
+END_DATE_TIME       20-DEC-17 23:44:00
+AREA                         0.0496713
+Name: 215, dtype: object, Nexrad_id: 9900, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_215_9900_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_215_9900_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 2,goes_objects: 16
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                         269
+BEGIN_LAT                      19.3838
+BEGIN_LON                     -155.984
+END_LAT                        19.7695
+END_LON                       -155.881
+BEGIN_DATE_TIME    2017-12-21 13:59:00
+CZ_TIMEZONE                     HST-10
+END_DATE_TIME       21-DEC-17 14:51:00
+AREA                         0.0397271
+Name: 269, dtype: object, Nexrad_id: 11280, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_269_11280_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_269_11280_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 15,goes_objects: 224
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                         285
+BEGIN_LAT                      21.3336
+BEGIN_LON                     -158.077
+END_LAT                        21.4481
+END_LON                       -157.747
+BEGIN_DATE_TIME    2017-12-27 12:43:00
+CZ_TIMEZONE                     HST-10
+END_DATE_TIME       27-DEC-17 13:47:00
+AREA                         0.0378193
+Name: 285, dtype: object, Nexrad_id: 11625, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_285_11625_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_285_11625_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 32,goes_objects: 592
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                         414
+BEGIN_LAT                      36.4076
+BEGIN_LON                     -86.6751
+END_LAT                        36.6291
+END_LON                       -86.5564
+BEGIN_DATE_TIME    2017-12-23 05:00:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       23-DEC-17 08:00:00
+AREA                         0.0262921
+Name: 414, dtype: object, Nexrad_id: 15287, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_414_15287_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_414_15287_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 93,goes_objects: 1840
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                         419
+BEGIN_LAT                      38.0336
+BEGIN_LON                     -82.9019
+END_LAT                        38.1432
+END_LON                       -82.6644
+BEGIN_DATE_TIME    2017-12-23 09:30:00
+CZ_TIMEZONE                      EST-5
+END_DATE_TIME       23-DEC-17 21:30:00
+AREA                           0.02603
+Name: 419, dtype: object, Nexrad_id: 15348, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_419_15348_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_419_15348_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 22,goes_objects: 400
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                         638
+BEGIN_LAT                      36.3638
+BEGIN_LON                     -88.0306
+END_LAT                        36.6223
+END_LON                       -87.9714
+BEGIN_DATE_TIME    2017-12-23 01:30:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       23-DEC-17 03:30:00
+AREA                         0.0153032
+Name: 638, dtype: object, Nexrad_id: 20475, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_638_20475_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_638_20475_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 23,goes_objects: 192
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                         658
+BEGIN_LAT                      36.3536
+BEGIN_LON                     -87.6275
+END_LAT                        36.6287
+END_LON                       -87.5741
+BEGIN_DATE_TIME    2017-12-23 04:00:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       23-DEC-17 06:00:00
+AREA                         0.0146903
+Name: 658, dtype: object, Nexrad_id: 20898, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_658_20898_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_658_20898_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 5,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 22,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 3,goes_objects: 48
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        1655
+BEGIN_LAT                      31.8934
+BEGIN_LON                     -94.9435
+END_LAT                        31.9237
+END_LON                       -94.8406
+BEGIN_DATE_TIME    2017-12-19 19:31:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       19-DEC-17 19:37:00
+AREA                        0.00311787
+Name: 1655, dtype: object, Nexrad_id: 36569, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_1655_36569_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_1655_36569_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 3,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 3,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2142
+BEGIN_LAT                      30.4354
+BEGIN_LON                     -93.4762
+END_LAT                        30.4584
+END_LON                       -93.4019
+BEGIN_DATE_TIME    2017-12-20 02:17:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       20-DEC-17 02:24:00
+AREA                         0.0017089
+Name: 2142, dtype: object, Nexrad_id: 43065, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2142_43065_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2142_43065_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 22,goes_objects: 80
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2305
+BEGIN_LAT                        36.65
+BEGIN_LON                       -87.17
+END_LAT                        36.7109
+END_LON                       -87.1463
+BEGIN_DATE_TIME    2017-12-23 04:00:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       23-DEC-17 10:00:00
+AREA                        0.00144333
+Name: 2305, dtype: object, Nexrad_id: 45760, Goes_id: 16
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2305_45760_16.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2305_45760_16.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 1,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2469
+BEGIN_LAT                      30.2755
+BEGIN_LON                     -93.9484
+END_LAT                        30.2945
+END_LON                        -93.885
+BEGIN_DATE_TIME    2017-12-20 01:37:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       20-DEC-17 01:42:00
+AREA                         0.0012046
+Name: 2469, dtype: object, Nexrad_id: 47802, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2469_47802_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2469_47802_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 33,goes_objects: 400
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2532
+BEGIN_LAT                       34.201
+BEGIN_LON                     -92.0486
+END_LAT                          34.23
+END_LON                         -92.01
+BEGIN_DATE_TIME    2017-12-22 11:25:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 13:25:00
+AREA                         0.0011194
+Name: 2532, dtype: object, Nexrad_id: 48459, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2532_48459_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2532_48459_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 4,goes_objects: 48
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2557
+BEGIN_LAT                      31.7435
+BEGIN_LON                     -95.1926
+END_LAT                        31.7687
+END_LON                       -95.1494
+BEGIN_DATE_TIME    2017-12-19 18:53:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       19-DEC-17 19:06:00
+AREA                        0.00108864
+Name: 2557, dtype: object, Nexrad_id: 48853, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2557_48853_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2557_48853_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 22,goes_objects: 336
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2573
+BEGIN_LAT                      34.4534
+BEGIN_LON                     -91.4399
+END_LAT                          34.48
+END_LON                          -91.4
+BEGIN_DATE_TIME    2017-12-22 09:37:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 11:37:00
+AREA                        0.00106134
+Name: 2573, dtype: object, Nexrad_id: 48992, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2573_48992_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2573_48992_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 60,goes_objects: 1840
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2589
+BEGIN_LAT                      46.0757
+BEGIN_LON                     -118.905
+END_LAT                         46.078
+END_LON                       -118.454
+BEGIN_DATE_TIME    2017-12-30 06:30:00
+CZ_TIMEZONE                      PST-8
+END_DATE_TIME       31-DEC-17 05:00:00
+AREA                        0.00103914
+Name: 2589, dtype: object, Nexrad_id: 49137, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2589_49137_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2589_49137_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 0,goes_objects: 16
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 31,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        2975
+BEGIN_LAT                      34.1681
+BEGIN_LON                      -92.051
+END_LAT                          34.19
+END_LON                         -92.02
+BEGIN_DATE_TIME    2017-12-22 09:30:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 11:30:00
+AREA                         0.0006789
+Name: 2975, dtype: object, Nexrad_id: 53112, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_2975_53112_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_2975_53112_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 1,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        3192
+BEGIN_LAT                      33.1597
+BEGIN_LON                     -85.4267
+END_LAT                        33.1695
+END_LON                       -85.3732
+BEGIN_DATE_TIME    2017-12-20 10:40:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       20-DEC-17 10:45:00
+AREA                         0.0005243
+Name: 3192, dtype: object, Nexrad_id: 55912, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_3192_55912_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_3192_55912_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 11,goes_objects: 144
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        3224
+BEGIN_LAT                      34.3486
+BEGIN_LON                     -91.9532
+END_LAT                        34.3749
+END_LON                       -91.9339
+BEGIN_DATE_TIME    2017-12-22 17:18:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 19:18:00
+AREA                        0.00050759
+Name: 3224, dtype: object, Nexrad_id: 56153, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_3224_56153_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_3224_56153_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 2,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        3281
+BEGIN_LAT                      30.3501
+BEGIN_LON                     -93.7148
+END_LAT                        30.3598
+END_LON                       -93.6649
+BEGIN_DATE_TIME    2017-12-20 01:59:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       20-DEC-17 02:03:00
+AREA                        0.00048403
+Name: 3281, dtype: object, Nexrad_id: 56524, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_3281_56524_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_3281_56524_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 2,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 2,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        3850
+BEGIN_LAT                      33.0195
+BEGIN_LON                     -84.5904
+END_LAT                        33.0245
+END_LON                        -84.536
+BEGIN_DATE_TIME    2017-12-20 13:15:00
+CZ_TIMEZONE                      EST-5
+END_DATE_TIME       20-DEC-17 13:17:00
+AREA                          0.000272
+Name: 3850, dtype: object, Nexrad_id: 62712, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_3850_62712_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_3850_62712_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 2,goes_objects: 16
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        3935
+BEGIN_LAT                      34.5151
+BEGIN_LON                     -91.5432
+END_LAT                        34.5326
+END_LON                       -91.5292
+BEGIN_DATE_TIME    2017-12-22 21:46:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 21:46:00
+AREA                          0.000245
+Name: 3935, dtype: object, Nexrad_id: 63732, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_3935_63732_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_3935_63732_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 54,goes_objects: 944
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        4000
+BEGIN_LAT                      34.4497
+BEGIN_LON                     -86.8212
+END_LAT                          34.47
+END_LON                         -86.81
+BEGIN_DATE_TIME    2017-12-20 07:01:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       20-DEC-17 12:00:00
+AREA                        0.00022736
+Name: 4000, dtype: object, Nexrad_id: 64361, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_4000_64361_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_4000_64361_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 8,goes_objects: 96
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        4189
+BEGIN_LAT                      33.9081
+BEGIN_LON                     -93.1661
+END_LAT                          33.92
+END_LON                         -93.15
+BEGIN_DATE_TIME    2017-12-22 09:00:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 11:00:00
+AREA                        0.00019159
+Name: 4189, dtype: object, Nexrad_id: 67051, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_4189_67051_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_4189_67051_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 1,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 22,goes_objects: 176
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        4732
+BEGIN_LAT                      34.4897
+BEGIN_LON                     -91.5602
+END_LAT                           34.5
+END_LON                         -91.55
+BEGIN_DATE_TIME    2017-12-22 12:20:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 14:20:00
+AREA                        0.00010506
+Name: 4732, dtype: object, Nexrad_id: 73065, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_4732_73065_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_4732_73065_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 3,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        4823
+BEGIN_LAT                      32.3366
+BEGIN_LON                     -92.6804
+END_LAT                        32.3433
+END_LON                       -92.6662
+BEGIN_DATE_TIME    2017-12-20 01:02:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       20-DEC-17 01:07:00
+AREA                         9.514e-05
+Name: 4823, dtype: object, Nexrad_id: 74675, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_4823_74675_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_4823_74675_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 3,goes_objects: 32
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        4897
+BEGIN_LAT                       32.251
+BEGIN_LON                     -94.4675
+END_LAT                        32.2546
+END_LON                       -94.4431
+BEGIN_DATE_TIME    2017-12-19 22:38:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       19-DEC-17 22:45:00
+AREA                         8.784e-05
+Name: 4897, dtype: object, Nexrad_id: 75331, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_4897_75331_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_4897_75331_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 26,goes_objects: 448
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        5265
+BEGIN_LAT                      46.7285
+BEGIN_LON                     -117.033
+END_LAT                        46.7306
+END_LON                       -117.004
+BEGIN_DATE_TIME    2017-12-29 20:45:00
+CZ_TIMEZONE                      PST-8
+END_DATE_TIME       29-DEC-17 23:00:00
+AREA                         6.111e-05
+Name: 5265, dtype: object, Nexrad_id: 80208, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_5265_80208_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_5265_80208_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 22,goes_objects: 272
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        5357
+BEGIN_LAT                      35.8654
+BEGIN_LON                     -89.2302
+END_LAT                        35.8812
+END_LON                       -89.2267
+BEGIN_DATE_TIME    2017-12-22 15:56:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 19:00:00
+AREA                          5.53e-05
+Name: 5357, dtype: object, Nexrad_id: 81134, Goes_id: 16
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_5357_81134_16.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_5357_81134_16.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 17,goes_objects: 288
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        5516
+BEGIN_LAT                       34.344
+BEGIN_LON                     -91.3602
+END_LAT                        34.3673
+END_LON                       -91.3582
+BEGIN_DATE_TIME    2017-12-22 13:43:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 16:00:00
+AREA                          4.66e-05
+Name: 5516, dtype: object, Nexrad_id: 83304, Goes_id: 16
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_5516_83304_16.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_5516_83304_16.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 6,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 13,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 3,goes_objects: 96
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        5768
+BEGIN_LAT                      46.2444
+BEGIN_LON                       -116.1
+END_LAT                          46.25
+END_LON                       -116.094
+BEGIN_DATE_TIME    2017-12-30 06:00:00
+CZ_TIMEZONE                      PST-8
+END_DATE_TIME       30-DEC-17 12:00:00
+AREA                         3.528e-05
+Name: 5768, dtype: object, Nexrad_id: 85324, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_5768_85324_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_5768_85324_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 4,goes_objects: 80
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        5848
+BEGIN_LAT                      35.6639
+BEGIN_LON                     -88.9108
+END_LAT                        35.6784
+END_LON                       -88.9086
+BEGIN_DATE_TIME    2017-12-23 02:10:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       23-DEC-17 04:10:00
+AREA                          3.19e-05
+Name: 5848, dtype: object, Nexrad_id: 86277, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_5848_86277_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_5848_86277_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 3,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 2,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 14,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 30,goes_objects: 496
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        6203
+BEGIN_LAT                      31.8199
+BEGIN_LON                     -95.1993
+END_LAT                        31.8201
+END_LON                       -95.0929
+BEGIN_DATE_TIME    2017-12-19 20:06:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       19-DEC-17 22:45:00
+AREA                         2.128e-05
+Name: 6203, dtype: object, Nexrad_id: 91004, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_6203_91004_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_6203_91004_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 31,goes_objects: 0
+INFO:root:No GOES objects
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 24,goes_objects: 384
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        6679
+BEGIN_LAT                      34.7461
+BEGIN_LON                     -92.3932
+END_LAT                          34.75
+END_LON                         -92.39
+BEGIN_DATE_TIME    2017-12-22 20:20:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 22:20:00
+AREA                         1.248e-05
+Name: 6679, dtype: object, Nexrad_id: 96976, Goes_id: 0
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_6679_96976_0.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_6679_96976_0.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 11,goes_objects: 208
+INFO:root:Loaded GOES and NEXRAD OBJECT
+INFO:root:Clipping: GOES and NEXRAD objects
+INFO:root:Unnamed: 0                        6950
+BEGIN_LAT                      34.8771
+BEGIN_LON                     -92.1011
+END_LAT                        34.8797
+END_LON                       -92.0977
+BEGIN_DATE_TIME    2017-12-22 21:23:00
+CZ_TIMEZONE                      CST-6
+END_DATE_TIME       22-DEC-17 23:23:00
+AREA                          8.84e-06
+Name: 6950, dtype: object, Nexrad_id: 100200, Goes_id: 16
+INFO:root:set image directory: ./goes_intersections/storms_train2017/GOES_train_6950_100200_16.jpg
+INFO:root:generated image segmentation
+INFO:root:image created: ./goes_intersections/storms_train2017/GOES_train_6950_100200_16.jpg
+INFO:root:generated training image
+INFO:root:append image
+INFO:root:append annotations
+INFO:root:created training instance
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:nexrad_objects: 0,goes_objects: 0
+INFO:root:No NEXRAD objects
+INFO:root:Dump instances, Directory: ./NCDC_stormevents/instances_train2017.json
+INFO:root:1550972678.731472
