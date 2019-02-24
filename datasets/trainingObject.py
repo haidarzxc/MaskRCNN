@@ -133,8 +133,8 @@ class TrainingObject:
     		"license": 1, #FOREGIN_KEY->licenses
     		"url": "https://s3.amazonaws.com/",
     		"file_name": self.current_image_dir.split("/")[3], #goes data (images)
-    		"height": str(rows), #goes image height
-    		"width": str(cols),  #goes image width
+    		"height": float(rows), #goes image height
+    		"width": float(cols),  #goes image width
     		"date_captured": str(goes_object['bucket_begin_time']),
     		"id": int(storm_row.name) #unique
     	}
