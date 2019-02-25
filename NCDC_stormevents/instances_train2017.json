@@ -19,8 +19,8 @@
       "license": 1,
       "url": "https://s3.amazonaws.com/",
       "file_name": "GOES_train_215_9900_0.jpg",
-      "height": 107,
-      "width": 91,
+      "height": 427,
+      "width": 640,
       "date_captured": "2017-12-21 07:12:24",
       "id": 215
     }
