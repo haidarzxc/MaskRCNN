@@ -242,7 +242,7 @@ class Clip():
 
         # ------REMOVE head(1)
         # for each nexrad object, iterate intersected goes objects.
-        nexrad_objects.head(1).apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
+        nexrad_objects.apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
 
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None, storm_id=None):
