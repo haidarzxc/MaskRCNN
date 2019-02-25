@@ -18,7 +18,7 @@
     {
       "license": 1,
       "url": "https://s3.amazonaws.com/",
-      "file_name": "COCO_val2014_000000397133.jpg",
+      "file_name": "GOES_train_215_9900_0.jpg",
       "height": 427,
       "width": 640,
       "date_captured": "2013-11-14 17:02:52",
