@@ -19,10 +19,10 @@
       "license": 1,
       "url": "https://s3.amazonaws.com/",
       "file_name": "GOES_train_215_9900_0.jpg",
-      "height": 427,
-      "width": 640,
-      "date_captured": "2013-11-14 17:02:52",
-      "id": 397133
+      "height": 107,
+      "width": 91,
+      "date_captured": "2017-12-21 07:12:24",
+      "id": 215
     }
   ],
   "type": "instances",
@@ -80,24 +80,24 @@
           297.55
         ]
       ],
-      "area": 1481.38065,
+      "area": 307200,
       "iscrowd": 0,
-      "image_id": 397133,
+      "image_id": 215,
       "bbox": [
         217.62,
         240.54,
-        38.99,
-        57.75
+        640,
+        480
       ],
-      "category_id": 44,
-      "id": 82445
+      "category_id": 1,
+      "id": 215
     }
   ],
   "categories": [
     {
-      "supercategory": "kitchen",
-      "id": 44,
-      "name": "bottle"
+      "supercategory": "person",
+      "id": 1,
+      "name": "person"
     }
   ]
 }
