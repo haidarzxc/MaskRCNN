@@ -147,7 +147,7 @@ class TrainingObject:
         list=[]
         list.append(self.current_segmentation.tolist())
 
-        bbox=self.generate_bounding_box()
+        bbox=self.generate_bounding_box(float(cols),float(rows))
 
         annoatation_dict={
             "segmentation": list,
@@ -190,15 +190,15 @@ class TrainingObject:
         # print(valueList)
 
 
-    def generate_bounding_box(self):
+    def generate_bounding_box(self,width,height):
         # image width and height
-        im = Image.open(self.current_image_dir)
-        width, height = im.size
+        # im = Image.open(self.current_image_dir)
+        # width, height = im.size
 
         area=width*height
         return {
             "area":area,
-            "coordinates":[217.62, 240.54, float(width), float(height)]
+            "coordinates":[0, 0, width, height]
 
         }
 

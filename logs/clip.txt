@@ -1,4 +1,4 @@
-INFO:root:1550976721.9533844
+INFO:root:1551065508.7133515
 INFO:root:NCDC_stormevents/area_filtered_stormevents.csv: csv file read
 INFO:root:NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv: csv file read
 INFO:root:goes_intersections/GOES_datetime_filtered_intersections.csv: csv file read
@@ -735,4 +735,4 @@ INFO:root:No NEXRAD objects
 INFO:root:nexrad_objects: 0,goes_objects: 0
 INFO:root:No NEXRAD objects
 INFO:root:Dump instances, Directory: ./NCDC_stormevents/instances_train2017.json
-INFO:root:1550976815.1130822
+INFO:root:1551065603.4280229
