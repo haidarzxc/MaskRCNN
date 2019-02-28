@@ -5,11 +5,15 @@ from pprint import pprint
 import json
 import datetime
 import os
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+# from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from PIL import Image
 import pyart
 import numpy as np
+# import warnings
+from pathlib import Path
 
 # project modules
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
@@ -77,13 +81,14 @@ goes 3 channels
 
 class TrainingObject:
     def __init__(self,track,year,output_dir,**kwargs):
+        # warnings.simplefilter('error', UserWarning)
         self.track=track
         self.year=year
         self.output_dir='./NCDC_stormevents/'+output_dir
         self.current_image_dir=None
         self.current_segmentation=None
 
-
+        self.fig = plt.figure()
 
         # instances header
         self.instances={
@@ -116,75 +121,67 @@ class TrainingObject:
             	}
             ]
         }
-        self.track.info("initialize instances object: "+self.output_dir)
-        with open(self.output_dir, 'w') as out:
-            json.dump(self.instances,out)
+        self.track.info("initialized instances object")
+
 
 
 
     def create_training_instance(self,storm_row,goes_object,rows,cols):
-        # initialize instances
-        instances=None
-
-        # load instances
-        self.track.info("load instances")
-        with open(self.output_dir) as out:
-            instances=json.load(out)
-
         # modify instances
         # append image instance
         image_dict={
     		"license": 1, #FOREGIN_KEY->licenses
     		"url": "https://s3.amazonaws.com/",
-    		"file_name": "GOES_train_"+os.path.splitext(goes_object["KEY"])[0]+".jpg", #goes data (images)
-    		"height": str(rows), #goes image height
-    		"width": str(cols),  #goes image width
+    		"file_name": self.current_image_dir.split("/")[3], #goes data (images)
+    		"height": float(rows), #goes image height
+    		"width": float(cols),  #goes image width
     		"date_captured": str(goes_object['bucket_begin_time']),
     		"id": int(storm_row.name) #unique
     	}
         self.track.info("append image")
-        instances['images'].append(image_dict)
+        self.instances['images'].append(image_dict)
 
         # append annotation instance
-
-        # image width and height
-        im = Image.open(self.current_image_dir)
-        width, height = im.size
 
         # numpy to list of lists
         list=[]
         list.append(self.current_segmentation.tolist())
 
-        area=(width*height)
-        bbox=[217.62, 240.54, width, height]
+        bbox=self.generate_bounding_box(float(cols),float(rows))
+
         annoatation_dict={
             "segmentation": list,
-            "area": area, #storm data area
+            "area": float(bbox["area"]), #storm data area
             "iscrowd": 0,
             "image_id": int(storm_row.name), #FOREGIN_KEY->images
-            "bbox": bbox, # nexrad image jpg bounding bbox[x,y,width,height]
+            "bbox": bbox["coordinates"], # nexrad image jpg bounding bbox[x,y,width,height]
             "category_id": 1, #FOREGIN_KEY->categories
             "id": int(storm_row.name) #unique
         }
         self.track.info("append annotations")
-        instances['annotations'].append(annoatation_dict)
+        self.instances['annotations'].append(annoatation_dict)
 
-        # overwrite instances
-        self.track.info("overwrite instances")
+    def dump_instances(self):
+        # dump instances
+        self.track.info("Dump instances, Directory: "+self.output_dir)
         with open(self.output_dir, 'w') as out:
-            json.dump(instances,out)
+            json.dump(self.instances,out)
 
     def generate_training_images(self,goes_data):
-        self.fig = plt.Figure(figsize=(16,15))
-        self.canvas = FigureCanvas(self.fig)
-        ax0 = self.fig.add_subplot(1, 1, 1)
-        ax0.imshow(goes_data)
+
+        # self.canvas = FigureCanvas(self.fig)
+        # ax0 = self.fig.add_subplot(1, 1, 1)
+
+        plt.imshow(goes_data)
+
+        if Path(self.current_image_dir).is_file():
+            print(self.current_image_dir)
+            raise Exception('Duplicate image')
 
         self.fig.savefig(self.current_image_dir, dpi=100)
         self.track.info("image created: "+self.current_image_dir)
 
-    def generate_segmentation_image(self,nexrad_object):
-        radar = pyart.io.read('nexrad_intersections/'+nexrad_object['KEY'])
+    def generate_segmentation_image(self,radar):
         value = 35
         refl_grid = radar.get_field(0, 'reflectivity')
         valueList = []
@@ -193,8 +190,18 @@ class TrainingObject:
         # print(valueList)
 
 
-    def generate_bounding_box(self,row):
-        pass
+    def generate_bounding_box(self,width,height):
+        # image width and height
+        # im = Image.open(self.current_image_dir)
+        # width, height = im.size
+
+        area=width*height
+        return {
+            "area":area,
+            "coordinates":[0, 0, width, height]
+
+        }
+
 
 
 
