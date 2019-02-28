@@ -192,7 +192,7 @@ def main(args):
             Track,
             args.clip,
             args.output,
-            args.train_dir
+            args.train_dir,
             )
 
 
