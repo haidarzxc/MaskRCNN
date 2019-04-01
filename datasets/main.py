@@ -126,7 +126,7 @@ def parse_args():
 Terminal Commands
 python datasets\main.py --intersectionTest GOES --storms area_filtered_stormevents.csv
 
-python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormevents.csv --locations 88D_locations.csv
+python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormevents.csv --locations 88D_locations.csv --output_dir NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv
 
 python datasets\main.py --areaFilter verified_storms.csv --output_dir area_filtered_stormevents.csv
 
@@ -153,7 +153,9 @@ def main(args):
         AreaFilter(Track,args.areaFilter,args.output,local)
 
     if args.intersectionTest is not None:
-
+        if args.output is None:
+            Track.warn("Exception: Pass a output file")
+            return
         if args.stormsFile is None:
             Track.warn("Exception: Pass a storms file")
             return
@@ -167,7 +169,7 @@ def main(args):
                 Track.warn("Exception: Pass a Locations file")
                 return
             Track.info("Starting NEXRAD intersection Test")
-            NexradIntersectionTest(session,Track,args.stormsFile,args.locationsFile,local)
+            NexradIntersectionTest(session,Track,args.stormsFile,args.locationsFile,local,args.output)
 
     if args.clip is not None:
         if args.output is None:

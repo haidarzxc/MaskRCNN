@@ -17,7 +17,7 @@ from utils.time import date_range_intersection_test
 from datasets.verifyStorms import VerifyStorms
 
 class NexradIntersectionTest():
-    def __init__(self,session,track,storms,locations,local, **kwargs):
+    def __init__(self,session,track,storms,locations,local,output_dir, **kwargs):
 
         if  session is None or \
             track is None or \
@@ -34,7 +34,7 @@ class NexradIntersectionTest():
 
         self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
         self.local=local
-        self.output_dir="NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv"
+        self.output_dir=output_dir
         self.output_dir_txt="NCDC_stormevents/TXT_NEXRAD_bounding_box_datetime_filtered_intersections.csv"
         self.locations=load_CSV_file("./NCDC_stormevents/"+locations)
 
