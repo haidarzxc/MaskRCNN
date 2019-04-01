@@ -124,7 +124,7 @@ def parse_args():
 
 '''
 Terminal Commands
-python datasets\main.py --intersectionTest GOES --storms area_filtered_stormevents.csv
+python datasets\main.py --intersectionTest GOES --storms area_filtered_stormevents.csv --output_dir NCDC_stormevents/GOES_datetime_filtered_intersections.csv
 
 python datasets\main.py --intersectionTest NEXRAD --storms area_filtered_stormevents.csv --locations 88D_locations.csv --output_dir NCDC_stormevents/NEXRAD_bounding_box_datetime_filtered_intersections.csv
 
@@ -162,7 +162,7 @@ def main(args):
         session=create_session(local)
         if args.intersectionTest=="GOES":
             Track.info("Starting GOES intersection Test")
-            GoesIntersectionTest(session,Track,args.stormsFile,local)
+            GoesIntersectionTest(session,Track,args.stormsFile,local,args.output)
 
         elif args.intersectionTest=="NEXRAD":
             if args.locationsFile is None:

@@ -10,12 +10,12 @@ from NCDC_stormevents_data_loader import load_CSV_file
 from utils.time import to_UTC_time, date_range_intersection_test
 
 class GoesIntersectionTest:
-    def __init__(self,session,track,storms,local, **kwargs):
+    def __init__(self,session,track,storms,local,output_dir, **kwargs):
         self.session=session
         self.track=track
         self.storms=load_CSV_file("./NCDC_stormevents/"+storms)
         self.local=local
-        self.output_dir="NCDC_stormevents/GOES_datetime_filtered_intersections.csv"
+        self.output_dir=output_dir
         self.output_dir_txt="NCDC_stormevents/TXT_GOES_datetime_filtered_intersections.csv"
         # create Log File
         self.track.createLogFile("./logs/goes_intersections_test.txt")
