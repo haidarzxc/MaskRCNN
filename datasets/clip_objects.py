@@ -64,8 +64,8 @@ class Clip():
 
         # filters storms for month december 2017
         self.track.info("begin iteration")
-        self.iterate_storms(begin_start_date='01-DEC-17',
-                            begin_end_date='31-DEC-17',
+        self.iterate_storms(begin_start_date='01-DEC-18',
+                            begin_end_date='31-DEC-18',
                             storm_id=storm_id)
 
         self.instances.dump_instances()
