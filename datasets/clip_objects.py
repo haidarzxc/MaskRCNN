@@ -64,8 +64,8 @@ class Clip():
 
         # filters storms for month december 2017
         self.track.info("begin iteration")
-        self.iterate_storms(begin_start_date='01-JUNE-18',
-                            begin_end_date='30-JUNE-18',
+        self.iterate_storms(begin_start_date='01-JUL-18',
+                            begin_end_date='31-JUL-18',
                             storm_id=storm_id)
 
         self.instances.dump_instances()
@@ -269,6 +269,7 @@ class Clip():
 
         # get intersections
         self.storms.apply(self.get_intersected_objects,axis=1)
+        
 
 
 
