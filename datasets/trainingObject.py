@@ -80,15 +80,16 @@ goes 3 channels
 '''
 
 class TrainingObject:
-    def __init__(self,track,year,output_dir,**kwargs):
+    def __init__(self,year,output_dir,**kwargs):
         # warnings.simplefilter('error', UserWarning)
-        self.track=track
         self.year=year
         self.output_dir='./NCDC_stormevents/'+output_dir
         self.current_image_dir=None
         self.current_segmentation=None
 
         self.fig = plt.figure()
+        self.images=[]
+        self.annotations=[]
 
         # instances header
         self.instances={
@@ -121,7 +122,7 @@ class TrainingObject:
             	}
             ]
         }
-        self.track.info("initialized instances object")
+        # self.track.info("initialized instances object")
 
 
 
@@ -138,8 +139,8 @@ class TrainingObject:
     		"date_captured": str(goes_object['bucket_begin_time']),
     		"id": int(storm_row.name) #unique
     	}
-        self.track.info("append image")
-        self.instances['images'].append(image_dict)
+        # self.track.info("append image")
+        self.images.append(image_dict)
 
         # append annotation instance
 
@@ -158,12 +159,12 @@ class TrainingObject:
             "category_id": 1, #FOREGIN_KEY->categories
             "id": int(storm_row.name) #unique
         }
-        self.track.info("append annotations")
-        self.instances['annotations'].append(annoatation_dict)
+        # self.track.info("append annotations")
+        self.annotations.append(annoatation_dict)
 
     def dump_instances(self):
         # dump instances
-        self.track.info("Dump instances, Directory: "+self.output_dir)
+        # self.track.info("Dump instances, Directory: "+self.output_dir)
         with open(self.output_dir, 'w') as out:
             json.dump(self.instances,out)
 
@@ -179,7 +180,7 @@ class TrainingObject:
             raise Exception('Duplicate image')
 
         self.fig.savefig(self.current_image_dir, dpi=100)
-        self.track.info("image created: "+self.current_image_dir)
+        # self.track.info("image created: "+self.current_image_dir)
 
     def generate_segmentation_image(self,radar):
         value = 35

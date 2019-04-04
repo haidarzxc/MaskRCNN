@@ -13,6 +13,7 @@ from netCDF4 import Dataset
 import pyart
 # from mpl_toolkits.basemap import Basemap, cm
 import math
+from multiprocessing import cpu_count, Pool
 
 # project modules
 from datasets.NCDC_stormevents_data_loader import load_CSV_file
@@ -28,50 +29,47 @@ class Clip():
 
     # constructor
     def __init__(self,storms_dir,nexrad_dir,goes_dir,
-                track,year,output_dir,train_dir,storm_id=None, **kwargs):
+                year,output_dir,train_dir,storm_id=None, **kwargs):
         super(Clip,self).__init__(**kwargs)
 
-        self.track=track
         self.year=year
         self.output_dir=output_dir
         self.train_dir='./'+train_dir
+        self.cores = cpu_count()
+        self.partitions = self.cores
 
-        # create Log File
-        self.track.createLogFile("./logs/clip.txt")
-        self.track.start_timer()
-        self.track.info(str(self.track.get_start_time()))
+        # # create Log File
+        # self.track.createLogFile("./logs/clip.txt")
+        # self.track.start_timer()
+        # self.track.info(str(self.track.get_start_time()))
 
 
         # load CSVs storms, nexrad, and goes
         self.storms=load_CSV_file("NCDC_stormevents/"+storms_dir)
         self.nexrad=load_CSV_file("NCDC_stormevents/"+nexrad_dir)
         self.goes=load_CSV_file(goes_dir)
-        self.track.info("loaded Storms, nexrad and goes csvs")
+        # self.track.info("loaded Storms, nexrad and goes csvs")
 
         self.nexrad=self.nexrad.sort_values(by=['bucket_begin_time'])
         self.goes=self.goes.sort_values(by=['bucket_begin_time'])
-        self.track.info("sorted nexrad and goes by bucket_begin_time")
+        # self.track.info("sorted nexrad and goes by bucket_begin_time")
 
 
         # training dataset directory
-        self.track.info("check if training dataset directory exists")
+        # self.track.info("check if training dataset directory exists")
         if not os.path.exists(self.train_dir):
             os.mkdir(self.train_dir)
-            track.info("created directory: "+str(self.train_dir))
-        # create instances
-        self.instances=TrainingObject(self.track,self.year,self.output_dir)
-        self.track.info("created instance of training object")
+            # track.info("created directory: "+str(self.train_dir))
+
 
         # filters storms for month december 2017
-        self.track.info("begin iteration")
+        # self.track.info("begin iteration")
         self.iterate_storms(begin_start_date='01-OCT-18',
                             begin_end_date='31-OCT-18',
                             storm_id=storm_id)
 
-        self.instances.dump_instances()
-
-        self.track.stop_timer()
-        self.track.info(str(self.track.get_end_time()))
+        # self.track.stop_timer()
+        # self.track.info(str(self.track.get_end_time()))
 
 
     def clip_goes(self,goes_netCdf,storm_row):
@@ -163,7 +161,7 @@ class Clip():
         return clipped
 
 
-    def clip_object(self,goes_object,nexrad_object,storm_row):
+    def clip_object(self,goes_object,nexrad_object,storm_row,instances):
         # download nexrad or goes objects of not found on disk
         if not Path(local.GOES_DIR+goes_object['KEY'].replace('/',"_")).is_file():
             iterate_goes_intersections(goes_object,local.GOES_DIR)
@@ -176,33 +174,33 @@ class Clip():
         goes_netCdf= Dataset(local.GOES_DIR+goes_object['KEY'].replace('/',"_"),"r")
         # read nexrad object
         radar = pyart.io.read_nexrad_archive(local.NEXRAD_DIR+nexrad_object['KEY'])
-        self.track.info("Loaded GOES and NEXRAD OBJECT")
+        # self.track.info("Loaded GOES and NEXRAD OBJECT")
 
         # clip goes and nexrad
-        self.track.info("Clipping: GOES and NEXRAD objects")
+        # self.track.info("Clipping: GOES and NEXRAD objects")
         clip_goes=self.clip_goes(goes_netCdf,storm_row)
         clip_nexrad=self.clip_nexrad(radar,storm_row)
 
         goes_netCdf.close()
 
         # add instance
-        self.track.info(str(storm_row)+", Nexrad_id: "+str(nexrad_object.name)+", Goes_id: "+str(goes_object.name))
+        # self.track.info(str(storm_row)+", Nexrad_id: "+str(nexrad_object.name)+", Goes_id: "+str(goes_object.name))
         print("storm_id",storm_row.name,",Nexrad_id:",nexrad_object.name,",Goes_id:",goes_object.name)
 
-        self.instances.current_image_dir=self.train_dir+"/GOES_train_"+str(storm_row.name)+"_"+str(nexrad_object.name)+"_"+str(goes_object.name)+".jpg"
-        self.track.info("set image directory: "+self.instances.current_image_dir)
-        self.instances.generate_segmentation_image(radar)
-        self.track.info("generated image segmentation")
-        self.instances.generate_training_images(clip_goes)
-        self.track.info("generated training image")
-        self.instances.create_training_instance(storm_row,goes_object,len(clip_goes),len(clip_goes[0]))
-        self.track.info("created training instance")
+        instances.current_image_dir=self.train_dir+"/GOES_train_"+str(storm_row.name)+"_"+str(nexrad_object.name)+"_"+str(goes_object.name)+".jpg"
+        # self.track.info("set image directory: "+self.instances.current_image_dir)
+        instances.generate_segmentation_image(radar)
+        # self.track.info("generated image segmentation")
+        instances.generate_training_images(clip_goes)
+        # self.track.info("generated training image")
+        instances.create_training_instance(storm_row,goes_object,len(clip_goes),len(clip_goes[0]))
+        # self.track.info("created training instance")
 
         # graph and export
         # Frame(clip_goes,clip_nexrad,nexrad_object,goes_object)
 
 
-    def iterate_goes(self,nexrad_row,goes_objects,storm_row):
+    def iterate_goes(self,nexrad_row,goes_objects,storm_row,instances):
 
         # format nexrad object bucket_begin_time
         nexrad_datetime=datetime.strptime(nexrad_row['bucket_begin_time'],'%Y-%m-%d %X')
@@ -223,27 +221,42 @@ class Clip():
             key=lambda x: abs((datetime.strptime(x,'%Y-%m-%d %X')) - nexrad_datetime)))
 
         # clip nearest goes object
-        self.clip_object(goes_objects.iloc[nearest_object_index],nexrad_row,storm_row)
+        self.clip_object(goes_objects.iloc[nearest_object_index],nexrad_row,storm_row,instances)
         # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
-    def get_intersected_objects(self,storm_row):
+    def get_intersected_objects(self,storm_row,instances):
         # get NEXRAD AND GOES objects given storm row
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
         # print("nexrad_objects",len(nexrad_objects),"goes_objects",len(goes_objects),"------------------------")
-        self.track.info("nexrad_objects: "+str(len(nexrad_objects))+",goes_objects: "+str(len(goes_objects)))
+        # self.track.info("nexrad_objects: "+str(len(nexrad_objects))+",goes_objects: "+str(len(goes_objects)))
 
         if len(nexrad_objects)==0:
-            self.track.info("No NEXRAD objects")
+            # self.track.info("No NEXRAD objects")
             return
         if len(goes_objects)==0:
-            self.track.info("No GOES objects")
+            # self.track.info("No GOES objects")
             return
 
         # ------REMOVE head(1)
         # for each nexrad object, iterate intersected goes objects.
-        nexrad_objects.apply(lambda x: self.iterate_goes(x,goes_objects,storm_row),axis=1)
+        nexrad_objects.apply(lambda x: self.iterate_goes(x,goes_objects,storm_row,instances),axis=1)
 
+    def run_apply(self,data):
+        instances=TrainingObject(self.year,self.output_dir)
+        data.head(1).apply(lambda dataRow:self.get_intersected_objects(dataRow,instances),axis=1)
+        print("DONE--------------------------------")
+        return instances
+
+    def parallelize(self,data,func):
+        data_split = np.array_split(data, self.partitions)
+        pool = Pool(self.cores)
+        print(data.shape)
+        all_instances=[]
+        data = pool.map(func, data_split)
+        pool.close()
+        pool.join()
+        return data
 
     def iterate_storms(self,begin_start_date=None,begin_end_date=None, storm_id=None):
 
@@ -268,7 +281,11 @@ class Clip():
             return
 
         # get intersections
-        self.storms.apply(self.get_intersected_objects,axis=1)
+        result=self.parallelize(self.storms,self.run_apply)
+        print(len(result))
+        for r in result:
+            if(len(r.images) > 0):
+                print(r.images)
 
 
 

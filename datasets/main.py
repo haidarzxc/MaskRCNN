@@ -191,7 +191,6 @@ def main(args):
             args.stormsFile,
             args.nexradFile,
             args.goesFile,
-            Track,
             args.clip,
             args.output,
             args.train_dir,
