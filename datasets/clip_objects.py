@@ -163,6 +163,7 @@ class Clip():
         return clipped
 
 
+
     def clip_object(self,goes_object,nexrad_object,storm_row):
         # download nexrad or goes objects of not found on disk
         if not Path(local.GOES_DIR+goes_object['KEY'].replace('/',"_")).is_file():
@@ -184,6 +185,10 @@ class Clip():
         clip_nexrad=self.clip_nexrad(radar,storm_row)
 
         goes_netCdf.close()
+        if clip_goes.shape[0]==0 or clip_goes.shape[1]==1:
+            self.track.info("GOES CLIP: Invalid image")
+            print("GOES CLIP: Invalid image")
+            return
 
         # add instance
         self.track.info(str(storm_row)+", Nexrad_id: "+str(nexrad_object.name)+", Goes_id: "+str(goes_object.name))
@@ -227,6 +232,8 @@ class Clip():
         # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
     def get_intersected_objects(self,storm_row):
+        if not storm_row.name == 116:
+            return
         # get NEXRAD AND GOES objects given storm row
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
@@ -269,7 +276,7 @@ class Clip():
 
         # get intersections
         self.storms.apply(self.get_intersected_objects,axis=1)
-        
+
 
 
 
