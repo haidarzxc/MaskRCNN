@@ -232,8 +232,6 @@ class Clip():
         # print("nearest_object",nearest_object_index,goes_objects.iloc[nearest_object_index],nexrad_datetime)
 
     def get_intersected_objects(self,storm_row):
-        if not storm_row.name == 116:
-            return
         # get NEXRAD AND GOES objects given storm row
         nexrad_objects=self.nexrad.loc[(self.nexrad['FOREIGN_KEY'] == storm_row.name)]
         goes_objects=self.goes.loc[(self.goes['FOREIGN_KEY'] == storm_row.name)]
