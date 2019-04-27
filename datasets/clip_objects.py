@@ -174,6 +174,10 @@ class Clip():
             os.chdir(current_working_dir)
         goes_netCdf=None
         radar=None
+        '''
+        ISSUE 2018/07/30/KLTX/KLTX20180730_144705_V06 NEXRAD object
+        failed to load object using pyart - object type not supported.
+        '''
         try:
             # read goes object ; goes_netCdf.variables
             goes_netCdf= Dataset(local.GOES_DIR+goes_object['KEY'].replace('/',"_"),"r")
@@ -274,8 +278,6 @@ class Clip():
         # NO RESET INDEX SINCE STORM ID IS USED TO FOREGIN_KEY
         # self.storms=self.storms.reset_index(drop=True)
 
-        print(self.storms.loc[6808])
-        self.get_intersected_objects(self.storms.loc[6808])
 
         # filter by given storm ID
         if not storm_id is None:
@@ -285,7 +287,7 @@ class Clip():
             return
 
         # get intersections
-        # self.storms.apply(self.get_intersected_objects,axis=1)
+        self.storms.apply(self.get_intersected_objects,axis=1)
 
 
 
