@@ -64,8 +64,8 @@ class Clip():
 
         # filters storms for month december 2017
         self.track.info("begin iteration")
-        self.iterate_storms(begin_start_date='01-APRIL-18',
-                            begin_end_date='30-APRIL-18',
+        self.iterate_storms(begin_start_date='01-JUL-18',
+                            begin_end_date='31-JUL-18',
                             storm_id=storm_id)
 
         self.instances.dump_instances()
@@ -172,12 +172,21 @@ class Clip():
             current_working_dir=os.getcwd()
             iterate_nexrad_intersections(nexrad_object,local.NEXRAD_DIR)
             os.chdir(current_working_dir)
-
-        # read goes object ; goes_netCdf.variables
-        goes_netCdf= Dataset(local.GOES_DIR+goes_object['KEY'].replace('/',"_"),"r")
-        # read nexrad object
-        radar = pyart.io.read_nexrad_archive(local.NEXRAD_DIR+nexrad_object['KEY'])
-        self.track.info("Loaded GOES and NEXRAD OBJECT")
+        goes_netCdf=None
+        radar=None
+        try:
+            # read goes object ; goes_netCdf.variables
+            goes_netCdf= Dataset(local.GOES_DIR+goes_object['KEY'].replace('/',"_"),"r")
+        except:
+            self.track.info("unable to load netCDF GOES object")
+            return
+        try:
+            # read nexrad object
+            radar = pyart.io.read_nexrad_archive(local.NEXRAD_DIR+nexrad_object['KEY'])
+            self.track.info("Loaded GOES and NEXRAD OBJECT")
+        except:
+            self.track.info("unable to load radar NEXRAD object")
+            return
 
         # clip goes and nexrad
         self.track.info("Clipping: GOES and NEXRAD objects")
@@ -265,6 +274,9 @@ class Clip():
         # NO RESET INDEX SINCE STORM ID IS USED TO FOREGIN_KEY
         # self.storms=self.storms.reset_index(drop=True)
 
+        print(self.storms.loc[6808])
+        self.get_intersected_objects(self.storms.loc[6808])
+
         # filter by given storm ID
         if not storm_id is None:
             print("ID:",storm_id)
@@ -273,7 +285,7 @@ class Clip():
             return
 
         # get intersections
-        self.storms.apply(self.get_intersected_objects,axis=1)
+        # self.storms.apply(self.get_intersected_objects,axis=1)
 
 
 

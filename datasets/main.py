@@ -134,6 +134,7 @@ python datasets\main.py --verifyStorms StormEvents_details-ftp_v1.0_d2017_c20180
 
 python datasets\main.py --clip 2017 --output_dir instances_train2017.json --storms area_filtered_stormevents.csv --nexrad NEXRAD_bounding_box_datetime_filtered_intersections.csv --goes goes_intersections/GOES_datetime_filtered_intersections.csv --train_dir goes_intersections/storms_train2017
 
+python datasets\main.py --clip 2018 --output_dir instances_train2018.json --storms area_filtered_stormevents_2018.csv --nexrad NEXRAD_bounding_box_datetime_filtered_intersections_2018.csv --goes goes_intersections/GOES_datetime_filtered_intersections_2018.csv --train_dir goes_intersections/storms_train2018
 
 '''
 
